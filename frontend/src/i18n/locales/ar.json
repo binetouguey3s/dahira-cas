@@ -55,7 +55,6 @@
     "email": "البريد الإلكتروني",
     "motDePasse": "كلمة المرور",
     "afficherMotDePasse": "إظهار كلمة المرور",
-    "dateNaissance": "تاريخ الميلاد",
     "profession": "المهنة",
     "adresse": "العنوان",
     "pays": "البلد",
@@ -63,7 +62,7 @@
     "photo": "الصورة"
   },
   "connexion": {
-    "titre": "مرحبًا بعودتك 👋",
+    "titre": "Dalal ak Diam !",
     "sousTitre": "سجّل الدخول لمتابعة الدروس وحياة الدائرة.",
     "bouton": "تسجيل الدخول",
     "erreur": "رقم الهاتف أو كلمة المرور غير صحيحة.",
@@ -94,7 +93,7 @@
     "bonsoir": "مساء الخير يا {{nom}}",
     "bienvenueVisiteur": "السلام عليكم، أهلًا وسهلًا",
     "conseilDuJour": "نصيحة اليوم",
-    "citationParDefaut": "الغنى الحقيقي غنى القلب المملوء بالإيمان والتقوى.",
+    "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "الفعاليات القادمة",
     "derniersEnseignements": "أحدث الدروس"
   },
@@ -280,8 +279,6 @@
     "carteDeMembre": "بطاقة عضوية",
     "nom": "الاسم",
     "numero": "رقم العضوية",
-    "ne": "تاريخ الميلاد",
-    "depuis": "عضو منذ",
     "qualite": "الصفة",
     "telephone": "الهاتف",
     "adresse": "العنوان",
@@ -300,7 +297,6 @@
   },
   "verification": {
     "valide": "بطاقة صالحة",
-    "inactive": "بطاقة معطّلة",
     "inconnue": "بطاقة غير معروفة",
     "inconnueAide": "هذا الرقم لا يطابق أي عضو. قد تكون البطاقة مزوّرة."
   },
@@ -382,7 +378,7 @@
     "identifiantsTitre": "بيانات الدخول المطلوب إرسالها",
     "identifiantsAide": "أرسلها إلى العضو، ويمكنه تغيير كلمة المرور من ملفه الشخصي.",
     "envoyerWhatsApp": "إرسال عبر واتساب",
-    "messageIdentifiants": "السلام عليكم {{nom}} 🤲\nحسابك في {{dahira}} جاهز.\nالموقع: {{site}}\nالهاتف: {{telephone}}\nكلمة المرور المؤقتة: {{mdp}}\nيُرجى تغييرها من ملفك الشخصي.",
+    "messageIdentifiants": "السلام عليكم {{nom}}\nحسابك في {{dahira}} جاهز.\nالموقع: {{site}}\nالهاتف: {{telephone}}\nكلمة المرور المؤقتة: {{mdp}}\nيُرجى تغييرها من ملفك الشخصي.",
     "activerReservationBus": "فتح حجز الحافلات",
     "redigerReponse": "اكتب إجابتك…",
     "repondre": "إرسال الإجابة",
@@ -423,7 +419,7 @@
     "referenceAide": "الرمز المستلم عبر الرسائل القصيرة (Wave / Orange Money).",
     "annulerPaiement": "إلغاء الدفع",
     "rappeler": "تذكير عبر واتساب",
-    "messageRappel": "السلام عليكم {{nom}} 🤲\nتذكير لطيف: اشتراكك لشهر {{mois}} ({{montant}}) في {{dahira}} لم يُسدَّد بعد. جزاك الله خيرًا!",
+    "messageRappel": "السلام عليكم {{nom}}\nتذكير لطيف: اشتراكك لشهر {{mois}} ({{montant}}) في {{dahira}} لم يُسدَّد بعد. جزاك الله خيرًا!",
     "aucunResultat": "لا توجد اشتراكات مطابقة.",
     "aucuneCeMois": "لا توجد اشتراكات لهذا الشهر.",
     "aucuneCeMoisAide": "أنشئ اشتراكات الشهر لجميع الأعضاء بنقرة واحدة.",

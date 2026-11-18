@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Logo } from "@/components/layout/Logo";
 import { useParametres } from "@/context/ParametresContext";
 import type { Membre } from "@/lib/api";
-import { initiales, locale } from "@/lib/utils";
+import { initiales } from "@/lib/utils";
 
 /**
  * Carte de membre au format carte bancaire (ISO/CEI 7810 ID-1 : 85,6 × 54 mm).
@@ -15,11 +15,6 @@ import { initiales, locale } from "@/lib/utils";
 
 export function urlVerification(numero: string) {
   return `${window.location.origin}/verifier/${encodeURIComponent(numero)}`;
-}
-
-function dateCourte(date: string | null) {
-  if (!date) return "—";
-  return new Date(date).toLocaleDateString(locale(), { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 const FOND =
@@ -96,10 +91,8 @@ export const RectoCarte = forwardRef<HTMLDivElement, { membre: Membre }>(({ memb
               <p className="text-[2.1cqw] font-semibold uppercase tracking-[0.12em] text-[#D9C89A]/85">{t("carte.nom")}</p>
               <p className="line-clamp-2 text-[4.6cqw] font-bold uppercase leading-[1.08] tracking-wide">{membre.nom_complet}</p>
             </div>
-            <div className="grid grid-cols-2 gap-x-[3cqw] gap-y-[1.6cqw]">
+            <div className="grid grid-cols-2 gap-x-[3cqw]">
               <Ligne label={t("carte.numero")} valeur={membre.carte_numero} />
-              <Ligne label={t("carte.ne")} valeur={dateCourte(membre.date_naissance)} />
-              <Ligne label={t("carte.depuis")} valeur={dateCourte(membre.date_inscription)} />
               <Ligne label={t("carte.qualite")} valeur={t(`roles.${membre.role}`)} />
             </div>
           </div>
@@ -149,16 +142,20 @@ export const VersoCarte = forwardRef<HTMLDivElement, { membre: Membre }>(({ memb
 
           <div className="flex min-w-0 flex-1 flex-col justify-between">
             <div className="space-y-[1.4cqw]">
-              <div>
-                <p className="text-[2cqw] font-semibold uppercase tracking-[0.12em] text-[#8a6d2a]">{t("carte.telephone")}</p>
-                <p className="text-[3cqw] font-semibold">{membre.telephone}</p>
-              </div>
-              <div>
-                <p className="text-[2cqw] font-semibold uppercase tracking-[0.12em] text-[#8a6d2a]">{t("carte.adresse")}</p>
-                <p className="line-clamp-2 text-[3cqw] font-semibold leading-tight">
-                  {[membre.adresse, membre.pays].filter(Boolean).join(", ") || "—"}
-                </p>
-              </div>
+              {membre.telephone && (
+                <div>
+                  <p className="text-[2cqw] font-semibold uppercase tracking-[0.12em] text-[#8a6d2a]">{t("carte.telephone")}</p>
+                  <p className="text-[3cqw] font-semibold">{membre.telephone}</p>
+                </div>
+              )}
+              {membre.adresse && (
+                <div>
+                  <p className="text-[2cqw] font-semibold uppercase tracking-[0.12em] text-[#8a6d2a]">{t("carte.adresse")}</p>
+                  <p className="line-clamp-2 text-[3cqw] font-semibold leading-tight">
+                    {[membre.adresse, membre.pays].filter(Boolean).join(", ")}
+                  </p>
+                </div>
+              )}
             </div>
             <div>
               <p className="text-[1.9cqw] leading-snug text-[#0B3D2E]/70">{t("carte.mention")}</p>

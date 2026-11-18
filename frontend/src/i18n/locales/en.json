@@ -55,7 +55,6 @@
     "email": "Email",
     "motDePasse": "Password",
     "afficherMotDePasse": "Show password",
-    "dateNaissance": "Date of birth",
     "profession": "Occupation",
     "adresse": "Address",
     "pays": "Country",
@@ -63,7 +62,7 @@
     "photo": "Photo"
   },
   "connexion": {
-    "titre": "Welcome back 👋",
+    "titre": "Dalal ak Diam !",
     "sousTitre": "Sign in to find the teachings and the life of the Dahira.",
     "bouton": "Sign in",
     "erreur": "Incorrect phone number or password.",
@@ -94,7 +93,7 @@
     "bonsoir": "Good evening {{nom}}",
     "bienvenueVisiteur": "Assalamu alaykum, welcome",
     "conseilDuJour": "Advice of the day",
-    "citationParDefaut": "True wealth is a heart filled with faith and piety.",
+    "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "Upcoming events",
     "derniersEnseignements": "Latest teachings"
   },
@@ -272,8 +271,6 @@
     "carteDeMembre": "Membership card",
     "nom": "Name",
     "numero": "Member no.",
-    "ne": "Born",
-    "depuis": "Member since",
     "qualite": "Status",
     "telephone": "Phone",
     "adresse": "Address",
@@ -292,7 +289,6 @@
   },
   "verification": {
     "valide": "Valid card",
-    "inactive": "Card deactivated",
     "inconnue": "Unknown card",
     "inconnueAide": "This number does not match any member. The card may be fake."
   },
@@ -362,7 +358,7 @@
     "identifiantsTitre": "Credentials to share",
     "identifiantsAide": "Send them to the member. They can change the password in their profile.",
     "envoyerWhatsApp": "Send on WhatsApp",
-    "messageIdentifiants": "Assalamu alaykum {{nom}} 🤲\nYour {{dahira}} account is ready.\nWebsite: {{site}}\nPhone: {{telephone}}\nTemporary password: {{mdp}}\nPlease change it in your profile.",
+    "messageIdentifiants": "Assalamu alaykum {{nom}}\nYour {{dahira}} account is ready.\nWebsite: {{site}}\nPhone: {{telephone}}\nTemporary password: {{mdp}}\nPlease change it in your profile.",
     "activerReservationBus": "Open bus booking",
     "redigerReponse": "Write your answer…",
     "repondre": "Send the answer",
@@ -399,7 +395,7 @@
     "referenceAide": "The code received by SMS (Wave / Orange Money).",
     "annulerPaiement": "Cancel payment",
     "rappeler": "Remind on WhatsApp",
-    "messageRappel": "Assalamu alaykum {{nom}} 🤲\nA gentle reminder: your {{mois}} contribution ({{montant}}) to {{dahira}} is still unpaid. Thank you!",
+    "messageRappel": "Assalamu alaykum {{nom}}\nA gentle reminder: your {{mois}} contribution ({{montant}}) to {{dahira}} is still unpaid. Thank you!",
     "aucunResultat": "No matching contributions.",
     "aucuneCeMois": "No contributions for this month.",
     "aucuneCeMoisAide": "Generate this month's contributions for all members in one click.",

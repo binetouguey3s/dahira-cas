@@ -1,4 +1,4 @@
-import { Banknote, CheckCircle2, MessageCircle, Plus, Search, Sparkles, Trash2, Wallet } from "lucide-react";
+import { Banknote, CalendarPlus, CheckCircle2, MessageCircle, Plus, Search, Trash2, Wallet } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -180,7 +180,7 @@ export default function AdminFinance() {
               <Plus className="h-4 w-4" /> {t("finance.ajouter")}
             </Button>
             <Button onClick={() => setGeneration(true)}>
-              <Sparkles className="h-4 w-4" /> {t("finance.generer")}
+              <CalendarPlus className="h-4 w-4" /> {t("finance.generer")}
             </Button>
           </>
         }
@@ -280,7 +280,7 @@ export default function AdminFinance() {
           action={
             !liste.length && (
               <Button onClick={() => setGeneration(true)}>
-                <Sparkles className="h-4 w-4" /> {t("finance.generer")}
+                <CalendarPlus className="h-4 w-4" /> {t("finance.generer")}
               </Button>
             )
           }
@@ -336,7 +336,7 @@ export default function AdminFinance() {
               {t("commun.annuler")}
             </Button>
             <Button onClick={generer} chargement={envoi} disabled={!Number(montantGeneration)}>
-              <Sparkles className="h-4 w-4" /> {t("finance.generer")}
+              <CalendarPlus className="h-4 w-4" /> {t("finance.generer")}
             </Button>
           </>
         }

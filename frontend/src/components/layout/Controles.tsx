@@ -48,7 +48,7 @@ export function SelecteurLangue({ compact = false }: { compact?: boolean }) {
                 l === actuelle && "font-semibold",
               )}
             >
-              <span className="text-base leading-none">{NOMS_LANGUES[l].drapeau}</span>
+              <span className="w-6 text-xs font-bold uppercase text-text-secondary">{l}</span>
               <span className="flex-1">{NOMS_LANGUES[l].nom}</span>
               {l === actuelle && <Check className="h-4 w-4 text-accent-primary" />}
             </DropdownMenu.Item>

@@ -124,7 +124,7 @@ export default function AdminOustaz() {
                       </motion.div>
                     ) : (
                       q.reponse && (
-                        <motion.div key="rep" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 rounded-2xl border-s-4 border-accent-primary bg-accent-soft p-4">
+                        <motion.div key="rep" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 rounded-2xl bg-accent-soft p-4">
                           <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-accent-primary">
                             <CheckCircle2 className="h-3.5 w-3.5" /> {t("questionsReponses.reponseOustaz")} · {formatDate(q.reponse.date_publication)}
                           </p>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EnTete } from "@/components/ui/Divers";
 import { Champ, Input, Textarea } from "@/components/ui/Input";
-import { useParametres } from "@/context/ParametresContext";
+import { PHOTO_GUIDE_PAR_DEFAUT, useParametres } from "@/context/ParametresContext";
 import { useToast } from "@/context/ToastContext";
 import { api, messageErreur, type Parametres } from "@/lib/api";
 
@@ -108,7 +108,7 @@ export default function AdminSite() {
             <ChoixImage
               label={t("adminSite.photoGuide")}
               aide={t("adminSite.photoGuideAide")}
-              actuelle={apercus.photo_guide ?? parametres.photo_guide}
+              actuelle={apercus.photo_guide ?? (parametres.photo_guide || PHOTO_GUIDE_PAR_DEFAUT)}
               apercu={<div className="h-16 w-16 rounded-2xl bg-accent-soft" />}
               onFichier={choisir("photo_guide")}
             />

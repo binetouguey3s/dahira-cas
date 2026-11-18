@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { FileUp, Link2, Pencil, Play, Plus, Search, Trash2, UploadCloud } from "lucide-react";
+import { Download, FileUp, Heart, Link2, Pencil, Play, Plus, Search, Trash2, UploadCloud } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -177,7 +177,11 @@ export default function AdminMediatheque() {
                   <Link to={`/mediatheque/${c.id}`} className="min-w-0 flex-1">
                     <p className="truncate font-semibold text-text-primary hover:underline">{c.titre}</p>
                     <p className="truncate text-sm text-text-secondary">
-                      {c.auteur} · {formatDate(c.date_publication)} · ♥ {c.nb_likes} · ↓ {c.nb_telechargements}
+                      <span className="inline-flex flex-wrap items-center gap-x-2">
+                        {c.auteur} · {formatDate(c.date_publication)}
+                        <span className="inline-flex items-center gap-1"><Heart className="h-3.5 w-3.5" /> {c.nb_likes}</span>
+                        <span className="inline-flex items-center gap-1"><Download className="h-3.5 w-3.5" /> {c.nb_telechargements}</span>
+                      </span>
                     </p>
                   </Link>
                   <Badge tone="neutral" className="hidden sm:inline-flex">

@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { BadgeCheck, ShieldAlert, ShieldX } from "lucide-react";
+import { BadgeCheck, MapPin, Phone, ShieldX } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
@@ -9,7 +9,6 @@ import { Logo } from "@/components/layout/Logo";
 import { Avatar } from "@/components/ui/Divers";
 import { useParametres } from "@/context/ParametresContext";
 import { api, type CarteVerification } from "@/lib/api";
-import { formatDate } from "@/lib/utils";
 
 export default function VerifierCarte() {
   const { t } = useTranslation();
@@ -28,7 +27,7 @@ export default function VerifierCarte() {
       .catch(() => setEtat("inconnue"));
   }, [numero]);
 
-  const valide = etat === "ok" && carte?.is_active;
+  const valide = etat === "ok";
 
   return (
     <div className="flex min-h-dvh flex-col items-center bg-bg-primary px-4 py-6">
@@ -54,25 +53,38 @@ export default function VerifierCarte() {
             <div className="h-14 w-14 animate-pulse rounded-full bg-white/30" />
           ) : (
             <motion.div initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.15 }}>
-              {valide ? <BadgeCheck className="h-14 w-14" /> : etat === "ok" ? <ShieldAlert className="h-14 w-14" /> : <ShieldX className="h-14 w-14" />}
+              {valide ? <BadgeCheck className="h-14 w-14" /> : <ShieldX className="h-14 w-14" />}
             </motion.div>
           )}
           <p className="text-xl font-bold">
-            {etat === "chargement" ? t("commun.chargement") : valide ? t("verification.valide") : etat === "ok" ? t("verification.inactive") : t("verification.inconnue")}
+            {etat === "chargement" ? t("commun.chargement") : valide ? t("verification.valide") : t("verification.inconnue")}
           </p>
           <p className="text-sm text-white/80">{numero}</p>
         </div>
 
         {carte && (
-          <div className="flex items-center gap-4 p-6">
-            <Avatar nom={carte.nom_complet} photo={carte.photo} taille={72} />
-            <div className="min-w-0">
-              <p className="text-lg font-bold text-text-primary">{carte.nom_complet}</p>
-              <p className="text-sm text-text-secondary">{t(`roles.${carte.role}`)}</p>
-              <p className="text-xs text-text-secondary">
-                {t("profil.membreDepuis")} {formatDate(carte.date_inscription)}
-              </p>
+          <div className="p-6">
+            <div className="flex items-center gap-4">
+              <Avatar nom={carte.nom_complet} photo={carte.photo} taille={72} />
+              <div className="min-w-0">
+                <p className="text-lg font-bold text-text-primary">{carte.nom_complet}</p>
+                <p className="text-sm text-text-secondary">{carte.carte_numero}</p>
+              </div>
             </div>
+            {(carte.telephone || carte.adresse) && (
+              <div className="mt-5 flex flex-col gap-2 border-t border-border-subtle pt-4 text-sm text-text-primary">
+                {carte.telephone && (
+                  <a href={`tel:${carte.telephone}`} className="flex items-center gap-2.5 hover:text-accent-primary">
+                    <Phone className="h-4 w-4 text-accent-primary" /> {carte.telephone}
+                  </a>
+                )}
+                {carte.adresse && (
+                  <p className="flex items-center gap-2.5">
+                    <MapPin className="h-4 w-4 text-accent-primary" /> {carte.adresse}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
         {etat === "inconnue" && <p className="p-6 text-center text-sm text-text-secondary">{t("verification.inconnueAide")}</p>}

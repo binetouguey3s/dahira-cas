@@ -121,13 +121,19 @@ class GestionMembresTests(APITestCase):
 
 
 class CarteTests(APITestCase):
-    def test_verification_publique_sans_donnees_sensibles(self):
-        membre = creer_membre("+221770000051")
+    def test_verification_renvoie_uniquement_les_champs_prevus(self):
+        membre = creer_membre("+221770000051", adresse="Médina, Dakar")
         res = self.client.get(f"/api/comptes/carte/{membre.carte_numero}/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.data["nom_complet"], membre.nom_complet)
-        self.assertNotIn("telephone", res.data)
+        self.assertEqual(set(res.data), {"nom_complet", "carte_numero", "photo", "telephone", "adresse"})
+        self.assertEqual(res.data["adresse"], "Médina, Dakar")
         self.assertEqual(self.client.get("/api/comptes/carte/INCONNU/").status_code, 404)
+
+    def test_carte_dun_compte_desactive_est_inconnue(self):
+        membre = creer_membre("+221770000052")
+        membre.is_active = False
+        membre.save()
+        self.assertEqual(self.client.get(f"/api/comptes/carte/{membre.carte_numero}/").status_code, 404)
 
 
 class CreationParAdminTests(APITestCase):

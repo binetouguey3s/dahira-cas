@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { ChevronRight, CreditCard, KeyRound, LogOut, PartyPopper, ShieldCheck } from "lucide-react";
+import { ChevronRight, CreditCard, KeyRound, LogOut, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -116,9 +116,8 @@ export default function Profil() {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 flex items-start gap-3 rounded-2xl bg-accent-secondary/15 p-4 text-sm text-text-primary"
+          className="mb-6 rounded-2xl bg-accent-secondary/15 p-4 text-sm text-text-primary"
         >
-          <PartyPopper className="mt-0.5 h-5 w-5 shrink-0 text-accent-secondary-text" />
           <span>
             <strong>{t("inscription.bienvenue")}</strong> {t("profil.bienvenueAide")}
           </span>
@@ -161,7 +160,7 @@ export default function Profil() {
             </div>
             {manquants.length > 0 && (
               <p className="mt-3 text-xs text-text-secondary">
-                {t("profil.manquePourCarte")} {manquants.map((c) => t(`champs.${c === "nom_complet" ? "nomComplet" : c === "date_naissance" ? "dateNaissance" : c}`)).join(", ")}
+                {t("profil.manquePourCarte")} {manquants.map((c) => t(c === "nom_complet" ? "champs.nomComplet" : "champs.photo")).join(", ")}
               </p>
             )}
           </Card>

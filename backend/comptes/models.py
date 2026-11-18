@@ -25,7 +25,6 @@ class Membre(AbstractUser):
     profession = models.CharField(max_length=120, blank=True)
     adresse = models.CharField(max_length=255, blank=True)
     pays = models.CharField(max_length=80, default="Sénégal")
-    date_naissance = models.DateField(blank=True, null=True)
     photo = models.ImageField(upload_to="membres/photos/", blank=True, null=True)
     role = models.CharField(max_length=30, choices=Role.choices, default=Role.MEMBRE)
     langue_preferee = models.CharField(max_length=5, choices=Langue.choices, default=Langue.FR)

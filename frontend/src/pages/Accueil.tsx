@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { ArrowRight, BookOpen, Calendar, CreditCard, HelpCircle, Play, Sparkles, Wallet } from "lucide-react";
+import { ArrowRight, BookOpen, Calendar, CreditCard, HelpCircle, Play, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -9,7 +9,7 @@ import { CarteContenu, CarteEvenement } from "@/components/metier/Elements";
 import { Button } from "@/components/ui/Button";
 import { ElementAnime, ListeAnimee, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { useAuth } from "@/context/AuthContext";
-import { useParametres } from "@/context/ParametresContext";
+import { PHOTO_GUIDE_PAR_DEFAUT, useParametres } from "@/context/ParametresContext";
 import { Traduit } from "@/context/TraductionContext";
 import { api, type ContenuMedia, type Evenement, type Paginated } from "@/lib/api";
 
@@ -37,7 +37,6 @@ export default function Accueil() {
       .catch(() => setEvenements([]));
   }, []);
 
-  const citation = parametres.citation_du_jour || t("accueil.citationParDefaut");
   const prenom = membre?.nom_complet?.split(" ")[0];
 
   const raccourcis = [
@@ -70,14 +69,14 @@ export default function Accueil() {
         />
         <div className="relative flex flex-col gap-6 md:flex-row md:items-center">
           <div className="flex-1">
-            <p className="mb-2 flex items-center gap-2 text-sm font-medium text-[#D9C89A]">
-              <Sparkles className="h-4 w-4" />
+            <p className="mb-2 text-sm font-medium text-[#D9C89A]">
               {membre ? t(salutation(new Date().getHours()), { nom: prenom }) : t("accueil.bienvenueVisiteur")}
             </p>
             <h1 className="max-w-xl text-2xl font-bold leading-tight md:text-4xl">{parametres.nom_dahira}</h1>
-            <blockquote className="mt-5 max-w-xl border-s-2 border-[#D9C89A]/70 ps-4">
-              <p className="font-serif text-lg leading-relaxed text-white/95 md:text-xl">
-                <Traduit texte={citation} />
+            <blockquote className="mt-5 max-w-xl">
+              <p className="font-serif text-xl leading-relaxed text-white/95 md:text-2xl">
+                {/* La parole du Guide par défaut est gardée telle quelle ; une citation saisie par l'admin est traduite. */}
+                {parametres.citation_du_jour ? <Traduit texte={parametres.citation_du_jour} /> : `« ${t("accueil.citationParDefaut")} »`}
               </p>
               <footer className="mt-2 text-xs uppercase tracking-[0.16em] text-white/65">
                 {t("accueil.conseilDuJour")} · {parametres.citation_auteur || parametres.nom_guide}
@@ -96,14 +95,14 @@ export default function Accueil() {
               </div>
             )}
           </div>
-          {parametres.photo_guide && (
+          {(
             <motion.img
-              src={parametres.photo_guide}
+              src={parametres.photo_guide || PHOTO_GUIDE_PAR_DEFAUT}
               alt={parametres.nom_guide}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.25, duration: 0.6 }}
-              className="h-36 w-36 self-center rounded-[28px] object-cover ring-4 ring-white/15 md:h-48 md:w-48"
+              className="h-44 w-36 self-center rounded-[28px] object-cover object-top ring-4 ring-white/15 md:h-60 md:w-48"
             />
           )}
         </div>

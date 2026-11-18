@@ -55,7 +55,6 @@
     "email": "Correo electrónico",
     "motDePasse": "Contraseña",
     "afficherMotDePasse": "Mostrar la contraseña",
-    "dateNaissance": "Fecha de nacimiento",
     "profession": "Profesión",
     "adresse": "Dirección",
     "pays": "País",
@@ -63,7 +62,7 @@
     "photo": "Foto"
   },
   "connexion": {
-    "titre": "Bienvenido de nuevo 👋",
+    "titre": "Dalal ak Diam !",
     "sousTitre": "Inicia sesión para encontrar las enseñanzas y la vida de la Dahira.",
     "bouton": "Iniciar sesión",
     "erreur": "Número o contraseña incorrectos.",
@@ -94,7 +93,7 @@
     "bonsoir": "Buenas noches, {{nom}}",
     "bienvenueVisiteur": "Assalamu alaykum, bienvenido",
     "conseilDuJour": "Consejo del día",
-    "citationParDefaut": "La verdadera riqueza es la de un corazón lleno de fe y piedad.",
+    "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "Próximos eventos",
     "derniersEnseignements": "Últimas enseñanzas"
   },
@@ -272,8 +271,6 @@
     "carteDeMembre": "Carné de miembro",
     "nom": "Nombre",
     "numero": "N.º de miembro",
-    "ne": "Nacido/a el",
-    "depuis": "Miembro desde",
     "qualite": "Condición",
     "telephone": "Teléfono",
     "adresse": "Dirección",
@@ -292,7 +289,6 @@
   },
   "verification": {
     "valide": "Carné válido",
-    "inactive": "Carné desactivado",
     "inconnue": "Carné desconocido",
     "inconnueAide": "Este número no corresponde a ningún miembro. El carné podría ser falso."
   },
@@ -362,7 +358,7 @@
     "identifiantsTitre": "Credenciales para enviar",
     "identifiantsAide": "Envíaselas al miembro. Podrá cambiar su contraseña en su perfil.",
     "envoyerWhatsApp": "Enviar por WhatsApp",
-    "messageIdentifiants": "Assalamu alaykum {{nom}} 🤲\nTu cuenta de {{dahira}} está lista.\nSitio: {{site}}\nTeléfono: {{telephone}}\nContraseña provisional: {{mdp}}\nRecuerda cambiarla en tu perfil.",
+    "messageIdentifiants": "Assalamu alaykum {{nom}}\nTu cuenta de {{dahira}} está lista.\nSitio: {{site}}\nTeléfono: {{telephone}}\nContraseña provisional: {{mdp}}\nRecuerda cambiarla en tu perfil.",
     "activerReservationBus": "Abrir la reserva de autobús",
     "redigerReponse": "Escribe tu respuesta…",
     "repondre": "Enviar la respuesta",
@@ -399,7 +395,7 @@
     "referenceAide": "El código recibido por SMS (Wave / Orange Money).",
     "annulerPaiement": "Anular el pago",
     "rappeler": "Recordar por WhatsApp",
-    "messageRappel": "Assalamu alaykum {{nom}} 🤲\nUn pequeño recordatorio: tu cuota de {{mois}} ({{montant}}) a {{dahira}} aún no está pagada. ¡Gracias!",
+    "messageRappel": "Assalamu alaykum {{nom}}\nUn pequeño recordatorio: tu cuota de {{mois}} ({{montant}}) a {{dahira}} aún no está pagada. ¡Gracias!",
     "aucunResultat": "Ninguna cuota coincide.",
     "aucuneCeMois": "No hay cuotas para este mes.",
     "aucuneCeMoisAide": "Genera las cuotas del mes para todos los miembros con un clic.",

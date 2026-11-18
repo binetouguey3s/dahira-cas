@@ -9,11 +9,11 @@ import fr from "./locales/fr.json";
 export const LANGUES = ["fr", "en", "es", "ar"] as const;
 export type Langue = (typeof LANGUES)[number];
 
-export const NOMS_LANGUES: Record<Langue, { nom: string; drapeau: string }> = {
-  fr: { nom: "Français", drapeau: "🇫🇷" },
-  en: { nom: "English", drapeau: "🇬🇧" },
-  es: { nom: "Español", drapeau: "🇪🇸" },
-  ar: { nom: "العربية", drapeau: "🇸🇦" },
+export const NOMS_LANGUES: Record<Langue, { nom: string }> = {
+  fr: { nom: "Français" },
+  en: { nom: "English" },
+  es: { nom: "Español" },
+  ar: { nom: "العربية" },
 };
 
 function langueInitiale(): Langue {

@@ -100,7 +100,6 @@ export interface Membre {
   profession: string;
   adresse: string;
   pays: string;
-  date_naissance: string | null;
   photo: string | null;
   role: Role;
   is_staff: boolean;
@@ -125,12 +124,10 @@ export interface MembreResume {
 
 export interface CarteVerification {
   nom_complet: string;
-  photo: string | null;
   carte_numero: string;
-  role: Role;
-  role_libelle: string;
-  is_active: boolean;
-  date_inscription: string;
+  photo: string | null;
+  telephone: string;
+  adresse: string;
 }
 
 export interface Cotisation {

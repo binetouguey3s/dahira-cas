@@ -15,9 +15,7 @@ const PAYS = [
   "Maroc", "Gabon", "Cameroun", "Congo", "Autre",
 ];
 
-type Champs = Pick<Membre, "nom_complet" | "telephone" | "email" | "profession" | "adresse" | "pays" | "langue_preferee"> & {
-  date_naissance: string;
-};
+type Champs = Pick<Membre, "nom_complet" | "telephone" | "email" | "profession" | "adresse" | "pays" | "langue_preferee">;
 
 /** Formulaire des informations personnelles. `seulement` limite aux champs manquants (assistant de carte). */
 export function FormulaireProfil({
@@ -41,7 +39,6 @@ export function FormulaireProfil({
     profession: membre?.profession ?? "",
     adresse: membre?.adresse ?? "",
     pays: membre?.pays || "Sénégal",
-    date_naissance: membre?.date_naissance ?? "",
     langue_preferee: membre?.langue_preferee ?? "fr",
   }));
 
@@ -59,7 +56,6 @@ export function FormulaireProfil({
       if (visible(c) || !seulement) donnees[c] = valeurs[c].trim?.() ?? valeurs[c];
     });
     if ("telephone" in donnees && donnees.telephone) donnees.telephone = donnees.telephone.replace(/\s+/g, "");
-    if ("date_naissance" in donnees && !donnees.date_naissance) donnees.date_naissance = null;
     try {
       const m = await mettreAJour(donnees as Partial<Membre>);
       notifier(t("commun.enregistre"));
@@ -87,20 +83,6 @@ export function FormulaireProfil({
           {(id) => <Input id={id} type="tel" value={valeurs.telephone} onChange={maj("telephone")} required />}
         </Champ>
       )}
-      {visible("date_naissance") && (
-        <Champ label={t("champs.dateNaissance")} erreur={erreurs.date_naissance}>
-          {(id) => (
-            <Input
-              id={id}
-              type="date"
-              value={valeurs.date_naissance}
-              onChange={maj("date_naissance")}
-              max={new Date().toISOString().slice(0, 10)}
-              required={!!seulement}
-            />
-          )}
-        </Champ>
-      )}
       {visible("email") && !seulement && (
         <Champ label={t("champs.email")} optionnel={t("commun.optionnel")} erreur={erreurs.email}>
           {(id) => <Input id={id} type="email" value={valeurs.email} onChange={maj("email")} autoComplete="email" />}
@@ -112,7 +94,7 @@ export function FormulaireProfil({
         </Champ>
       )}
       {visible("adresse") && (
-        <Champ label={t("champs.adresse")} aide={t("profil.aideAdresse")} erreur={erreurs.adresse}>
+        <Champ label={t("champs.adresse")} optionnel={t("commun.optionnel")} aide={t("profil.aideAdresse")} erreur={erreurs.adresse}>
           {(id) => (
             <Input
               id={id}
@@ -120,7 +102,6 @@ export function FormulaireProfil({
               onChange={maj("adresse")}
               autoComplete="street-address"
               placeholder="Médina, Dakar"
-              required={!!seulement}
             />
           )}
         </Champ>

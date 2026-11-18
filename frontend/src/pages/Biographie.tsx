@@ -3,9 +3,8 @@ import { Compass, Lightbulb, Route } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
-import { Logo } from "@/components/layout/Logo";
 import { ElementAnime, ListeAnimee } from "@/components/ui/Divers";
-import { useParametres } from "@/context/ParametresContext";
+import { PHOTO_GUIDE_PAR_DEFAUT, useParametres } from "@/context/ParametresContext";
 import { Traduit } from "@/context/TraductionContext";
 
 export default function Biographie() {
@@ -37,17 +36,11 @@ export default function Biographie() {
           className="relative mx-auto mb-5 w-fit"
         >
           <div className="absolute -inset-2 rounded-full bg-gradient-to-br from-[#D9C89A] to-[#BFA05A] opacity-80 blur-[2px]" />
-          {parametres.photo_guide ? (
-            <img
-              src={parametres.photo_guide}
-              alt={parametres.nom_guide}
-              className="relative h-36 w-36 rounded-full object-cover ring-4 ring-[#0B3D2E] md:h-44 md:w-44"
-            />
-          ) : (
-            <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-[#0B3D2E] ring-4 ring-[#0B3D2E] md:h-44 md:w-44">
-              <Logo taille={88} />
-            </div>
-          )}
+          <img
+            src={parametres.photo_guide || PHOTO_GUIDE_PAR_DEFAUT}
+            alt={parametres.nom_guide}
+            className="relative h-40 w-40 rounded-full object-cover object-top ring-4 ring-[#0B3D2E] md:h-48 md:w-48"
+          />
         </motion.div>
         <p className="relative text-xs font-semibold uppercase tracking-[0.2em] text-[#D9C89A]">{t("nav.biographie")}</p>
         <h1 className="relative mt-2 text-3xl font-bold md:text-4xl">{parametres.nom_guide}</h1>
@@ -57,7 +50,6 @@ export default function Biographie() {
       </motion.section>
 
       <ListeAnimee className="relative mx-auto flex max-w-3xl flex-col gap-6">
-        <div className="absolute bottom-6 start-6 top-6 hidden w-px bg-gradient-to-b from-accent-primary/40 via-accent-secondary/40 to-transparent md:block" />
         {sections.map(({ icone: Icone, titre, texte }) => (
           <ElementAnime key={titre} className="relative flex gap-5">
             <div className="relative z-10 hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent-primary text-white shadow-lg shadow-accent-primary/25 md:flex">

@@ -20,10 +20,6 @@ import { CHAMPS_CARTE, champsManquants } from "@/lib/carte";
 const LIBELLES: Record<string, string> = {
   photo: "photo.photo",
   nom_complet: "champs.nomComplet",
-  telephone: "champs.telephone",
-  date_naissance: "champs.dateNaissance",
-  adresse: "champs.adresse",
-  pays: "champs.pays",
 };
 
 /** Étape 1 : compléter les informations indispensables à la carte. */

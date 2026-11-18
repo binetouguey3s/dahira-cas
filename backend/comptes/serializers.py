@@ -34,7 +34,6 @@ class MembreSerializer(serializers.ModelSerializer):
             "profession",
             "adresse",
             "pays",
-            "date_naissance",
             "photo",
             "role",
             "is_staff",
@@ -75,7 +74,6 @@ class MembreAdminSerializer(serializers.ModelSerializer):
             "profession",
             "adresse",
             "pays",
-            "date_naissance",
             "photo",
             "role",
             "is_active",
@@ -115,13 +113,11 @@ class MembreResumeSerializer(serializers.ModelSerializer):
 
 
 class CarteVerificationSerializer(serializers.ModelSerializer):
-    """Informations publiques affichées quand on scanne le QR code d'une carte."""
-
-    role_libelle = serializers.CharField(source="get_role_display")
+    """Informations affichées quand on scanne le QR code d'une carte de membre."""
 
     class Meta:
         model = Membre
-        fields = ["nom_complet", "photo", "carte_numero", "role", "role_libelle", "is_active", "date_inscription"]
+        fields = ["nom_complet", "carte_numero", "photo", "telephone", "adresse"]
 
 
 class InscriptionSerializer(serializers.ModelSerializer):

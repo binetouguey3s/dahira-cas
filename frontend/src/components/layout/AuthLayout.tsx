@@ -13,7 +13,6 @@ import { Logo } from "./Logo";
 export function AuthLayout({ titre, sousTitre, children }: { titre: string; sousTitre: string; children: ReactNode }) {
   const { t } = useTranslation();
   const { parametres } = useParametres();
-  const citation = parametres.citation_du_jour || t("accueil.citationParDefaut");
 
   return (
     <div className="flex min-h-dvh flex-col bg-bg-primary md:flex-row">
@@ -39,7 +38,7 @@ export function AuthLayout({ titre, sousTitre, children }: { titre: string; sous
         >
           <span className="font-serif text-6xl leading-none text-[#D9C89A]/60">“</span>
           <p className="-mt-4 font-serif text-2xl leading-relaxed">
-            <Traduit texte={citation} />
+            {parametres.citation_du_jour ? <Traduit texte={parametres.citation_du_jour} /> : t("accueil.citationParDefaut")}
           </p>
           <footer className="mt-4 text-sm text-white/70">— {parametres.citation_auteur || parametres.nom_guide}</footer>
         </motion.blockquote>

@@ -55,7 +55,6 @@
     "email": "Email",
     "motDePasse": "Mot de passe",
     "afficherMotDePasse": "Afficher le mot de passe",
-    "dateNaissance": "Date de naissance",
     "profession": "Profession",
     "adresse": "Adresse",
     "pays": "Pays",
@@ -63,7 +62,7 @@
     "photo": "Photo"
   },
   "connexion": {
-    "titre": "Bon retour 👋",
+    "titre": "Dalal ak Diam !",
     "sousTitre": "Connectez-vous pour retrouver les enseignements et la vie du Dahira.",
     "bouton": "Se connecter",
     "erreur": "Numéro ou mot de passe incorrect.",
@@ -94,7 +93,7 @@
     "bonsoir": "Bonsoir {{nom}}",
     "bienvenueVisiteur": "Assalamou alaykoum, bienvenue",
     "conseilDuJour": "Conseil du jour",
-    "citationParDefaut": "La véritable richesse est celle du cœur rempli de foi et de piété.",
+    "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "Prochains événements",
     "derniersEnseignements": "Derniers enseignements"
   },
@@ -272,8 +271,6 @@
     "carteDeMembre": "Carte de membre",
     "nom": "Nom",
     "numero": "N° membre",
-    "ne": "Né(e) le",
-    "depuis": "Membre depuis",
     "qualite": "Qualité",
     "telephone": "Téléphone",
     "adresse": "Adresse",
@@ -292,7 +289,6 @@
   },
   "verification": {
     "valide": "Carte valide",
-    "inactive": "Carte désactivée",
     "inconnue": "Carte inconnue",
     "inconnueAide": "Ce numéro ne correspond à aucun membre. La carte est peut-être fausse."
   },
@@ -362,7 +358,7 @@
     "identifiantsTitre": "Identifiants à transmettre",
     "identifiantsAide": "Envoyez-les au membre. Il pourra changer son mot de passe dans son profil.",
     "envoyerWhatsApp": "Envoyer par WhatsApp",
-    "messageIdentifiants": "Assalamou alaykoum {{nom}} 🤲\nVotre compte {{dahira}} est prêt.\nSite : {{site}}\nTéléphone : {{telephone}}\nMot de passe provisoire : {{mdp}}\nPensez à le changer dans votre profil.",
+    "messageIdentifiants": "Assalamou alaykoum {{nom}}\nVotre compte {{dahira}} est prêt.\nSite : {{site}}\nTéléphone : {{telephone}}\nMot de passe provisoire : {{mdp}}\nPensez à le changer dans votre profil.",
     "activerReservationBus": "Ouvrir la réservation de bus",
     "redigerReponse": "Rédigez votre réponse…",
     "repondre": "Envoyer la réponse",
@@ -399,7 +395,7 @@
     "referenceAide": "Le code reçu par SMS (Wave / Orange Money).",
     "annulerPaiement": "Annuler le paiement",
     "rappeler": "Rappeler par WhatsApp",
-    "messageRappel": "Assalamou alaykoum {{nom}} 🤲\nPetit rappel : votre cotisation de {{mois}} ({{montant}}) au {{dahira}} n'est pas encore réglée. Jërëjëf !",
+    "messageRappel": "Assalamou alaykoum {{nom}}\nPetit rappel : votre cotisation de {{mois}} ({{montant}}) au {{dahira}} n'est pas encore réglée. Jërëjëf !",
     "aucunResultat": "Aucune cotisation ne correspond.",
     "aucuneCeMois": "Aucune cotisation pour ce mois.",
     "aucuneCeMoisAide": "Générez les cotisations du mois pour tous les membres en un clic.",

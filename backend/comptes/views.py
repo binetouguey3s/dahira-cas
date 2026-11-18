@@ -94,7 +94,8 @@ class VerifierCarteView(APIView):
     throttle_classes = [AnonRateThrottle]
 
     def get(self, request, numero):
-        membre = get_object_or_404(Membre, carte_numero=numero)
+        # Une carte d'un compte désactivé n'est plus valide : elle est traitée comme inconnue.
+        membre = get_object_or_404(Membre, carte_numero=numero, is_active=True)
         return Response(CarteVerificationSerializer(membre, context={"request": request}).data)
 
 

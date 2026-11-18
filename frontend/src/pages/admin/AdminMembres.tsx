@@ -18,9 +18,7 @@ import { formatDate } from "@/lib/utils";
 
 const ROLES: Role[] = ["membre", "responsable_finance", "oustaz", "admin_contenus", "admin_general"];
 
-type Formulaire = Pick<MembreAdmin, "nom_complet" | "telephone" | "email" | "profession" | "adresse" | "pays" | "role" | "is_active"> & {
-  date_naissance: string;
-};
+type Formulaire = Pick<MembreAdmin, "nom_complet" | "telephone" | "email" | "profession" | "adresse" | "pays" | "role" | "is_active">;
 
 const VIDE: Formulaire = {
   nom_complet: "",
@@ -31,7 +29,6 @@ const VIDE: Formulaire = {
   pays: "Sénégal",
   role: "membre",
   is_active: true,
-  date_naissance: "",
 };
 
 function lienWhatsApp(telephone: string, message: string) {
@@ -86,7 +83,6 @@ export default function AdminMembres() {
         pays: edition.pays,
         role: edition.role,
         is_active: edition.is_active,
-        date_naissance: edition.date_naissance ?? "",
       });
   }, [edition]);
 
@@ -97,7 +93,7 @@ export default function AdminMembres() {
 
   const enregistrer = async () => {
     setEnvoi(true);
-    const donnees = { ...form, telephone: form.telephone.replace(/\s+/g, ""), date_naissance: form.date_naissance || null };
+    const donnees = { ...form, telephone: form.telephone.replace(/\s+/g, "") };
     try {
       if (edition === "nouveau") {
         const { data } = await api.post<MembreAdmin & { mot_de_passe_provisoire: string }>("/comptes/membres/", donnees);
@@ -266,9 +262,6 @@ export default function AdminMembres() {
           </Champ>
           <Champ label={t("champs.email")} optionnel={t("commun.optionnel")}>
             {(id) => <Input id={id} type="email" value={form.email} onChange={maj("email")} />}
-          </Champ>
-          <Champ label={t("champs.dateNaissance")} optionnel={t("commun.optionnel")}>
-            {(id) => <Input id={id} type="date" value={form.date_naissance} onChange={maj("date_naissance")} />}
           </Champ>
           <Champ label={t("champs.profession")} optionnel={t("commun.optionnel")}>
             {(id) => <Input id={id} value={form.profession} onChange={maj("profession")} />}

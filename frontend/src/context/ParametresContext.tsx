@@ -2,6 +2,9 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 
 import { api, type Parametres } from "@/lib/api";
 
+/** Photo du Guide fournie avec le site (remplaçable dans « Paramètres du site »). */
+export const PHOTO_GUIDE_PAR_DEFAUT = "/guide.jpg";
+
 const PAR_DEFAUT: Parametres = {
   nom_dahira: "Dahira Cheikh Abdoulahi Seye",
   sigle: "FDCAS",
