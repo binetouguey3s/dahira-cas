@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "accueil": "الرئيسية",
+    "mediatheque": "المكتبة",
+    "questionsReponses": "أسئلة وأجوبة",
+    "evenements": "الفعاليات",
+    "profil": "الملف الشخصي",
+    "cotisations": "الاشتراكات",
+    "biographie": "السيرة",
+    "admin": "الإدارة"
+  },
+  "commun": {
+    "langue": "تغيير اللغة",
+    "theme": "تبديل الوضع الفاتح/الداكن",
+    "chargement": "جارٍ التحميل…",
+    "enregistrer": "حفظ",
+    "annuler": "إلغاء",
+    "voirTout": "عرض الكل",
+    "retour": "رجوع"
+  },
+  "inscription": {
+    "titre": "إنشاء حسابي",
+    "sousTitre": "انضم إلى الجماعة لمتابعة تعاليم الشيخ وحياة الداهيرا",
+    "nomComplet": "الاسم الكامل",
+    "telephone": "رقم الهاتف",
+    "email": "البريد الإلكتروني",
+    "optionnel": "(اختياري)",
+    "motDePasse": "كلمة المرور",
+    "bouton": "إنشاء حسابي",
+    "dejaMembre": "هل أنت عضو بالفعل؟",
+    "seConnecter": "تسجيل الدخول",
+    "continuerSansCompte": "الاستمرار بدون حساب"
+  },
+  "connexion": {
+    "titre": "مرحبًا بعودتك",
+    "sousTitre": "سجّل الدخول للوصول إلى التعاليم وحياة الداهيرا",
+    "telephone": "رقم الهاتف",
+    "motDePasse": "كلمة المرور",
+    "bouton": "تسجيل الدخول",
+    "pasDeCompte": "لست عضوًا بعد؟",
+    "sInscrire": "إنشاء حساب"
+  },
+  "accueil": {
+    "titre": "الرئيسية",
+    "salutation": "السلام عليكم، {{nom}}",
+    "conseilDuJour": "نصيحة اليوم",
+    "citationGuide": "الغنى الحقيقي هو غنى القلب بالإيمان والتقوى.",
+    "prochainEvenement": "الفعالية القادمة",
+    "dernierEnseignements": "أحدث التعاليم",
+    "voirTout": "عرض الكل",
+    "aucunContenu": "لا توجد تعاليم متاحة حاليًا."
+  },
+  "mediatheque": {
+    "tous": "الكل",
+    "audio": "صوت",
+    "video": "فيديو",
+    "texte": "نص",
+    "aimer": "أعجبني",
+    "telecharger": "تحميل",
+    "partager": "مشاركة",
+    "poserQuestion": "طرح سؤال حول هذا التعليم",
+    "placeholderQuestion": "اكتب سؤالك هنا…",
+    "envoyer": "إرسال السؤال",
+    "questionEnvoyee": "تم إرسال سؤالك. ستتلقى الجواب في قسم الأسئلة والأجوبة.",
+    "aucunResultat": "لا يوجد محتوى يطابق هذا الفلتر."
+  },
+  "profil": {
+    "carte": "بطاقة رقم",
+    "email": "البريد الإلكتروني",
+    "langue": "اللغة",
+    "membreDepuis": "عضو منذ",
+    "deconnexion": "تسجيل الخروج",
+    "roles": {
+      "membre": "عضو",
+      "responsable_finance": "مسؤول المالية",
+      "oustaz": "الأستاذ",
+      "admin_contenus": "مسؤول المحتوى",
+      "admin_general": "المسؤول العام"
+    }
+  },
+  "cotisations": {
+    "totalPaye": "المجموع المدفوع",
+    "aucuneCotisation": "لا توجد اشتراكات مسجلة حتى الآن.",
+    "statuts": {
+      "paye": "مدفوعة",
+      "en_retard": "متأخرة",
+      "non_paye": "غير مدفوعة"
+    }
+  },
+  "questionsReponses": {
+    "titre": "العنوان",
+    "theme": "الموضوع",
+    "contenu": "سؤالك",
+    "poserUneQuestion": "طرح سؤال",
+    "envoyer": "إرسال",
+    "repondue": "تمت الإجابة",
+    "enAttente": "قيد الانتظار",
+    "reponseGuide": "إجابة الأستاذ",
+    "aucuneQuestion": "لا توجد أسئلة حتى الآن. كن أول من يطرح سؤالًا.",
+    "themes": {
+      "jeune_ramadan": "الصيام ورمضان",
+      "zakat": "الزكاة",
+      "vie_dahira": "حياة الداهيرا",
+      "autre": "أخرى"
+    }
+  },
+  "evenements": {
+    "description": "الوصف",
+    "lieu": "المكان",
+    "date": "التاريخ والوقت",
+    "categorie": "الفئة",
+    "aucunEvenement": "لا توجد فعاليات قادمة حاليًا.",
+    "busDisponible": "حافلة الجماعة متوفرة",
+    "reserverPlace": "حجز مقعدي في الحافلة",
+    "reservationConfirmee": "تم تأكيد حجز مقعدك في الحافلة.",
+    "reservationImpossible": "تعذر الحجز — قد يكون لديك مقعد محجوز مسبقًا.",
+    "categories": {
+      "magal": "المقال",
+      "gamou": "الغامو",
+      "dahira": "الداهيرا",
+      "causerie": "محاضرة",
+      "autre": "أخرى"
+    }
+  },
+  "biographie": {
+    "nomGuide": "الشيخ عبد الله سيي",
+    "titreGuide": "المرشد الديني — داهيرا الشيخ عبد الله سيي",
+    "parcours": "المسار",
+    "texteParcours": "تتلمذ على التقليد المريدي من خلال تعاليم الشيخ أحمدو بامبا مباكي، وكرّس حياته لنقل العلم الديني والمرافقة الروحية للجماعة.",
+    "vision": "الرؤية",
+    "texteVision": "جمع المؤمنين حول قيم التقوى والعمل والتضامن التي يحملها الخدمة، استمرارًا لتعاليم الشيخ.",
+    "enseignements": "التعاليم",
+    "texteEnseignements": "يركز المرشد على الممارسة اليومية للإيمان، وتربية الشباب، والدعم المتبادل داخل الداهيرا، من خلال المحاضرات والنصائح والإجابة على أسئلة الأعضاء."
+  },
+  "admin": {
+    "titre": "مساحة الإدارة",
+    "finance": "المالية",
+    "evenements": "الفعاليات",
+    "questionsEnAttente": "أسئلة قيد الانتظار",
+    "gestionMembresBientot": "إدارة الأعضاء (قريبًا)",
+    "marquerPaye": "وضع علامة مدفوعة",
+    "nouvelEvenement": "فعالية جديدة",
+    "activerReservationBus": "تفعيل حجز الحافلة لهذه الفعالية",
+    "creer": "إنشاء الفعالية",
+    "redigerReponse": "كتابة الإجابة…",
+    "repondre": "إرسال الإجابة",
+    "aucuneQuestionEnAttente": "لا توجد أسئلة قيد الانتظار."
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "accueil": "Home",
+    "mediatheque": "Media library",
+    "questionsReponses": "Q&A",
+    "evenements": "Events",
+    "profil": "Profile",
+    "cotisations": "Dues",
+    "biographie": "Biography",
+    "admin": "Admin"
+  },
+  "commun": {
+    "langue": "Change language",
+    "theme": "Toggle light/dark mode",
+    "chargement": "Loading…",
+    "enregistrer": "Save",
+    "annuler": "Cancel",
+    "voirTout": "See all",
+    "retour": "Back"
+  },
+  "inscription": {
+    "titre": "Create my account",
+    "sousTitre": "Join the community to follow the Guide's teachings and the Dahira's life",
+    "nomComplet": "Full name",
+    "telephone": "Phone number",
+    "email": "Email",
+    "optionnel": "(optional)",
+    "motDePasse": "Password",
+    "bouton": "Create my account",
+    "dejaMembre": "Already a member?",
+    "seConnecter": "Sign in",
+    "continuerSansCompte": "Continue without an account"
+  },
+  "connexion": {
+    "titre": "Welcome back",
+    "sousTitre": "Sign in to find the teachings and the Dahira's life again",
+    "telephone": "Phone number",
+    "motDePasse": "Password",
+    "bouton": "Sign in",
+    "pasDeCompte": "Not a member yet?",
+    "sInscrire": "Create an account"
+  },
+  "accueil": {
+    "titre": "Home",
+    "salutation": "Assalamu alaikum, {{nom}}",
+    "conseilDuJour": "Advice of the day",
+    "citationGuide": "True wealth is a heart filled with faith and piety.",
+    "prochainEvenement": "Next event",
+    "dernierEnseignements": "Latest teachings",
+    "voirTout": "See all",
+    "aucunContenu": "No teachings available right now."
+  },
+  "mediatheque": {
+    "tous": "All",
+    "audio": "Audio",
+    "video": "Video",
+    "texte": "Text",
+    "aimer": "Like",
+    "telecharger": "Download",
+    "partager": "Share",
+    "poserQuestion": "Ask a question about this teaching",
+    "placeholderQuestion": "Write your question here…",
+    "envoyer": "Send question",
+    "questionEnvoyee": "Your question has been sent. You'll receive an answer in the Q&A section.",
+    "aucunResultat": "No content matches this filter."
+  },
+  "profil": {
+    "carte": "Card no.",
+    "email": "Email",
+    "langue": "Language",
+    "membreDepuis": "Member since",
+    "deconnexion": "Sign out",
+    "roles": {
+      "membre": "Member",
+      "responsable_finance": "Finance officer",
+      "oustaz": "Oustaz",
+      "admin_contenus": "Content admin",
+      "admin_general": "General administrator"
+    }
+  },
+  "cotisations": {
+    "totalPaye": "Total paid",
+    "aucuneCotisation": "No dues recorded yet.",
+    "statuts": {
+      "paye": "Paid",
+      "en_retard": "Overdue",
+      "non_paye": "Unpaid"
+    }
+  },
+  "questionsReponses": {
+    "titre": "Title",
+    "theme": "Topic",
+    "contenu": "Your question",
+    "poserUneQuestion": "Ask a question",
+    "envoyer": "Send",
+    "repondue": "Answered",
+    "enAttente": "Pending",
+    "reponseGuide": "Oustaz's answer",
+    "aucuneQuestion": "No questions yet. Be the first to ask one.",
+    "themes": {
+      "jeune_ramadan": "Fasting & Ramadan",
+      "zakat": "Zakat",
+      "vie_dahira": "Dahira life",
+      "autre": "Other"
+    }
+  },
+  "evenements": {
+    "description": "Description",
+    "lieu": "Location",
+    "date": "Date and time",
+    "categorie": "Category",
+    "aucunEvenement": "No upcoming events right now.",
+    "busDisponible": "Community bus available",
+    "reserverPlace": "Reserve my bus seat",
+    "reservationConfirmee": "Your bus seat is confirmed.",
+    "reservationImpossible": "Reservation failed — you may already have a seat booked.",
+    "categories": {
+      "magal": "Magal",
+      "gamou": "Gamou",
+      "dahira": "Dahira",
+      "causerie": "Talk",
+      "autre": "Other"
+    }
+  },
+  "biographie": {
+    "nomGuide": "Cheikh Abdoulahi Seye",
+    "titreGuide": "Religious guide — Dahira Cheikh Abdoulahi Seye",
+    "parcours": "Journey",
+    "texteParcours": "Trained in the Mouride tradition under the teachings of Cheikh Ahmadou Bamba Mbacké, the Guide has devoted his life to passing on religious knowledge and spiritual guidance to the community.",
+    "vision": "Vision",
+    "texteVision": "Bringing the faithful together around piety, work, and solidarity — the values of the Khidma — in the continuity of the Cheikh's teaching.",
+    "enseignements": "Teachings",
+    "texteEnseignements": "The Guide emphasizes daily practice of faith, the education of youth, and mutual support within the Dahira, through talks, advice, and answers to members' questions."
+  },
+  "admin": {
+    "titre": "Admin space",
+    "finance": "Finance",
+    "evenements": "Events",
+    "questionsEnAttente": "Pending questions",
+    "gestionMembresBientot": "Member management (coming soon)",
+    "marquerPaye": "Mark as paid",
+    "nouvelEvenement": "New event",
+    "activerReservationBus": "Enable bus reservation for this event",
+    "creer": "Create event",
+    "redigerReponse": "Write the answer…",
+    "repondre": "Send answer",
+    "aucuneQuestionEnAttente": "No pending questions."
+  }
+}

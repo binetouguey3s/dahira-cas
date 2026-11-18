@@ -1,0 +1,119 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cairo:wght@400;600;700&family=Amiri&display=swap");
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Design system Dahira — repris du design system validé (palette Holst)
+   ------------------------------------------------------------------ */
+:root,
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #eaf6f0;
+  --bg-elevated: #ffffff;
+  --text-primary: #0b3d2e;
+  --text-secondary: #3a4440;
+  --text-inverse: #ffffff;
+  --text-inverse-muted: rgba(255, 255, 255, 0.75);
+  --border-default: #6b7570;
+  --accent-primary: #1e7a5d;
+  --accent-secondary: #bfa05a;
+  --status-success: #1e7a5d;
+  --status-error: #c0392b;
+  --status-error-bg: #fbeae8;
+  --status-warning: #d9a441;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-strong: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(107, 117, 112, 0.25);
+  --glass-shadow: rgba(11, 61, 46, 0.12);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #082019;
+  --bg-secondary: #0b3d2e;
+  --bg-elevated: #103226;
+  --text-primary: #eaf6f0;
+  --text-secondary: #aab3ae;
+  --text-inverse: #082019;
+  --text-inverse-muted: rgba(8, 32, 25, 0.75);
+  --border-default: #6b7570;
+  --accent-primary: #61b795;
+  --accent-secondary: #d9c89a;
+  --status-success: #61b795;
+  --status-error: #e07a6d;
+  --status-error-bg: rgba(224, 122, 109, 0.16);
+  --status-warning: #f0d8a8;
+  --glass-bg: rgba(16, 50, 38, 0.72);
+  --glass-bg-strong: rgba(16, 50, 38, 0.85);
+  --glass-border: rgba(170, 179, 174, 0.25);
+  --glass-shadow: rgba(0, 0, 0, 0.35);
+}
+
+:root {
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-3xl: 64px;
+
+  --radius-none: 0px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  --font-sans: "Inter", sans-serif;
+  --font-arabic-sans: "Cairo", sans-serif;
+  --font-arabic-serif: "Amiri", serif;
+}
+
+/* Expose les tokens ci-dessus comme utilitaires Tailwind (bg-primary, text-primary, etc.) */
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-inverse: var(--text-inverse);
+  --color-border-default: var(--border-default);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-status-success: var(--status-success);
+  --color-status-error: var(--status-error);
+  --color-status-error-bg: var(--status-error-bg);
+  --color-status-warning: var(--status-warning);
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-bg-strong: var(--glass-bg-strong);
+  --color-glass-border: var(--glass-border);
+
+  --font-sans: var(--font-sans);
+  --font-arabic-sans: var(--font-arabic-sans);
+  --font-arabic-serif: var(--font-arabic-serif);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-full: var(--radius-full);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+[dir="rtl"] body {
+  font-family: var(--font-arabic-sans);
+}
+
+::selection {
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+}

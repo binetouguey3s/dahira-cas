@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "accueil": "Accueil",
+    "mediatheque": "Médiathèque",
+    "questionsReponses": "Q&R",
+    "evenements": "Événements",
+    "profil": "Profil",
+    "cotisations": "Cotisations",
+    "biographie": "Biographie",
+    "admin": "Admin"
+  },
+  "commun": {
+    "langue": "Changer de langue",
+    "theme": "Changer de mode clair/sombre",
+    "chargement": "Chargement…",
+    "enregistrer": "Enregistrer",
+    "annuler": "Annuler",
+    "voirTout": "Tout voir",
+    "retour": "Retour"
+  },
+  "inscription": {
+    "titre": "Créer mon compte",
+    "sousTitre": "Rejoignez la communauté pour suivre les enseignements et la vie du Dahira",
+    "nomComplet": "Nom complet",
+    "telephone": "Numéro de téléphone",
+    "email": "Email",
+    "optionnel": "(optionnel)",
+    "motDePasse": "Mot de passe",
+    "bouton": "Créer mon compte",
+    "dejaMembre": "Déjà membre ?",
+    "seConnecter": "Se connecter",
+    "continuerSansCompte": "Continuer sans compte"
+  },
+  "connexion": {
+    "titre": "Bon retour",
+    "sousTitre": "Connectez-vous pour retrouver les enseignements et la vie du Dahira",
+    "telephone": "Numéro de téléphone",
+    "motDePasse": "Mot de passe",
+    "bouton": "Se connecter",
+    "pasDeCompte": "Pas encore membre ?",
+    "sInscrire": "Créer un compte"
+  },
+  "accueil": {
+    "titre": "Accueil",
+    "salutation": "Assalamou alaykoum, {{nom}}",
+    "conseilDuJour": "Conseil du jour",
+    "citationGuide": "La véritable richesse est celle du cœur rempli de foi et de piété.",
+    "prochainEvenement": "Prochain événement",
+    "dernierEnseignements": "Derniers enseignements",
+    "voirTout": "Tout voir",
+    "aucunContenu": "Aucun enseignement disponible pour le moment."
+  },
+  "mediatheque": {
+    "tous": "Tous",
+    "audio": "Audio",
+    "video": "Vidéo",
+    "texte": "Texte",
+    "aimer": "Aimer",
+    "telecharger": "Télécharger",
+    "partager": "Partager",
+    "poserQuestion": "Poser une question sur cet enseignement",
+    "placeholderQuestion": "Écrivez votre question ici…",
+    "envoyer": "Envoyer la question",
+    "questionEnvoyee": "Votre question a bien été envoyée. Vous recevrez une réponse dans l'espace Questions & Réponses.",
+    "aucunResultat": "Aucun contenu ne correspond à ce filtre."
+  },
+  "profil": {
+    "carte": "Carte n°",
+    "email": "Email",
+    "langue": "Langue",
+    "membreDepuis": "Membre depuis",
+    "deconnexion": "Déconnexion",
+    "roles": {
+      "membre": "Membre",
+      "responsable_finance": "Responsable Finance",
+      "oustaz": "Oustaz",
+      "admin_contenus": "Admin Contenus",
+      "admin_general": "Administrateur général"
+    }
+  },
+  "cotisations": {
+    "totalPaye": "Total payé",
+    "aucuneCotisation": "Aucune cotisation enregistrée pour le moment.",
+    "statuts": {
+      "paye": "Payée",
+      "en_retard": "En retard",
+      "non_paye": "Non payée"
+    }
+  },
+  "questionsReponses": {
+    "titre": "Titre",
+    "theme": "Thème",
+    "contenu": "Votre question",
+    "poserUneQuestion": "Poser une question",
+    "envoyer": "Envoyer",
+    "repondue": "Répondue",
+    "enAttente": "En attente",
+    "reponseGuide": "Réponse de l'Oustaz",
+    "aucuneQuestion": "Aucune question pour le moment. Soyez le premier à en poser une.",
+    "themes": {
+      "jeune_ramadan": "Jeûne & Ramadan",
+      "zakat": "Zakat",
+      "vie_dahira": "Vie du Dahira",
+      "autre": "Autre"
+    }
+  },
+  "evenements": {
+    "description": "Description",
+    "lieu": "Lieu",
+    "date": "Date et heure",
+    "categorie": "Catégorie",
+    "aucunEvenement": "Aucun événement à venir pour le moment.",
+    "busDisponible": "Bus communautaire disponible",
+    "reserverPlace": "Réserver ma place dans le bus",
+    "reservationConfirmee": "Votre place dans le bus est confirmée.",
+    "reservationImpossible": "Réservation impossible — vous avez peut-être déjà une place réservée.",
+    "categories": {
+      "magal": "Magal",
+      "gamou": "Gamou",
+      "dahira": "Dahira",
+      "causerie": "Causerie",
+      "autre": "Autre"
+    }
+  },
+  "biographie": {
+    "nomGuide": "Cheikh Abdoulahi Seye",
+    "titreGuide": "Guide religieux — Dahira Cheikh Abdoulahi Seye",
+    "parcours": "Parcours",
+    "texteParcours": "Formé dans la tradition mouride auprès des enseignements de Cheikh Ahmadou Bamba Mbacké, le Guide a consacré sa vie à la transmission du savoir religieux et à l'accompagnement spirituel de la communauté.",
+    "vision": "Vision",
+    "texteVision": "Rassembler les fidèles autour des valeurs de piété, de travail et de solidarité portées par le Khidma, dans la continuité de l'enseignement du Cheikh.",
+    "enseignements": "Enseignements",
+    "texteEnseignements": "Le Guide met l'accent sur la pratique quotidienne de la foi, l'éducation des jeunes et le soutien mutuel au sein du Dahira, à travers des causeries, des conseils et des réponses aux questions des membres."
+  },
+  "admin": {
+    "titre": "Espace administration",
+    "finance": "Finance",
+    "evenements": "Événements",
+    "questionsEnAttente": "Questions en attente",
+    "gestionMembresBientot": "Gestion des membres (bientôt disponible)",
+    "marquerPaye": "Marquer payée",
+    "nouvelEvenement": "Nouvel événement",
+    "activerReservationBus": "Activer la réservation de bus pour cet événement",
+    "creer": "Créer l'événement",
+    "redigerReponse": "Rédiger la réponse…",
+    "repondre": "Envoyer la réponse",
+    "aucuneQuestionEnAttente": "Aucune question en attente."
+  }
+}
