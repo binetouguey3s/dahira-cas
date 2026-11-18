@@ -34,7 +34,7 @@ export function CarteEvenement({ evenement }: { evenement: Evenement }) {
   const { t } = useTranslation();
   const passe = new Date(evenement.date) < new Date();
   return (
-    <Link to={`/evenements/${evenement.id}`} className="block">
+    <Link to={`/evenements/${evenement.id}`} className="block min-w-0">
       <CardInteractive className="flex items-center gap-4">
         <PaveDate date={evenement.date} passe={passe} />
         <div className="min-w-0 flex-1">
@@ -64,7 +64,7 @@ export function CarteContenu({ contenu }: { contenu: ContenuMedia }) {
   const { t } = useTranslation();
   const Icone = ICONES_CONTENU[contenu.type] ?? FileText;
   return (
-    <Link to={`/mediatheque/${contenu.id}`} className="block">
+    <Link to={`/mediatheque/${contenu.id}`} className="block min-w-0">
       <CardInteractive className="flex items-center gap-4">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent-primary">
           <Icone className="h-6 w-6" />

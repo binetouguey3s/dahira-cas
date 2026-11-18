@@ -26,8 +26,9 @@ export function ListeAnimee({ children, className }: { children: ReactNode; clas
 }
 
 export function ElementAnime({ children, className }: { children: ReactNode; className?: string }) {
+  // min-w-0 : dans une grille, l'élément peut rétrécir et les textes longs sont tronqués au lieu de déborder.
   return (
-    <motion.div variants={elementCascade} className={className}>
+    <motion.div variants={elementCascade} className={cn("min-w-0", className)}>
       {children}
     </motion.div>
   );
