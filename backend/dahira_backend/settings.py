@@ -14,6 +14,20 @@ SECRET_KEY = config("SECRET_KEY", default="django-insecure-change-me-in-producti
 DEBUG = config("DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
+# --- Sécurité HTTPS en production (Render) -------------------------------
+# Render termine le HTTPS puis transmet la requête en HTTP à Django :
+# cet en-tête permet à Django de savoir que la requête d'origine était sécurisée
+# (sinon la connexion à /admin/ échoue avec "CSRF verification failed").
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600  # 1 h ; à augmenter une fois le site stable
+    CSRF_TRUSTED_ORIGINS = [
+        f"https://{host}" for host in ALLOWED_HOSTS if host not in ("localhost", "127.0.0.1")
+    ]
+
 # --- Applications ---------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -107,7 +121,15 @@ LANGUAGES = [
 # --- Fichiers statiques et médias ---------------------------------------
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Depuis Django 5.1, les backends de stockage se déclarent via STORAGES
+# (STATICFILES_STORAGE et DEFAULT_FILE_STORAGE ont été supprimés).
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    },
+}
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -124,7 +146,9 @@ if CLOUDINARY_CLOUD_NAME:
         "API_KEY": CLOUDINARY_API_KEY,
         "API_SECRET": CLOUDINARY_API_SECRET,
     }
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    STORAGES["default"] = {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"
+    }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
