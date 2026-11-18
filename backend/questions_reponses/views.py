@@ -27,9 +27,10 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = Question.objects.select_related("reponse", "membre")
-        if a_un_role(self.request.user, ROLES_OUSTAZ):
-            return qs
-        return qs.filter(membre=self.request.user)
+        # ?miennes=1 : l'espace personnel n'affiche que ses propres questions, même pour l'Oustaz.
+        if self.request.query_params.get("miennes") == "1" or not a_un_role(self.request.user, ROLES_OUSTAZ):
+            return qs.filter(membre=self.request.user)
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(membre=self.request.user)
@@ -59,8 +60,10 @@ class QuestionViewSet(viewsets.ModelViewSet):
         question = self.get_object()
         existante = getattr(question, "reponse", None)
         donnees = {"question": question.id, "texte": request.data.get("texte", "")}
-        if "audio" in request.data:
+        if request.data.get("audio"):
             donnees["audio"] = request.data.get("audio")
+        elif existante and existante.audio and request.data.get("supprimer_audio") != "1":
+            donnees["audio"] = existante.audio
         serializer = ReponseSerializer(existante, data=donnees)
         serializer.is_valid(raise_exception=True)
         serializer.save(repondant=request.user)

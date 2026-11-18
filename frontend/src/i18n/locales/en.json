@@ -184,7 +184,7 @@
     "confidentialite": "Your questions are private: only you and the Oustaz can read them.",
     "poserUneQuestion": "Ask a question",
     "modifierQuestion": "Edit my question",
-    "aideFormulaire": "Be specific: the Oustaz will answer you right here.",
+    "aideFormulaire": "Write your question, record it as a voice message, or both: the Oustaz will answer you right here.",
     "theme": "Topic",
     "votreQuestion": "Your question",
     "placeholder": "Write your question…",
@@ -476,5 +476,14 @@
     "montantCotisation": "Monthly contribution (FCFA)",
     "numeroWave": "Wave number",
     "numeroOM": "Orange Money number"
+  },
+  "vocal": {
+    "ouVocal": "Or send a voice message",
+    "enregistrer": "Record a voice message",
+    "aide": "Tap to speak, 3 minutes maximum.",
+    "arreter": "Stop recording",
+    "supprimer": "Delete the voice message",
+    "micRefuse": "Cannot access the microphone. Allow it in your browser.",
+    "nonDisponible": "Voice recording is not available in this browser."
   }
 }

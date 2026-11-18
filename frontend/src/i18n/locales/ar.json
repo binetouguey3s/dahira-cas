@@ -192,7 +192,7 @@
     "confidentialite": "أسئلتك خاصة: لا يقرؤها إلا أنت والأستاذ.",
     "poserUneQuestion": "اطرح سؤالًا",
     "modifierQuestion": "تعديل سؤالي",
-    "aideFormulaire": "كن دقيقًا: سيجيبك الأستاذ هنا مباشرة.",
+    "aideFormulaire": "اكتب سؤالك أو سجّله صوتيًا أو كليهما: سيجيبك الأستاذ هنا مباشرة.",
     "theme": "الموضوع",
     "votreQuestion": "سؤالك",
     "placeholder": "اكتب سؤالك…",
@@ -504,5 +504,14 @@
     "montantCotisation": "الاشتراك الشهري (فرنك)",
     "numeroWave": "رقم Wave",
     "numeroOM": "رقم Orange Money"
+  },
+  "vocal": {
+    "ouVocal": "أو أرسل رسالة صوتية",
+    "enregistrer": "تسجيل رسالة صوتية",
+    "aide": "اضغط للتحدث، 3 دقائق كحد أقصى.",
+    "arreter": "إيقاف التسجيل",
+    "supprimer": "حذف الرسالة الصوتية",
+    "micRefuse": "تعذّر الوصول إلى الميكروفون. اسمح به في المتصفح.",
+    "nonDisponible": "التسجيل الصوتي غير متاح في هذا المتصفح."
   }
 }

@@ -126,7 +126,7 @@ export default function Accueil() {
       </ListeAnimee>
 
       <div className="grid gap-10 lg:grid-cols-2">
-        <section>
+        <section className="min-w-0">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-text-primary">{t("accueil.prochainsEvenements")}</h2>
             <Link to="/evenements" className="text-sm font-semibold text-accent-primary hover:underline">
@@ -148,7 +148,7 @@ export default function Accueil() {
           )}
         </section>
 
-        <section>
+        <section className="min-w-0">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-text-primary">{t("accueil.derniersEnseignements")}</h2>
             <Link to="/mediatheque" className="text-sm font-semibold text-accent-primary hover:underline">

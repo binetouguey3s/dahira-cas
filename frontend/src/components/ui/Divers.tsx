@@ -1,6 +1,6 @@
 import { motion, type Variants } from "motion/react";
 import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { cn, initiales } from "@/lib/utils";
 
@@ -63,6 +63,7 @@ export function EnTete({
 
 /* ---------- Avatar ---------- */
 
+/** Photo de profil ; si l'image ne se charge pas, les initiales s'affichent à la place. */
 export function Avatar({
   nom,
   photo,
@@ -74,10 +75,13 @@ export function Avatar({
   taille?: number;
   className?: string;
 }) {
-  return photo ? (
+  const [echec, setEchec] = useState(false);
+  useEffect(() => setEchec(false), [photo]);
+  return photo && !echec ? (
     <img
       src={photo}
       alt={nom}
+      onError={() => setEchec(true)}
       width={taille}
       height={taille}
       loading="lazy"

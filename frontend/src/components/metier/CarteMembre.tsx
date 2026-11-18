@@ -48,6 +48,7 @@ function Ligne({ label, valeur }: { label: string; valeur: string }) {
 
 export const RectoCarte = forwardRef<HTMLDivElement, { membre: Membre }>(({ membre }, ref) => {
   const { t } = useTranslation();
+  const [photoEchec, setPhotoEchec] = useState(false);
   const { parametres } = useParametres();
   return (
     <div ref={ref} className="@container w-full">
@@ -77,8 +78,8 @@ export const RectoCarte = forwardRef<HTMLDivElement, { membre: Membre }>(({ memb
         <div className="absolute inset-x-[5cqw] bottom-[6cqw] top-[18.5cqw] flex gap-[4cqw]">
           <div className="relative h-full shrink-0">
             <div className="h-full aspect-[3/3.7] overflow-hidden rounded-[2.4cqw] bg-[#0B3D2E] ring-[0.5cqw] ring-[#D9C89A]">
-              {membre.photo ? (
-                <img src={membre.photo} alt="" crossOrigin="anonymous" className="h-full w-full object-cover" />
+              {membre.photo && !photoEchec ? (
+                <img src={membre.photo} alt="" crossOrigin="anonymous" onError={() => setPhotoEchec(true)} className="h-full w-full object-cover" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-[8cqw] font-bold text-[#D9C89A]">
                   {initiales(membre.nom_complet)}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { ajouterVocal, EnregistreurVocal, type Vocal } from "@/components/metier/EnregistreurVocal";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { Avatar, ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
@@ -22,6 +23,7 @@ export default function AdminOustaz() {
   const [brouillons, setBrouillons] = useState<Record<number, string>>({});
   const [enEdition, setEnEdition] = useState<number | null>(null);
   const [envoiId, setEnvoiId] = useState<number | null>(null);
+  const [vocaux, setVocaux] = useState<Record<number, Vocal | null>>({});
 
   const charger = () =>
     toutesLesPages<Question>("/questions-reponses/questions/?ordering=date_creation")
@@ -33,11 +35,16 @@ export default function AdminOustaz() {
   }, []);
 
   const repondre = async (q: Question) => {
-    const texte = brouillons[q.id]?.trim();
-    if (!texte) return;
+    const texte = (brouillons[q.id] ?? q.reponse?.texte ?? "").trim();
+    const vocal = vocaux[q.id] ?? null;
+    if (!texte && !vocal && !q.reponse?.audio) return;
     setEnvoiId(q.id);
+    const donnees = new FormData();
+    donnees.append("texte", texte);
+    ajouterVocal(donnees, vocal);
     try {
-      await api.post(`/questions-reponses/questions/${q.id}/repondre/`, { texte });
+      await api.post(`/questions-reponses/questions/${q.id}/repondre/`, donnees);
+      setVocaux((v) => ({ ...v, [q.id]: null }));
       notifier(t("oustaz.reponseEnvoyee"));
       setBrouillons((b) => ({ ...b, [q.id]: "" }));
       setEnEdition(null);
@@ -93,10 +100,12 @@ export default function AdminOustaz() {
                     </div>
                     <Badge tone="or">{t(`questionsReponses.themes.${q.theme}`)}</Badge>
                   </div>
-                  <p className="whitespace-pre-line text-text-primary">
-                    <Traduit texte={q.texte} />
-                  </p>
-                  {q.audio && <audio controls className="mt-3 w-full" src={q.audio} />}
+                  {q.texte && (
+                    <p className="whitespace-pre-line text-text-primary">
+                      <Traduit texte={q.texte} />
+                    </p>
+                  )}
+                  {q.audio && <audio controls preload="metadata" className="mt-3 h-10 w-full" src={q.audio} />}
 
                   <AnimatePresence mode="wait">
                     {edite ? (
@@ -107,6 +116,9 @@ export default function AdminOustaz() {
                           placeholder={t("admin.redigerReponse")}
                           rows={4}
                         />
+                        <div className="mt-2">
+                          <EnregistreurVocal vocal={vocaux[q.id] ?? null} onChange={(v) => setVocaux((x) => ({ ...x, [q.id]: v }))} />
+                        </div>
                         <div className="mt-2 flex justify-end gap-2">
                           {enEdition === q.id && (
                             <Button variant="ghost" onClick={() => setEnEdition(null)}>
@@ -116,7 +128,7 @@ export default function AdminOustaz() {
                           <Button
                             onClick={() => repondre({ ...q })}
                             chargement={envoiId === q.id}
-                            disabled={!(brouillons[q.id] ?? q.reponse?.texte ?? "").trim()}
+                            disabled={!(brouillons[q.id] ?? q.reponse?.texte ?? "").trim() && !vocaux[q.id] && !q.reponse?.audio}
                           >
                             <Send className="h-4 w-4 rtl:rotate-180" /> {t("admin.repondre")}
                           </Button>
@@ -128,7 +140,8 @@ export default function AdminOustaz() {
                           <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-accent-primary">
                             <CheckCircle2 className="h-3.5 w-3.5" /> {t("questionsReponses.reponseOustaz")} · {formatDate(q.reponse.date_publication)}
                           </p>
-                          <p className="whitespace-pre-line text-sm text-text-primary">{q.reponse.texte}</p>
+                          {q.reponse.texte && <p className="whitespace-pre-line text-sm text-text-primary">{q.reponse.texte}</p>}
+                          {q.reponse.audio && <audio controls preload="metadata" className="mt-2 h-10 w-full" src={q.reponse.audio} />}
                           <Button
                             variant="ghost"
                             size="sm"

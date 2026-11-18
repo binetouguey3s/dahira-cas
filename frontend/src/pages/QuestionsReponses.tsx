@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { ajouterVocal, EnregistreurVocal, type Vocal } from "@/components/metier/EnregistreurVocal";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
@@ -25,10 +26,11 @@ export default function QuestionsReponses() {
   const [texte, setTexte] = useState("");
   const [theme, setTheme] = useState<ThemeQuestion>("autre");
   const [envoi, setEnvoi] = useState(false);
+  const [vocal, setVocal] = useState<Vocal | null>(null);
   const [aSupprimer, setASupprimer] = useState<Question | null>(null);
 
   const charger = () =>
-    toutesLesPages<Question>("/questions-reponses/questions/?ordering=-date_creation")
+    toutesLesPages<Question>("/questions-reponses/questions/?miennes=1&ordering=-date_creation")
       .then(setQuestions)
       .catch(() => setQuestions([]));
 
@@ -39,20 +41,29 @@ export default function QuestionsReponses() {
   const ouvrir = (q: Question | "nouvelle") => {
     setEdition(q);
     setTexte(q === "nouvelle" ? "" : q.texte);
+    setVocal(null);
     setTheme(q === "nouvelle" ? "autre" : q.theme);
   };
 
+  const audioExistant = edition && edition !== "nouvelle" ? edition.audio : null;
+  const valide = !!texte.trim() || !!vocal || !!audioExistant;
+
   const enregistrer = async () => {
-    if (!texte.trim() || !edition) return;
+    if (!valide || !edition) return;
     setEnvoi(true);
+    const donnees = new FormData();
+    donnees.append("texte", texte.trim());
+    donnees.append("theme", theme);
+    ajouterVocal(donnees, vocal);
     try {
       if (edition === "nouvelle") {
-        await api.post("/questions-reponses/questions/", { texte: texte.trim(), theme });
+        await api.post("/questions-reponses/questions/", donnees);
         notifier(t("questionsReponses.envoyee"));
       } else {
-        await api.patch(`/questions-reponses/questions/${edition.id}/`, { texte: texte.trim(), theme });
+        await api.patch(`/questions-reponses/questions/${edition.id}/`, donnees);
         notifier(t("commun.enregistre"));
       }
+      setVocal(null);
       setEdition(null);
       charger();
     } catch (err) {
@@ -124,7 +135,8 @@ export default function QuestionsReponses() {
                     {q.reponse ? t("questionsReponses.repondue") : t("questionsReponses.enAttente")}
                   </Badge>
                 </div>
-                <p className="whitespace-pre-line text-text-primary">{q.texte}</p>
+                {q.texte && <p className="whitespace-pre-line text-text-primary">{q.texte}</p>}
+                {q.audio && <audio controls preload="metadata" className="mt-2 h-10 w-full" src={q.audio} />}
 
                 {q.reponse ? (
                   <motion.div
@@ -135,10 +147,12 @@ export default function QuestionsReponses() {
                     <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-accent-primary">
                       <MessageCircleQuestion className="h-3.5 w-3.5" /> {t("questionsReponses.reponseOustaz")}
                     </p>
-                    <p className="whitespace-pre-line text-sm leading-relaxed text-text-primary">
-                      <Traduit texte={q.reponse.texte} />
-                    </p>
-                    {q.reponse.audio && <audio controls className="mt-3 w-full" src={q.reponse.audio} />}
+                    {q.reponse.texte && (
+                      <p className="whitespace-pre-line text-sm leading-relaxed text-text-primary">
+                        <Traduit texte={q.reponse.texte} />
+                      </p>
+                    )}
+                    {q.reponse.audio && <audio controls preload="metadata" className="mt-3 h-10 w-full" src={q.reponse.audio} />}
                   </motion.div>
                 ) : (
                   <div className="mt-4 flex gap-2">
@@ -177,7 +191,7 @@ export default function QuestionsReponses() {
             <Button variant="outline" onClick={() => setEdition(null)}>
               {t("commun.annuler")}
             </Button>
-            <Button onClick={enregistrer} chargement={envoi} disabled={!texte.trim()}>
+            <Button onClick={enregistrer} chargement={envoi} disabled={!valide}>
               {edition === "nouvelle" ? t("commun.envoyer") : t("commun.enregistrer")}
             </Button>
           </>
@@ -201,13 +215,19 @@ export default function QuestionsReponses() {
                 id={id}
                 value={texte}
                 onChange={(e) => setTexte(e.target.value)}
-                rows={5}
+                rows={4}
                 maxLength={3000}
                 placeholder={t("questionsReponses.placeholder")}
-                autoFocus
               />
             )}
           </Champ>
+          <div>
+            <p className="mb-2 text-sm font-semibold text-text-primary">
+              {t("vocal.ouVocal")} <span className="font-normal text-text-secondary">{t("commun.optionnel")}</span>
+            </p>
+            {audioExistant && !vocal && <audio controls preload="metadata" className="mb-2 h-10 w-full" src={audioExistant} />}
+            <EnregistreurVocal vocal={vocal} onChange={setVocal} />
+          </div>
           <AnimatePresence>
             {texte.length > 2500 && (
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-end text-xs text-text-secondary">

@@ -184,7 +184,7 @@
     "confidentialite": "Vos questions sont privées : seuls vous et l'Oustaz pouvez les lire.",
     "poserUneQuestion": "Poser une question",
     "modifierQuestion": "Modifier ma question",
-    "aideFormulaire": "Soyez précis : l'Oustaz vous répondra ici même.",
+    "aideFormulaire": "Écrivez votre question, enregistrez-la en vocal, ou les deux : l'Oustaz vous répondra ici même.",
     "theme": "Thème",
     "votreQuestion": "Votre question",
     "placeholder": "Écrivez votre question…",
@@ -476,5 +476,14 @@
     "montantCotisation": "Cotisation mensuelle (FCFA)",
     "numeroWave": "Numéro Wave",
     "numeroOM": "Numéro Orange Money"
+  },
+  "vocal": {
+    "ouVocal": "Ou envoyez un message vocal",
+    "enregistrer": "Enregistrer un vocal",
+    "aide": "Touchez pour parler, 3 minutes maximum.",
+    "arreter": "Arrêter l'enregistrement",
+    "supprimer": "Supprimer le vocal",
+    "micRefuse": "Impossible d'accéder au micro. Autorisez-le dans votre navigateur.",
+    "nonDisponible": "L'enregistrement vocal n'est pas disponible sur ce navigateur."
   }
 }
