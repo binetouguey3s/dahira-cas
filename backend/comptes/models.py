@@ -17,6 +17,7 @@ class Membre(AbstractUser):
     class Langue(models.TextChoices):
         FR = "fr", "Français"
         EN = "en", "English"
+        ES = "es", "Español"
         AR = "ar", "العربية"
 
     nom_complet = models.CharField(max_length=150)
@@ -34,8 +35,18 @@ class Membre(AbstractUser):
 
     def save(self, *args, **kwargs):
         if not self.carte_numero:
-            self.carte_numero = f"FDCAS-{uuid.uuid4().int % 100000:05d}"
+            self.carte_numero = self._nouveau_numero_carte()
+        # Un super-administrateur Django a d'office le rôle le plus élevé sur le site.
+        if self.is_superuser and self.role == self.Role.MEMBRE:
+            self.role = self.Role.ADMIN_GENERAL
         super().save(*args, **kwargs)
+
+    @classmethod
+    def _nouveau_numero_carte(cls) -> str:
+        while True:
+            numero = f"FDCAS-{uuid.uuid4().int % 1000000:06d}"
+            if not cls.objects.filter(carte_numero=numero).exists():
+                return numero
 
     def __str__(self):
         return self.nom_complet or self.username

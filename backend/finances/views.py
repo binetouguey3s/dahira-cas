@@ -1,27 +1,55 @@
+from django.utils import timezone
 from rest_framework import permissions, viewsets
+from rest_framework.filters import OrderingFilter, SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
+
+from comptes.permissions import ROLES_FINANCE, a_un_role
 
 from .models import Cotisation
 from .serializers import CotisationSerializer
 
 
-class EstResponsableFinanceOuProprietaire(permissions.BasePermission):
-    """Un membre ne voit que ses propres cotisations ; le responsable Finance / admin général voit tout."""
+class CotisationPermission(permissions.BasePermission):
+    """Un membre peut seulement CONSULTER ses propres cotisations.
+
+    Créer, modifier ou supprimer une cotisation (dont la marquer « payée ») est
+    réservé au Responsable Finance et à l'Administrateur général.
+    """
 
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated
-
-    def has_object_permission(self, request, view, obj):
-        if request.user.role in ("responsable_finance", "admin_general") or request.user.is_staff:
+        if not (request.user and request.user.is_authenticated):
+            return False
+        if request.method in permissions.SAFE_METHODS:
             return True
-        return obj.membre_id == request.user.id
+        return a_un_role(request.user, ROLES_FINANCE)
 
 
 class CotisationViewSet(viewsets.ModelViewSet):
     serializer_class = CotisationSerializer
-    permission_classes = [EstResponsableFinanceOuProprietaire]
+    permission_classes = [CotisationPermission]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ["membre", "statut", "mois", "annee"]
+    search_fields = ["membre__nom_complet", "membre__telephone", "membre__carte_numero"]
+    ordering_fields = ["annee", "mois", "montant", "statut", "date_paiement"]
 
     def get_queryset(self):
-        user = self.request.user
-        if user.role in ("responsable_finance", "admin_general") or user.is_staff:
-            return Cotisation.objects.all()
-        return Cotisation.objects.filter(membre=user)
+        qs = Cotisation.objects.select_related("membre")
+        if a_un_role(self.request.user, ROLES_FINANCE):
+            return qs
+        return qs.filter(membre=self.request.user)
+
+    def _date_paiement(self, serializer):
+        statut = serializer.validated_data.get("statut")
+        if statut == Cotisation.Statut.PAYE and not serializer.validated_data.get("date_paiement"):
+            instance = getattr(serializer, "instance", None)
+            if not (instance and instance.date_paiement):
+                return {"date_paiement": timezone.now()}
+        if statut and statut != Cotisation.Statut.PAYE:
+            return {"date_paiement": None}
+        return {}
+
+    def perform_create(self, serializer):
+        serializer.save(**self._date_paiement(serializer))
+
+    def perform_update(self, serializer):
+        serializer.save(**self._date_paiement(serializer))
