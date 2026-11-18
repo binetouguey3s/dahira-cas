@@ -1,45 +1,55 @@
+from django.db import IntegrityError
+from django.db.models import F
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
-from .models import ContenuMedia
+from comptes.permissions import ROLES_CONTENUS, role_ou_lecture_seule
+
+from .models import ContenuMedia, Like
 from .serializers import ContenuMediaSerializer
 
 
-class EstAdminContenuOuLectureSeule(permissions.BasePermission):
-    """Lecture ouverte à tous ; création/modification réservée à l'Oustaz et aux admins contenus."""
-
-    ROLES_AUTORISES = ("oustaz", "admin_contenus", "admin_general")
-
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        user = request.user
-        return bool(
-            user
-            and user.is_authenticated
-            and (user.is_staff or user.role in self.ROLES_AUTORISES)
-        )
-
-
 class ContenuMediaViewSet(viewsets.ModelViewSet):
-    queryset = ContenuMedia.objects.all()
+    """Lecture ouverte à tous ; publication réservée à l'Oustaz et aux admins contenus."""
+
+    queryset = ContenuMedia.objects.select_related("evenement").all()
     serializer_class = ContenuMediaSerializer
-    permission_classes = [EstAdminContenuOuLectureSeule]
-    filterset_fields = ["type", "evenement"]
+    permission_classes = [role_ou_lecture_seule(*ROLES_CONTENUS)]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+    filterset_fields = ["type", "evenement", "auteur"]
+    search_fields = ["titre", "description", "auteur"]
+    ordering_fields = ["date_publication", "nb_likes", "nb_telechargements", "titre"]
+
+    def perform_destroy(self, instance):
+        if instance.fichier:
+            instance.fichier.delete(save=False)
+        instance.delete()
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def aimer(self, request, pk=None):
-        """POST /api/mediatheque/contenus/{id}/aimer/ — incrémente le compteur de likes."""
+        """POST /api/mediatheque/contenus/{id}/aimer/ — ajoute ou retire le like du membre."""
         contenu = self.get_object()
-        contenu.nb_likes += 1
-        contenu.save(update_fields=["nb_likes"])
-        return Response({"nb_likes": contenu.nb_likes})
+        like = Like.objects.filter(contenu=contenu, membre=request.user).first()
+        if like:
+            like.delete()
+            ContenuMedia.objects.filter(pk=contenu.pk, nb_likes__gt=0).update(nb_likes=F("nb_likes") - 1)
+            aime = False
+        else:
+            try:
+                Like.objects.create(contenu=contenu, membre=request.user)
+                ContenuMedia.objects.filter(pk=contenu.pk).update(nb_likes=F("nb_likes") + 1)
+            except IntegrityError:
+                pass
+            aime = True
+        contenu.refresh_from_db(fields=["nb_likes"])
+        return Response({"nb_likes": contenu.nb_likes, "aime": aime})
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.AllowAny])
     def telecharger(self, request, pk=None):
         """POST /api/mediatheque/contenus/{id}/telecharger/ — incrémente le compteur de téléchargements."""
         contenu = self.get_object()
-        contenu.nb_telechargements += 1
-        contenu.save(update_fields=["nb_telechargements"])
+        ContenuMedia.objects.filter(pk=contenu.pk).update(nb_telechargements=F("nb_telechargements") + 1)
+        contenu.refresh_from_db(fields=["nb_telechargements"])
         return Response({"nb_telechargements": contenu.nb_telechargements})

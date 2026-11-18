@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "mediatheque",
     "questions_reponses",
     "notifications",
+    "site_web",
 ]
 
 AUTH_USER_MODEL = "comptes.Membre"
@@ -165,7 +166,15 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ),
     "PAGE_SIZE": 20,
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/minute",
+        "user": "600/minute",
+        "traduction": "120/minute",
+    },
 }
+
+# Traduction automatique des textes saisis (DeepL). Laisser vide pour désactiver.
+DEEPL_API_KEY = config("DEEPL_API_KEY", default="")
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),

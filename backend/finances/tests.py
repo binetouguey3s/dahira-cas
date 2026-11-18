@@ -58,3 +58,20 @@ class CotisationSecuriteTests(APITestCase):
 
     def test_anonyme_refuse(self):
         self.assertEqual(self.client.get(URL).status_code, 401)
+
+
+class GenererCotisationsTests(APITestCase):
+    def test_generer_le_mois_sans_doublon(self):
+        finance = creer_membre("+221770000081", role="responsable_finance")
+        creer_membre("+221770000082")
+        inactif = creer_membre("+221770000083")
+        inactif.is_active = False
+        inactif.save()
+        self.client.force_authenticate(finance)
+        donnees = {"mois": 5, "annee": 2026, "montant": 1000}
+        self.assertEqual(self.client.post(f"{URL}generer/", donnees).data["creees"], 2)
+        self.assertEqual(self.client.post(f"{URL}generer/", donnees).data["creees"], 0)
+
+    def test_membre_ne_peut_pas_generer(self):
+        self.client.force_authenticate(creer_membre("+221770000084"))
+        self.assertEqual(self.client.post(f"{URL}generer/", {"mois": 5, "annee": 2026, "montant": 1}).status_code, 403)

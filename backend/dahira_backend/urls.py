@@ -11,6 +11,7 @@ urlpatterns = [
     path("api/mediatheque/", include("mediatheque.urls")),
     path("api/questions-reponses/", include("questions_reponses.urls")),
     path("api/notifications/", include("notifications.urls")),
+    path("api/site/", include("site_web.urls")),
 ]
 
 if settings.DEBUG:

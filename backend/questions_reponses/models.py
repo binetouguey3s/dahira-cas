@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from dahira_backend.stockage import stockage_audio_video
+
 
 class Question(models.Model):
     class Theme(models.TextChoices):
@@ -18,7 +20,7 @@ class Question(models.Model):
     )
     theme = models.CharField(max_length=20, choices=Theme.choices, default=Theme.AUTRE)
     texte = models.TextField(blank=True)
-    audio = models.FileField(upload_to="questions/audio/", blank=True, null=True)
+    audio = models.FileField(upload_to="questions/audio/", storage=stockage_audio_video, blank=True, null=True)
     statut = models.CharField(max_length=20, choices=Statut.choices, default=Statut.EN_ATTENTE)
     date_creation = models.DateTimeField(auto_now_add=True)
 
@@ -35,7 +37,7 @@ class Reponse(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="reponses"
     )
     texte = models.TextField(blank=True)
-    audio = models.FileField(upload_to="reponses/audio/", blank=True, null=True)
+    audio = models.FileField(upload_to="reponses/audio/", storage=stockage_audio_video, blank=True, null=True)
     date_publication = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
