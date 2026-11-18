@@ -1,15 +1,31 @@
+import { AnimatePresence, motion } from "motion/react";
+import { AlertCircle, Check } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 
-import { TopBarControls } from "@/components/layout/TopBarControls";
+import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/Button";
-import { Input, Label } from "@/components/ui/Input";
+import { Champ, Input, MotDePasseInput } from "@/components/ui/Input";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
+import type { Langue } from "@/i18n";
+import { messageErreur } from "@/lib/api";
+import { cn } from "@/lib/utils";
+
+function forceMotDePasse(mdp: string) {
+  let score = 0;
+  if (mdp.length >= 8) score++;
+  if (/[A-Z]/.test(mdp) && /[a-z]/.test(mdp)) score++;
+  if (/\d/.test(mdp)) score++;
+  if (/[^A-Za-z0-9]/.test(mdp) || mdp.length >= 12) score++;
+  return score;
+}
 
 export default function Inscription() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { inscrire } = useAuth();
+  const { notifier } = useToast();
   const navigate = useNavigate();
 
   const [nomComplet, setNomComplet] = useState("");
@@ -19,85 +35,126 @@ export default function Inscription() {
   const [erreur, setErreur] = useState("");
   const [envoi, setEnvoi] = useState(false);
 
+  const force = forceMotDePasse(motDePasse);
+  const couleursForce = ["bg-status-error", "bg-status-error", "bg-status-warning", "bg-accent-primary", "bg-accent-primary"];
+
   const soumettre = async (e: React.FormEvent) => {
     e.preventDefault();
     setErreur("");
     setEnvoi(true);
     try {
-      await inscrire({ nom_complet: nomComplet, telephone, email, password: motDePasse });
-      navigate("/");
-    } catch {
-      setErreur("Inscription impossible — vérifiez vos informations.");
+      await inscrire({
+        nom_complet: nomComplet.trim(),
+        telephone,
+        email: email.trim(),
+        password: motDePasse,
+        langue_preferee: i18n.language as Langue,
+      });
+      notifier(t("inscription.bienvenue"));
+      navigate("/profil?bienvenue=1");
+    } catch (err) {
+      setErreur(messageErreur(err, t("inscription.erreur")));
     } finally {
       setEnvoi(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-primary md:flex-row">
-      <div className="flex flex-col justify-center gap-4 bg-gradient-to-br from-[#0B3D2E] to-[#1E7A5D] p-10 text-white md:w-1/2">
-        <div className="h-16 w-16 rounded-lg bg-white/10" />
-        <h1 className="max-w-sm text-3xl font-bold">Dahira Cheikh Abdoulahi Seye</h1>
-        <p className="max-w-sm text-sm text-white/85">{t("inscription.sousTitre")}</p>
-      </div>
-
-      <div className="relative flex flex-1 flex-col items-center justify-center gap-6 p-6">
-        <div className="absolute right-4 top-4">
-          <TopBarControls />
-        </div>
-        <form onSubmit={soumettre} className="flex w-full max-w-sm flex-col gap-4">
-          <h2 className="text-xl font-bold text-text-primary">{t("inscription.titre")}</h2>
-
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="nom">{t("inscription.nomComplet")}</Label>
-            <Input id="nom" value={nomComplet} onChange={(e) => setNomComplet(e.target.value)} required />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="telephone">{t("inscription.telephone")}</Label>
+    <AuthLayout titre={t("inscription.titre")} sousTitre={t("inscription.sousTitre")}>
+      <form onSubmit={soumettre} className="flex flex-col gap-4">
+        <Champ label={t("champs.nomComplet")}>
+          {(id) => (
             <Input
-              id="telephone"
+              id={id}
+              autoComplete="name"
+              value={nomComplet}
+              onChange={(e) => setNomComplet(e.target.value)}
+              placeholder="Awa Ndiaye"
+              required
+            />
+          )}
+        </Champ>
+        <Champ label={t("champs.telephone")} aide={t("inscription.aideTelephone")}>
+          {(id) => (
+            <Input
+              id={id}
               type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               value={telephone}
               onChange={(e) => setTelephone(e.target.value)}
               placeholder="+221 77 123 45 67"
               required
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email">
-              {t("inscription.email")} <span className="font-normal text-text-secondary">{t("inscription.optionnel")}</span>
-            </Label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="mdp">{t("inscription.motDePasse")}</Label>
-            <Input
-              id="mdp"
-              type="password"
-              value={motDePasse}
-              onChange={(e) => setMotDePasse(e.target.value)}
-              minLength={8}
-              required
-            />
-          </div>
+          )}
+        </Champ>
+        <Champ label={t("champs.email")} optionnel={t("commun.optionnel")}>
+          {(id) => (
+            <Input id={id} type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          )}
+        </Champ>
+        <Champ label={t("champs.motDePasse")} aide={t("inscription.aideMotDePasse")}>
+          {(id) => (
+            <>
+              <MotDePasseInput
+                id={id}
+                autoComplete="new-password"
+                value={motDePasse}
+                onChange={(e) => setMotDePasse(e.target.value)}
+                minLength={8}
+                libelleAfficher={t("champs.afficherMotDePasse")}
+                required
+              />
+              {motDePasse && (
+                <div className="mt-1 flex gap-1" aria-hidden>
+                  {[0, 1, 2, 3].map((i) => (
+                    <motion.span
+                      key={i}
+                      className={cn("h-1 flex-1 rounded-full", i < force ? couleursForce[force] : "bg-border-subtle")}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ delay: i * 0.05 }}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </Champ>
 
-          {erreur && <p className="text-sm text-status-error">{erreur}</p>}
+        <ul className="flex flex-col gap-1.5 rounded-xl bg-bg-secondary/60 p-3 text-xs text-text-secondary">
+          {[t("inscription.avantage1"), t("inscription.avantage2"), t("inscription.avantage3")].map((a) => (
+            <li key={a} className="flex items-center gap-2">
+              <Check className="h-3.5 w-3.5 shrink-0 text-accent-primary" /> {a}
+            </li>
+          ))}
+        </ul>
 
-          <Button type="submit" disabled={envoi} className="mt-2 w-full">
-            {t("inscription.bouton")}
-          </Button>
+        <AnimatePresence>
+          {erreur && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="flex items-start gap-2 rounded-xl bg-status-error-bg px-3 py-2.5 text-sm text-status-error"
+              role="alert"
+            >
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {erreur}
+            </motion.p>
+          )}
+        </AnimatePresence>
 
-          <p className="text-center text-sm text-text-secondary">
-            {t("inscription.dejaMembre")}{" "}
-            <Link to="/connexion" className="font-semibold text-accent-primary">
-              {t("inscription.seConnecter")}
-            </Link>
-          </p>
-          <Link to="/" className="text-center text-xs font-semibold text-text-secondary underline">
-            {t("inscription.continuerSansCompte")}
+        <Button type="submit" chargement={envoi} size="lg" className="w-full">
+          {t("inscription.bouton")}
+        </Button>
+
+        <p className="text-center text-sm text-text-secondary">
+          {t("inscription.dejaMembre")}{" "}
+          <Link to="/connexion" className="font-semibold text-accent-primary hover:underline">
+            {t("inscription.seConnecter")}
           </Link>
-        </form>
-      </div>
-    </div>
+        </p>
+      </form>
+    </AuthLayout>
   );
 }

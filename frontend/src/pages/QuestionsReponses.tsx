@@ -1,111 +1,232 @@
+import { AnimatePresence, motion } from "motion/react";
+import { Lock, MessageCircleQuestion, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MessageCircleQuestion } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
-import { TopBarControls } from "@/components/layout/TopBarControls";
-import { Badge, Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Label, Textarea } from "@/components/ui/Input";
-import { api, type Paginated, type Question } from "@/lib/api";
+import { Badge, Card } from "@/components/ui/Card";
+import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
+import { Champ, Select, Textarea } from "@/components/ui/Input";
+import { Confirmation, Modal } from "@/components/ui/Modal";
+import { useToast } from "@/context/ToastContext";
+import { Traduit } from "@/context/TraductionContext";
+import { api, messageErreur, toutesLesPages, type Question, type ThemeQuestion } from "@/lib/api";
+import { formatDate } from "@/lib/utils";
 
-const THEMES = ["jeune_ramadan", "zakat", "vie_dahira", "autre"] as const;
+const THEMES: ThemeQuestion[] = ["jeune_ramadan", "zakat", "vie_dahira", "autre"];
 
 export default function QuestionsReponses() {
   const { t } = useTranslation();
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [afficherFormulaire, setAfficherFormulaire] = useState(false);
+  const { notifier } = useToast();
+  const [questions, setQuestions] = useState<Question[] | null>(null);
+  const [filtre, setFiltre] = useState<"toutes" | "en_attente" | "repondu">("toutes");
+  const [edition, setEdition] = useState<Question | "nouvelle" | null>(null);
   const [texte, setTexte] = useState("");
-  const [theme, setTheme] = useState<string>("autre");
+  const [theme, setTheme] = useState<ThemeQuestion>("autre");
   const [envoi, setEnvoi] = useState(false);
+  const [aSupprimer, setASupprimer] = useState<Question | null>(null);
 
-  const charger = () => {
-    api.get<Paginated<Question>>("/questions-reponses/questions/").then((res) =>
-      setQuestions(res.data.results),
-    );
-  };
+  const charger = () =>
+    toutesLesPages<Question>("/questions-reponses/questions/?ordering=-date_creation")
+      .then(setQuestions)
+      .catch(() => setQuestions([]));
 
   useEffect(() => {
     charger();
   }, []);
 
-  const soumettre = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const ouvrir = (q: Question | "nouvelle") => {
+    setEdition(q);
+    setTexte(q === "nouvelle" ? "" : q.texte);
+    setTheme(q === "nouvelle" ? "autre" : q.theme);
+  };
+
+  const enregistrer = async () => {
+    if (!texte.trim() || !edition) return;
     setEnvoi(true);
     try {
-      await api.post("/questions-reponses/questions/", { texte, theme });
-      setTexte("");
-      setAfficherFormulaire(false);
+      if (edition === "nouvelle") {
+        await api.post("/questions-reponses/questions/", { texte: texte.trim(), theme });
+        notifier(t("questionsReponses.envoyee"));
+      } else {
+        await api.patch(`/questions-reponses/questions/${edition.id}/`, { texte: texte.trim(), theme });
+        notifier(t("commun.enregistre"));
+      }
+      setEdition(null);
       charger();
+    } catch (err) {
+      notifier(messageErreur(err, t("commun.erreur")), "erreur");
     } finally {
       setEnvoi(false);
     }
   };
 
+  const supprimer = async () => {
+    if (!aSupprimer) return;
+    setEnvoi(true);
+    try {
+      await api.delete(`/questions-reponses/questions/${aSupprimer.id}/`);
+      setQuestions((qs) => qs?.filter((q) => q.id !== aSupprimer.id) ?? null);
+      notifier(t("commun.supprime"));
+      setASupprimer(null);
+    } catch (err) {
+      notifier(messageErreur(err, t("commun.erreur")), "erreur");
+    } finally {
+      setEnvoi(false);
+    }
+  };
+
+  const visibles = (questions ?? []).filter((q) => filtre === "toutes" || q.statut === filtre);
+  const nbAttente = (questions ?? []).filter((q) => q.statut === "en_attente").length;
+
   return (
     <AppShell>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-text-primary">{t("nav.questionsReponses")}</h1>
-        <TopBarControls />
-      </div>
+      <EnTete
+        surTitre={t("questionsReponses.surTitre")}
+        titre={t("nav.questionsReponses")}
+        sousTitre={t("questionsReponses.sousTitre")}
+        action={
+          <Button onClick={() => ouvrir("nouvelle")}>
+            <Plus className="h-4 w-4" /> {t("questionsReponses.poserUneQuestion")}
+          </Button>
+        }
+      />
 
-      <Button onClick={() => setAfficherFormulaire((v) => !v)} className="mb-5 w-full">
-        {t("questionsReponses.poserUneQuestion")}
-      </Button>
+      <p className="mb-5 flex items-center gap-2 rounded-xl bg-bg-secondary/70 px-4 py-3 text-xs text-text-secondary">
+        <Lock className="h-4 w-4 shrink-0 text-accent-primary" /> {t("questionsReponses.confidentialite")}
+      </p>
 
-      {afficherFormulaire && (
-        <Card className="mb-5">
-          <form onSubmit={soumettre} className="flex flex-col gap-3">
-            <div>
-              <Label htmlFor="theme">{t("questionsReponses.theme")}</Label>
-              <select
-                id="theme"
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
-                className="h-11 w-full rounded-lg border border-border-default bg-bg-primary px-3 text-text-primary"
-              >
+      <Onglets
+        className="mb-6 max-w-md"
+        valeur={filtre}
+        onChange={setFiltre}
+        options={[
+          { id: "toutes", label: t("questionsReponses.toutes") },
+          { id: "en_attente", label: t("questionsReponses.enAttente"), compteur: nbAttente },
+          { id: "repondu", label: t("questionsReponses.repondues") },
+        ]}
+      />
+
+      {questions === null ? (
+        <SqueletteListe />
+      ) : visibles.length ? (
+        <ListeAnimee key={filtre} className="flex flex-col gap-4">
+          {visibles.map((q) => (
+            <ElementAnime key={q.id}>
+              <Card className="p-5">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Badge tone="or">{t(`questionsReponses.themes.${q.theme}`)}</Badge>
+                    <span className="text-xs text-text-secondary">{formatDate(q.date_creation)}</span>
+                  </div>
+                  <Badge tone={q.reponse ? "success" : "warning"}>
+                    {q.reponse ? t("questionsReponses.repondue") : t("questionsReponses.enAttente")}
+                  </Badge>
+                </div>
+                <p className="whitespace-pre-line text-text-primary">{q.texte}</p>
+
+                {q.reponse ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-4 rounded-2xl border-s-4 border-accent-primary bg-accent-soft p-4"
+                  >
+                    <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-accent-primary">
+                      <MessageCircleQuestion className="h-3.5 w-3.5" /> {t("questionsReponses.reponseOustaz")}
+                    </p>
+                    <p className="whitespace-pre-line text-sm leading-relaxed text-text-primary">
+                      <Traduit texte={q.reponse.texte} />
+                    </p>
+                    {q.reponse.audio && <audio controls className="mt-3 w-full" src={q.reponse.audio} />}
+                  </motion.div>
+                ) : (
+                  <div className="mt-4 flex gap-2">
+                    <Button variant="secondary" size="sm" onClick={() => ouvrir(q)}>
+                      <Pencil className="h-3.5 w-3.5" /> {t("commun.modifier")}
+                    </Button>
+                    <Button variant="ghost" size="sm" className="text-status-error" onClick={() => setASupprimer(q)}>
+                      <Trash2 className="h-3.5 w-3.5" /> {t("commun.supprimer")}
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            </ElementAnime>
+          ))}
+        </ListeAnimee>
+      ) : (
+        <Vide
+          icone={MessageCircleQuestion}
+          titre={t("questionsReponses.aucuneQuestion")}
+          message={t("questionsReponses.aucuneQuestionAide")}
+          action={
+            <Button onClick={() => ouvrir("nouvelle")}>
+              <Plus className="h-4 w-4" /> {t("questionsReponses.poserUneQuestion")}
+            </Button>
+          }
+        />
+      )}
+
+      <Modal
+        ouvert={edition !== null}
+        onFermer={() => setEdition(null)}
+        titre={edition === "nouvelle" ? t("questionsReponses.poserUneQuestion") : t("questionsReponses.modifierQuestion")}
+        description={t("questionsReponses.aideFormulaire")}
+        pied={
+          <>
+            <Button variant="outline" onClick={() => setEdition(null)}>
+              {t("commun.annuler")}
+            </Button>
+            <Button onClick={enregistrer} chargement={envoi} disabled={!texte.trim()}>
+              {edition === "nouvelle" ? t("commun.envoyer") : t("commun.enregistrer")}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <Champ label={t("questionsReponses.theme")}>
+            {(id) => (
+              <Select id={id} value={theme} onChange={(e) => setTheme(e.target.value as ThemeQuestion)}>
                 {THEMES.map((th) => (
                   <option key={th} value={th}>
                     {t(`questionsReponses.themes.${th}`)}
                   </option>
                 ))}
-              </select>
-            </div>
-            <div>
-              <Label htmlFor="texte">{t("questionsReponses.contenu")}</Label>
-              <Textarea id="texte" value={texte} onChange={(e) => setTexte(e.target.value)} rows={4} required />
-            </div>
-            <Button type="submit" disabled={envoi}>
-              {t("questionsReponses.envoyer")}
-            </Button>
-          </form>
-        </Card>
-      )}
-
-      <div className="flex flex-col gap-3">
-        {questions.map((q) => (
-          <Card key={q.id}>
-            <div className="mb-2 flex items-start justify-between gap-2">
-              <p className="font-semibold text-text-primary">{t(`questionsReponses.themes.${q.theme}`)}</p>
-              <Badge tone={q.reponse ? "success" : "warning"}>
-                {q.reponse ? t("questionsReponses.repondue") : t("questionsReponses.enAttente")}
-              </Badge>
-            </div>
-            <p className="mb-2 text-sm text-text-secondary">{q.texte}</p>
-            {q.reponse && (
-              <div className="rounded-lg bg-accent-soft p-3">
-                <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-accent-primary">
-                  <MessageCircleQuestion className="h-3 w-3" /> {t("questionsReponses.reponseGuide")}
-                </p>
-                <p className="text-sm text-text-primary">{q.reponse.texte}</p>
-              </div>
+              </Select>
             )}
-          </Card>
-        ))}
-        {questions.length === 0 && (
-          <p className="py-8 text-center text-sm text-text-secondary">{t("questionsReponses.aucuneQuestion")}</p>
-        )}
-      </div>
+          </Champ>
+          <Champ label={t("questionsReponses.votreQuestion")}>
+            {(id) => (
+              <Textarea
+                id={id}
+                value={texte}
+                onChange={(e) => setTexte(e.target.value)}
+                rows={5}
+                maxLength={3000}
+                placeholder={t("questionsReponses.placeholder")}
+                autoFocus
+              />
+            )}
+          </Champ>
+          <AnimatePresence>
+            {texte.length > 2500 && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-end text-xs text-text-secondary">
+                {texte.length}/3000
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+      </Modal>
+
+      <Confirmation
+        ouvert={!!aSupprimer}
+        onFermer={() => setASupprimer(null)}
+        onConfirmer={supprimer}
+        titre={t("questionsReponses.supprimerTitre")}
+        message={t("questionsReponses.supprimerMessage")}
+        libelleConfirmer={t("commun.supprimer")}
+        chargement={envoi}
+      />
     </AppShell>
   );
 }

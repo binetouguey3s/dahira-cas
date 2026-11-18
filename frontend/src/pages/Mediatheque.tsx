@@ -1,89 +1,109 @@
+import { Play, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { FileText, Headphones, Video } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
-import { TopBarControls } from "@/components/layout/TopBarControls";
-import { Badge, Card } from "@/components/ui/Card";
+import { CarteContenu } from "@/components/metier/Elements";
+import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
+import { Input } from "@/components/ui/Input";
 import { api, type ContenuMedia, type Paginated } from "@/lib/api";
 
-const ICONES: Record<string, typeof Headphones> = {
-  audio: Headphones,
-  video: Video,
-  texte: FileText,
-};
+type Filtre = "tous" | "audio" | "video" | "texte";
 
 export default function Mediatheque() {
   const { t } = useTranslation();
-  const [contenus, setContenus] = useState<ContenuMedia[]>([]);
-  const [filtre, setFiltre] = useState<string>("tous");
-  const [chargement, setChargement] = useState(true);
+  const [contenus, setContenus] = useState<ContenuMedia[] | null>(null);
+  const [filtre, setFiltre] = useState<Filtre>("tous");
+  const [recherche, setRecherche] = useState("");
+  const [tri, setTri] = useState("-date_publication");
+  const [suivante, setSuivante] = useState<string | null>(null);
 
   useEffect(() => {
-    setChargement(true);
-    const params = filtre === "tous" ? "" : `?type=${filtre}`;
-    api
-      .get<Paginated<ContenuMedia>>(`/mediatheque/contenus/${params}`)
-      .then((res) => setContenus(res.data.results))
-      .catch(() => setContenus([]))
-      .finally(() => setChargement(false));
-  }, [filtre]);
+    const params = new URLSearchParams({ ordering: tri });
+    if (filtre !== "tous") params.set("type", filtre);
+    if (recherche.trim()) params.set("search", recherche.trim());
+    setContenus(null);
+    const minuterie = window.setTimeout(() => {
+      api
+        .get<Paginated<ContenuMedia>>(`/mediatheque/contenus/?${params}`)
+        .then((res) => {
+          setContenus(res.data.results);
+          setSuivante(res.data.next);
+        })
+        .catch(() => setContenus([]));
+    }, recherche ? 300 : 0);
+    return () => window.clearTimeout(minuterie);
+  }, [filtre, recherche, tri]);
 
-  const onglets = [
-    { id: "tous", label: t("mediatheque.tous") },
-    { id: "audio", label: t("mediatheque.audio") },
-    { id: "video", label: t("mediatheque.video") },
-    { id: "texte", label: t("mediatheque.texte") },
-  ];
+  const chargerPlus = async () => {
+    if (!suivante) return;
+    const { data } = await api.get<Paginated<ContenuMedia>>(suivante);
+    setContenus((c) => [...(c ?? []), ...data.results]);
+    setSuivante(data.next);
+  };
 
   return (
     <AppShell>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-text-primary">{t("nav.mediatheque")}</h1>
-        <TopBarControls />
+      <EnTete surTitre={t("mediatheque.surTitre")} titre={t("nav.mediatheque")} sousTitre={t("mediatheque.sousTitre")} />
+
+      <div className="mb-4 flex flex-col gap-3 md:flex-row">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
+          <Input
+            value={recherche}
+            onChange={(e) => setRecherche(e.target.value)}
+            placeholder={t("mediatheque.rechercher")}
+            className="ps-11"
+            type="search"
+          />
+        </div>
+        <select
+          value={tri}
+          onChange={(e) => setTri(e.target.value)}
+          aria-label={t("commun.trier")}
+          className="select-chevron h-12 cursor-pointer appearance-none rounded-[var(--radius-md)] border border-border-subtle bg-bg-elevated bg-[length:16px] bg-[position:right_14px_center] bg-no-repeat pe-10 ps-4 text-sm text-text-primary rtl:bg-[position:left_14px_center]"
+        >
+          <option value="-date_publication">{t("mediatheque.triRecents")}</option>
+          <option value="-nb_likes">{t("mediatheque.triPopulaires")}</option>
+          <option value="titre">{t("mediatheque.triAlphabetique")}</option>
+        </select>
       </div>
 
-      <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
-        {onglets.map((onglet) => (
-          <button
-            key={onglet.id}
-            onClick={() => setFiltre(onglet.id)}
-            className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-              filtre === onglet.id
-                ? "bg-accent-primary text-white"
-                : "bg-bg-secondary text-text-secondary"
-            }`}
-          >
-            {onglet.label}
-          </button>
-        ))}
-      </div>
+      <Onglets
+        className="mb-6"
+        valeur={filtre}
+        onChange={setFiltre}
+        options={[
+          { id: "tous", label: t("mediatheque.tous") },
+          { id: "audio", label: t("mediatheque.types.audio") },
+          { id: "video", label: t("mediatheque.types.video") },
+          { id: "texte", label: t("mediatheque.types.texte") },
+        ]}
+      />
 
-      {chargement && <p className="text-sm text-text-secondary">{t("commun.chargement")}</p>}
-
-      <div className="flex flex-col gap-3">
-        {contenus.map((contenu) => {
-          const Icone = ICONES[contenu.type] ?? FileText;
-          return (
-            <Link key={contenu.id} to={`/mediatheque/${contenu.id}`}>
-              <Card className="flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent-primary">
-                  <Icone className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-text-primary">{contenu.titre}</p>
-                  <p className="text-sm text-text-secondary">{contenu.description}</p>
-                </div>
-                <Badge tone="neutral">{contenu.type}</Badge>
-              </Card>
-            </Link>
-          );
-        })}
-        {!chargement && contenus.length === 0 && (
-          <p className="py-8 text-center text-sm text-text-secondary">{t("mediatheque.aucunResultat")}</p>
-        )}
-      </div>
+      {contenus === null ? (
+        <SqueletteListe lignes={4} />
+      ) : contenus.length ? (
+        <>
+          <ListeAnimee key={`${filtre}-${tri}`} className="grid gap-3 md:grid-cols-2">
+            {contenus.map((c) => (
+              <ElementAnime key={c.id}>
+                <CarteContenu contenu={c} />
+              </ElementAnime>
+            ))}
+          </ListeAnimee>
+          {suivante && (
+            <button
+              onClick={chargerPlus}
+              className="mx-auto mt-6 block rounded-full border border-border-subtle px-5 py-2.5 text-sm font-semibold text-text-primary hover:bg-bg-secondary"
+            >
+              {t("commun.voirPlus")}
+            </button>
+          )}
+        </>
+      ) : (
+        <Vide icone={Play} titre={t("mediatheque.aucunResultat")} message={t("mediatheque.aucunResultatAide")} />
+      )}
     </AppShell>
   );
 }

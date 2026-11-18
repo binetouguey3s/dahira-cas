@@ -1,55 +1,92 @@
+import { Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { Calendar, MapPin } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
-import { TopBarControls } from "@/components/layout/TopBarControls";
-import { Badge, Card } from "@/components/ui/Card";
-import { api, type Evenement, type Paginated } from "@/lib/api";
+import { CarteEvenement } from "@/components/metier/Elements";
+import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
+import { api, type CategorieEvenement, type Evenement, type Paginated } from "@/lib/api";
+import { locale } from "@/lib/utils";
+
+const CATEGORIES: (CategorieEvenement | "toutes")[] = ["toutes", "magal", "gamou", "dahira", "causerie", "autre"];
 
 export default function Evenements() {
   const { t } = useTranslation();
-  const [evenements, setEvenements] = useState<Evenement[]>([]);
+  const [periode, setPeriode] = useState<"a_venir" | "passes">("a_venir");
+  const [categorie, setCategorie] = useState<CategorieEvenement | "toutes">("toutes");
+  const [evenements, setEvenements] = useState<Evenement[] | null>(null);
 
   useEffect(() => {
+    const params = new URLSearchParams({ periode });
+    if (periode === "a_venir") params.set("ordering", "date");
+    if (categorie !== "toutes") params.set("categorie", categorie);
+    setEvenements(null);
     api
-      .get<Paginated<Evenement>>("/evenements/evenements/?ordering=date")
-      .then((res) => setEvenements(res.data.results));
-  }, []);
+      .get<Paginated<Evenement>>(`/evenements/evenements/?${params}`)
+      .then((res) => setEvenements(res.data.results))
+      .catch(() => setEvenements([]));
+  }, [periode, categorie]);
+
+  // Regroupe par mois pour une lecture plus agréable.
+  const parMois = (evenements ?? []).reduce<Record<string, Evenement[]>>((acc, ev) => {
+    const cle = new Date(ev.date).toLocaleDateString(locale(), { month: "long", year: "numeric" });
+    (acc[cle] ??= []).push(ev);
+    return acc;
+  }, {});
 
   return (
     <AppShell>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-text-primary">{t("nav.evenements")}</h1>
-        <TopBarControls />
+      <EnTete surTitre={t("evenements.surTitre")} titre={t("nav.evenements")} sousTitre={t("evenements.sousTitre")} />
+
+      <Onglets
+        className="mb-4 max-w-sm"
+        valeur={periode}
+        onChange={setPeriode}
+        options={[
+          { id: "a_venir", label: t("evenements.aVenir") },
+          { id: "passes", label: t("evenements.passes") },
+        ]}
+      />
+
+      <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4">
+        {CATEGORIES.map((c) => (
+          <button
+            key={c}
+            onClick={() => setCategorie(c)}
+            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors ${
+              categorie === c
+                ? "border-accent-secondary bg-accent-secondary/15 text-accent-secondary-text"
+                : "border-border-subtle text-text-secondary hover:text-text-primary"
+            }`}
+          >
+            {c === "toutes" ? t("evenements.toutesCategories") : t(`evenements.categories.${c}`)}
+          </button>
+        ))}
       </div>
 
-      <div className="flex flex-col gap-3">
-        {evenements.map((ev) => (
-          <Link key={ev.id} to={`/evenements/${ev.id}`}>
-            <Card>
-              <div className="mb-2 flex items-start justify-between gap-2">
-                <p className="font-semibold text-text-primary">{ev.titre}</p>
-                <Badge tone="neutral">{t(`evenements.categories.${ev.categorie}`)}</Badge>
-              </div>
-              <p className="mb-2 line-clamp-2 text-sm text-text-secondary">{ev.description}</p>
-              <div className="flex flex-wrap gap-4 text-sm text-text-secondary">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  {new Date(ev.date).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
-                </span>
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" /> {ev.lieu}
-                </span>
-              </div>
-            </Card>
-          </Link>
-        ))}
-        {evenements.length === 0 && (
-          <p className="py-8 text-center text-sm text-text-secondary">{t("evenements.aucunEvenement")}</p>
-        )}
-      </div>
+      {evenements === null ? (
+        <SqueletteListe lignes={3} />
+      ) : evenements.length ? (
+        <div className="flex flex-col gap-8">
+          {Object.entries(parMois).map(([mois, liste]) => (
+            <section key={mois}>
+              <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.12em] text-text-secondary">{mois}</h2>
+              <ListeAnimee className="flex flex-col gap-3">
+                {liste.map((ev) => (
+                  <ElementAnime key={ev.id}>
+                    <CarteEvenement evenement={ev} />
+                  </ElementAnime>
+                ))}
+              </ListeAnimee>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <Vide
+          icone={Calendar}
+          titre={periode === "a_venir" ? t("evenements.aucunAVenir") : t("evenements.aucunPasse")}
+        />
+      )}
     </AppShell>
   );
 }

@@ -1,85 +1,102 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
-import { api, type Membre } from "@/lib/api";
+import { changerLangue, LANGUES, type Langue } from "@/i18n";
+import { api, jetons, type Membre } from "@/lib/api";
+
+interface DonneesInscription {
+  nom_complet: string;
+  telephone: string;
+  email?: string;
+  password: string;
+  langue_preferee?: Langue;
+}
 
 interface AuthContextValue {
   membre: Membre | null;
   chargement: boolean;
-  connecter: (telephone: string, motDePasse: string) => Promise<void>;
-  inscrire: (donnees: {
-    nom_complet: string;
-    telephone: string;
-    email?: string;
-    password: string;
-  }) => Promise<void>;
+  connecter: (telephone: string, motDePasse: string) => Promise<Membre | null>;
+  inscrire: (donnees: DonneesInscription) => Promise<void>;
   deconnecter: () => void;
+  /** Met à jour le profil côté serveur (JSON ou FormData pour la photo). */
+  mettreAJour: (donnees: Partial<Membre> | FormData) => Promise<Membre>;
+  remplacer: (membre: Membre) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+function appliquerLanguePreferee(membre: Membre) {
+  try {
+    // La langue choisie sur cet appareil reste prioritaire si elle existe déjà.
+    if (localStorage.getItem("dahira_langue")) return;
+  } catch {
+    /* ignore */
+  }
+  if ((LANGUES as readonly string[]).includes(membre.langue_preferee)) changerLangue(membre.langue_preferee as Langue);
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [membre, setMembre] = useState<Membre | null>(null);
   const [chargement, setChargement] = useState(true);
 
-  const chargerProfil = async () => {
-    const token = localStorage.getItem("dahira_access_token");
-    if (!token) {
+  const chargerProfil = useCallback(async (): Promise<Membre | null> => {
+    if (!jetons.acces()) {
       setChargement(false);
-      return;
+      return null;
     }
     try {
       const { data } = await api.get<Membre>("/comptes/moi/");
       setMembre(data);
+      return data;
     } catch {
-      localStorage.removeItem("dahira_access_token");
-      localStorage.removeItem("dahira_refresh_token");
+      jetons.effacer();
+      setMembre(null);
+      return null;
     } finally {
       setChargement(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     chargerProfil();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const surDeconnexion = () => setMembre(null);
+    window.addEventListener("dahira:deconnexion", surDeconnexion);
+    return () => window.removeEventListener("dahira:deconnexion", surDeconnexion);
+  }, [chargerProfil]);
 
   const connecter = async (telephone: string, motDePasse: string) => {
     const { data } = await api.post("/comptes/connexion/", {
-      username: telephone,
+      username: telephone.replace(/\s+/g, ""),
       password: motDePasse,
     });
-    localStorage.setItem("dahira_access_token", data.access);
-    localStorage.setItem("dahira_refresh_token", data.refresh);
-    await chargerProfil();
+    jetons.enregistrer(data.access, data.refresh);
+    const profil = await chargerProfil();
+    if (profil) appliquerLanguePreferee(profil);
+    return profil;
   };
 
-  const inscrire = async (donnees: {
-    nom_complet: string;
-    telephone: string;
-    email?: string;
-    password: string;
-  }) => {
-    const { data } = await api.post("/comptes/inscription/", donnees);
-    localStorage.setItem("dahira_access_token", data.access);
-    localStorage.setItem("dahira_refresh_token", data.refresh);
+  const inscrire = async (donnees: DonneesInscription) => {
+    const { data } = await api.post("/comptes/inscription/", {
+      ...donnees,
+      telephone: donnees.telephone.replace(/\s+/g, ""),
+    });
+    jetons.enregistrer(data.access, data.refresh);
     setMembre(data.membre);
   };
 
   const deconnecter = () => {
-    localStorage.removeItem("dahira_access_token");
-    localStorage.removeItem("dahira_refresh_token");
+    jetons.effacer();
     setMembre(null);
+  };
+
+  const mettreAJour = async (donnees: Partial<Membre> | FormData) => {
+    const { data } = await api.patch<Membre>("/comptes/moi/", donnees);
+    setMembre(data);
+    return data;
   };
 
   return (
     <AuthContext.Provider
-      value={{ membre, chargement, connecter, inscrire, deconnecter }}
+      value={{ membre, chargement, connecter, inscrire, deconnecter, mettreAJour, remplacer: setMembre }}
     >
       {children}
     </AuthContext.Provider>

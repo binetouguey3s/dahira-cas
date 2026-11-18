@@ -1,114 +1,175 @@
+import { motion } from "motion/react";
+import { ArrowRight, BookOpen, Calendar, CreditCard, HelpCircle, Play, Sparkles, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { BookOpen, Calendar, HeartHandshake, Play } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
-import { TopBarControls } from "@/components/layout/TopBarControls";
-import { Card } from "@/components/ui/Card";
-import { api, type ContenuMedia, type Evenement, type Paginated } from "@/lib/api";
+import { CarteContenu, CarteEvenement } from "@/components/metier/Elements";
+import { Button } from "@/components/ui/Button";
+import { ElementAnime, ListeAnimee, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { useAuth } from "@/context/AuthContext";
+import { useParametres } from "@/context/ParametresContext";
+import { Traduit } from "@/context/TraductionContext";
+import { api, type ContenuMedia, type Evenement, type Paginated } from "@/lib/api";
+
+function salutation(heure: number) {
+  if (heure < 12) return "accueil.bonjour";
+  if (heure < 18) return "accueil.bonApresMidi";
+  return "accueil.bonsoir";
+}
 
 export default function Accueil() {
   const { t } = useTranslation();
   const { membre } = useAuth();
-  const [derniersContenus, setDerniersContenus] = useState<ContenuMedia[]>([]);
-  const [prochainEvenement, setProchainEvenement] = useState<Evenement | null>(null);
+  const { parametres } = useParametres();
+  const [contenus, setContenus] = useState<ContenuMedia[] | null>(null);
+  const [evenements, setEvenements] = useState<Evenement[] | null>(null);
 
   useEffect(() => {
     api
-      .get<Paginated<ContenuMedia>>("/mediatheque/contenus/?ordering=-date_publication")
-      .then((res) => setDerniersContenus(res.data.results.slice(0, 3)))
-      .catch(() => undefined);
+      .get<Paginated<ContenuMedia>>("/mediatheque/contenus/?ordering=-date_publication&page_size=4")
+      .then((res) => setContenus(res.data.results.slice(0, 4)))
+      .catch(() => setContenus([]));
     api
-      .get<Paginated<Evenement>>("/evenements/evenements/?ordering=date")
-      .then((res) => setProchainEvenement(res.data.results[0] ?? null))
-      .catch(() => undefined);
+      .get<Paginated<Evenement>>("/evenements/evenements/?periode=a_venir&ordering=date")
+      .then((res) => setEvenements(res.data.results.slice(0, 3)))
+      .catch(() => setEvenements([]));
   }, []);
+
+  const citation = parametres.citation_du_jour || t("accueil.citationParDefaut");
+  const prenom = membre?.nom_complet?.split(" ")[0];
+
+  const raccourcis = [
+    { to: "/biographie", icone: BookOpen, label: t("nav.biographie") },
+    { to: "/mediatheque", icone: Play, label: t("nav.mediatheque") },
+    { to: "/evenements", icone: Calendar, label: t("nav.evenements") },
+    ...(membre
+      ? [
+          { to: "/questions-reponses", icone: HelpCircle, label: t("nav.qa") },
+          { to: "/cotisations", icone: Wallet, label: t("nav.cotisations") },
+          { to: "/carte", icone: CreditCard, label: t("nav.carte") },
+        ]
+      : []),
+  ];
 
   return (
     <AppShell>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <p className="text-sm text-text-secondary">
-            {t("accueil.salutation", { nom: membre?.nom_complet?.split(" ")[0] ?? "" })}
-          </p>
-          <h1 className="text-xl font-bold text-text-primary">{t("accueil.titre")}</h1>
-        </div>
-        <TopBarControls />
-      </div>
-
-      <Card className="mb-6 bg-gradient-to-br from-accent-primary to-[#0B3D2E] text-white">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-white/70">
-          {t("accueil.conseilDuJour")}
-        </p>
-        <p className="font-serif text-lg leading-relaxed">{t("accueil.citationGuide")}</p>
-      </Card>
-
-      <div className="mb-6 grid grid-cols-3 gap-3">
-        <Link to="/biographie">
-          <Card className="flex flex-col items-center gap-2 py-5 text-center">
-            <BookOpen className="h-6 w-6 text-accent-primary" />
-            <span className="text-xs font-semibold text-text-primary">{t("nav.biographie")}</span>
-          </Card>
-        </Link>
-        <Link to="/mediatheque">
-          <Card className="flex flex-col items-center gap-2 py-5 text-center">
-            <Play className="h-6 w-6 text-accent-primary" />
-            <span className="text-xs font-semibold text-text-primary">{t("nav.mediatheque")}</span>
-          </Card>
-        </Link>
-        <Link to="/evenements">
-          <Card className="flex flex-col items-center gap-2 py-5 text-center">
-            <Calendar className="h-6 w-6 text-accent-primary" />
-            <span className="text-xs font-semibold text-text-primary">{t("nav.evenements")}</span>
-          </Card>
-        </Link>
-      </div>
-
-      {prochainEvenement && (
-        <Link to="/evenements" className="mb-6 block">
-          <Card className="flex items-center gap-4">
-            <div className="flex h-14 w-14 flex-col items-center justify-center rounded-lg bg-accent-soft text-accent-primary">
-              <Calendar className="h-6 w-6" />
-            </div>
-            <div className="flex-1">
-              <p className="text-xs font-semibold uppercase text-accent-primary">
-                {t("accueil.prochainEvenement")}
+      {/* Bandeau d'accueil */}
+      <motion.section
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="relative mb-8 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B3D2E] via-[#145c45] to-[#1E7A5D] p-6 text-white shadow-[0_24px_60px_-24px_rgba(11,61,46,0.6)] md:p-10"
+      >
+        <div className="motif-etoiles pointer-events-none absolute inset-0" />
+        <motion.div
+          className="pointer-events-none absolute -end-20 -top-20 h-64 w-64 rounded-full bg-[#D9C89A]/25 blur-3xl"
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <div className="relative flex flex-col gap-6 md:flex-row md:items-center">
+          <div className="flex-1">
+            <p className="mb-2 flex items-center gap-2 text-sm font-medium text-[#D9C89A]">
+              <Sparkles className="h-4 w-4" />
+              {membre ? t(salutation(new Date().getHours()), { nom: prenom }) : t("accueil.bienvenueVisiteur")}
+            </p>
+            <h1 className="max-w-xl text-2xl font-bold leading-tight md:text-4xl">{parametres.nom_dahira}</h1>
+            <blockquote className="mt-5 max-w-xl border-s-2 border-[#D9C89A]/70 ps-4">
+              <p className="font-serif text-lg leading-relaxed text-white/95 md:text-xl">
+                <Traduit texte={citation} />
               </p>
-              <p className="font-semibold text-text-primary">{prochainEvenement.titre}</p>
-              <p className="text-sm text-text-secondary">{prochainEvenement.lieu}</p>
-            </div>
-          </Card>
-        </Link>
-      )}
+              <footer className="mt-2 text-xs uppercase tracking-[0.16em] text-white/65">
+                {t("accueil.conseilDuJour")} · {parametres.citation_auteur || parametres.nom_guide}
+              </footer>
+            </blockquote>
+            {!membre && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button asChild variant="or" size="lg">
+                  <Link to="/inscription">
+                    {t("nav.devenirMembre")} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" size="lg" className="text-white hover:bg-white/10">
+                  <Link to="/connexion">{t("nav.connexion")}</Link>
+                </Button>
+              </div>
+            )}
+          </div>
+          {parametres.photo_guide && (
+            <motion.img
+              src={parametres.photo_guide}
+              alt={parametres.nom_guide}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.25, duration: 0.6 }}
+              className="h-36 w-36 self-center rounded-[28px] object-cover ring-4 ring-white/15 md:h-48 md:w-48"
+            />
+          )}
+        </div>
+      </motion.section>
 
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-semibold text-text-primary">{t("accueil.dernierEnseignements")}</h2>
-        <Link to="/mediatheque" className="text-sm font-semibold text-accent-primary">
-          {t("accueil.voirTout")}
-        </Link>
-      </div>
-      <div className="flex flex-col gap-3">
-        {derniersContenus.map((contenu) => (
-          <Link key={contenu.id} to={`/mediatheque/${contenu.id}`}>
-            <Card className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent-soft text-accent-primary">
-                <Play className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-text-primary">{contenu.titre}</p>
-                <p className="text-sm text-text-secondary">{contenu.type}</p>
-              </div>
-            </Card>
-          </Link>
+      {/* Raccourcis */}
+      <ListeAnimee className="mb-10 grid grid-cols-3 gap-3 md:grid-cols-6">
+        {raccourcis.map(({ to, icone: Icone, label }) => (
+          <ElementAnime key={to}>
+            <Link
+              to={to}
+              className="group flex flex-col items-center gap-2 rounded-2xl border border-border-subtle bg-bg-elevated px-2 py-4 text-center transition-all duration-200 hover:-translate-y-1 hover:border-accent-primary/40 hover:shadow-[0_12px_28px_-14px_var(--glass-shadow)]"
+            >
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent-primary transition-transform duration-300 group-hover:scale-110">
+                <Icone className="h-5 w-5" />
+              </span>
+              <span className="text-xs font-semibold text-text-primary">{label}</span>
+            </Link>
+          </ElementAnime>
         ))}
-        {derniersContenus.length === 0 && (
-          <Card className="flex flex-col items-center gap-2 py-8 text-center text-text-secondary">
-            <HeartHandshake className="h-6 w-6" />
-            <p className="text-sm">{t("accueil.aucunContenu")}</p>
-          </Card>
-        )}
+      </ListeAnimee>
+
+      <div className="grid gap-10 lg:grid-cols-2">
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-text-primary">{t("accueil.prochainsEvenements")}</h2>
+            <Link to="/evenements" className="text-sm font-semibold text-accent-primary hover:underline">
+              {t("commun.voirTout")}
+            </Link>
+          </div>
+          {evenements === null ? (
+            <SqueletteListe lignes={2} />
+          ) : evenements.length ? (
+            <ListeAnimee className="flex flex-col gap-3">
+              {evenements.map((ev) => (
+                <ElementAnime key={ev.id}>
+                  <CarteEvenement evenement={ev} />
+                </ElementAnime>
+              ))}
+            </ListeAnimee>
+          ) : (
+            <Vide icone={Calendar} titre={t("evenements.aucunAVenir")} />
+          )}
+        </section>
+
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-text-primary">{t("accueil.derniersEnseignements")}</h2>
+            <Link to="/mediatheque" className="text-sm font-semibold text-accent-primary hover:underline">
+              {t("commun.voirTout")}
+            </Link>
+          </div>
+          {contenus === null ? (
+            <SqueletteListe lignes={3} />
+          ) : contenus.length ? (
+            <ListeAnimee className="flex flex-col gap-3">
+              {contenus.map((c) => (
+                <ElementAnime key={c.id}>
+                  <CarteContenu contenu={c} />
+                </ElementAnime>
+              ))}
+            </ListeAnimee>
+          ) : (
+            <Vide icone={Play} titre={t("mediatheque.aucunContenu")} />
+          )}
+        </section>
       </div>
     </AppShell>
   );

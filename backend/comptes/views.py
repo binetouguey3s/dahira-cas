@@ -98,8 +98,16 @@ class VerifierCarteView(APIView):
         return Response(CarteVerificationSerializer(membre, context={"request": request}).data)
 
 
+def mot_de_passe_provisoire() -> str:
+    return "-".join(secrets.token_hex(2) for _ in range(3))
+
+
 class MembreAdminViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
 ):
     """/api/comptes/membres/ — gestion des membres par l'Administrateur général."""
 
@@ -115,11 +123,22 @@ class MembreAdminViewSet(
             nb_cotisations_payees=Count("cotisations", filter=Q(cotisations__statut="paye"))
         )
 
+    def create(self, request, *args, **kwargs):
+        """Inscrit un membre à sa place (ex. sans smartphone) avec un mot de passe provisoire."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        provisoire = mot_de_passe_provisoire()
+        membre = serializer.save(username=serializer.validated_data["telephone"])
+        membre.set_password(provisoire)
+        membre.save(update_fields=["password"])
+        donnees = self.get_serializer(self.get_queryset().get(pk=membre.pk)).data
+        return Response({**donnees, "mot_de_passe_provisoire": provisoire}, status=201)
+
     @action(detail=True, methods=["post"], url_path="reinitialiser-mot-de-passe")
     def reinitialiser_mot_de_passe(self, request, pk=None):
         """Génère un mot de passe provisoire à transmettre au membre."""
         membre = self.get_object()
-        provisoire = "-".join(secrets.token_hex(2) for _ in range(3))
+        provisoire = mot_de_passe_provisoire()
         membre.set_password(provisoire)
         membre.save(update_fields=["password"])
         return Response({"mot_de_passe_provisoire": provisoire})

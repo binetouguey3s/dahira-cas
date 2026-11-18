@@ -128,3 +128,20 @@ class CarteTests(APITestCase):
         self.assertEqual(res.data["nom_complet"], membre.nom_complet)
         self.assertNotIn("telephone", res.data)
         self.assertEqual(self.client.get("/api/comptes/carte/INCONNU/").status_code, 404)
+
+
+class CreationParAdminTests(APITestCase):
+    def test_admin_inscrit_un_membre_avec_mot_de_passe_provisoire(self):
+        admin = creer_membre("+221770000101", role="admin_general")
+        self.client.force_authenticate(admin)
+        res = self.client.post("/api/comptes/membres/", {"nom_complet": "Mame Diarra", "telephone": "+221770000102"})
+        self.assertEqual(res.status_code, 201)
+        membre = Membre.objects.get(telephone="+221770000102")
+        self.assertEqual(membre.username, "+221770000102")
+        self.assertTrue(membre.check_password(res.data["mot_de_passe_provisoire"]))
+        self.assertTrue(membre.carte_numero)
+
+    def test_finance_ne_peut_pas_inscrire(self):
+        self.client.force_authenticate(creer_membre("+221770000103", role="responsable_finance"))
+        res = self.client.post("/api/comptes/membres/", {"nom_complet": "X", "telephone": "+221770000104"})
+        self.assertEqual(res.status_code, 403)

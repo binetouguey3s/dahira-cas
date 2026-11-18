@@ -34,7 +34,7 @@ class CotisationViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["membre", "statut", "mois", "annee"]
     search_fields = ["membre__nom_complet", "membre__telephone", "membre__carte_numero"]
-    ordering_fields = ["annee", "mois", "montant", "statut", "date_paiement"]
+    ordering_fields = ["annee", "mois", "montant", "statut", "date_paiement", "membre__nom_complet"]
 
     def get_queryset(self):
         qs = Cotisation.objects.select_related("membre")

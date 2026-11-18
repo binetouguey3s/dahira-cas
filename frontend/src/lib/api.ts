@@ -1,27 +1,95 @@
-import axios from "axios";
+import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000/api";
+export const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000/api";
 
-export const api = axios.create({
-  baseURL: API_BASE_URL,
-});
+const CLE_ACCES = "dahira_access_token";
+const CLE_RAFRAICHIR = "dahira_refresh_token";
+
+export const jetons = {
+  acces: () => localStorage.getItem(CLE_ACCES),
+  rafraichir: () => localStorage.getItem(CLE_RAFRAICHIR),
+  enregistrer(acces: string, rafraichir?: string) {
+    localStorage.setItem(CLE_ACCES, acces);
+    if (rafraichir) localStorage.setItem(CLE_RAFRAICHIR, rafraichir);
+  },
+  effacer() {
+    localStorage.removeItem(CLE_ACCES);
+    localStorage.removeItem(CLE_RAFRAICHIR);
+  },
+};
+
+export const api = axios.create({ baseURL: API_BASE_URL });
 
 // Attache le jeton JWT à chaque requête, s'il existe.
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("dahira_access_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  const token = jetons.acces();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-export type Role =
-  | "membre"
-  | "responsable_finance"
-  | "oustaz"
-  | "admin_contenus"
-  | "admin_general";
+// Quand le jeton d'accès expire, on le renouvelle une fois puis on rejoue la requête.
+let renouvellement: Promise<string | null> | null = null;
+
+async function renouvelerJeton(): Promise<string | null> {
+  const rafraichir = jetons.rafraichir();
+  if (!rafraichir) return null;
+  try {
+    const { data } = await axios.post(`${API_BASE_URL}/comptes/connexion/rafraichir/`, { refresh: rafraichir });
+    jetons.enregistrer(data.access, data.refresh);
+    return data.access as string;
+  } catch {
+    jetons.effacer();
+    window.dispatchEvent(new Event("dahira:deconnexion"));
+    return null;
+  }
+}
+
+api.interceptors.response.use(
+  (reponse) => reponse,
+  async (erreur: AxiosError) => {
+    const config = erreur.config as (InternalAxiosRequestConfig & { _rejoue?: boolean }) | undefined;
+    if (erreur.response?.status === 401 && config && !config._rejoue && jetons.rafraichir()) {
+      config._rejoue = true;
+      renouvellement ??= renouvelerJeton().finally(() => (renouvellement = null));
+      const nouveau = await renouvellement;
+      if (nouveau) {
+        config.headers.Authorization = `Bearer ${nouveau}`;
+        return api(config);
+      }
+    }
+    return Promise.reject(erreur);
+  },
+);
+
+/** Transforme une erreur de l'API (format Django REST Framework) en message lisible. */
+export function messageErreur(erreur: unknown, parDefaut: string): string {
+  const reponse = (erreur as AxiosError)?.response;
+  if (!reponse) return (erreur as AxiosError)?.message === "Network Error" ? "Connexion au serveur impossible." : parDefaut;
+  const data = reponse.data as unknown;
+  const aplatir = (v: unknown): string[] => {
+    if (typeof v === "string") return [v];
+    if (Array.isArray(v)) return v.flatMap(aplatir);
+    if (v && typeof v === "object") return Object.values(v).flatMap(aplatir);
+    return [];
+  };
+  const messages = aplatir(data).filter(Boolean);
+  return messages.length ? messages.join(" ") : parDefaut;
+}
+
+/** Récupère toutes les pages d'une liste paginée. */
+export async function toutesLesPages<T>(url: string): Promise<T[]> {
+  const resultats: T[] = [];
+  let suivante: string | null = url;
+  while (suivante) {
+    const { data }: { data: Paginated<T> } = await api.get<Paginated<T>>(suivante);
+    resultats.push(...data.results);
+    suivante = data.next;
+  }
+  return resultats;
+}
+
+export type Role = "membre" | "responsable_finance" | "oustaz" | "admin_contenus" | "admin_general";
+export type CodeLangue = "fr" | "en" | "es" | "ar";
 
 export interface Membre {
   id: number;
@@ -32,10 +100,36 @@ export interface Membre {
   profession: string;
   adresse: string;
   pays: string;
+  date_naissance: string | null;
   photo: string | null;
   role: Role;
-  langue_preferee: "fr" | "en" | "ar";
+  is_staff: boolean;
+  langue_preferee: CodeLangue;
   carte_numero: string;
+  date_inscription: string;
+}
+
+export interface MembreAdmin extends Omit<Membre, "username"> {
+  is_active: boolean;
+  last_login: string | null;
+  nb_cotisations_payees: number;
+}
+
+export interface MembreResume {
+  id: number;
+  nom_complet: string;
+  telephone: string;
+  carte_numero: string;
+  photo: string | null;
+}
+
+export interface CarteVerification {
+  nom_complet: string;
+  photo: string | null;
+  carte_numero: string;
+  role: Role;
+  role_libelle: string;
+  is_active: boolean;
   date_inscription: string;
 }
 
@@ -43,6 +137,7 @@ export interface Cotisation {
   id: number;
   membre: number;
   membre_nom: string;
+  membre_telephone: string;
   mois: number;
   annee: number;
   montant: string;
@@ -52,37 +147,66 @@ export interface Cotisation {
   date_paiement: string | null;
 }
 
+export interface Bus {
+  numero: number;
+  places_total: number;
+  places_restantes: number | null;
+}
+
+export interface ReservationBus {
+  id: number;
+  evenement: number;
+  evenement_titre: string;
+  membre: number;
+  membre_nom: string;
+  membre_telephone: string;
+  bus_numero: number;
+  nb_places: number;
+  date_reservation: string;
+}
+
+export type CategorieEvenement = "magal" | "gamou" | "dahira" | "causerie" | "autre";
+
 export interface Evenement {
   id: number;
   titre: string;
   description: string;
   lieu: string;
-  categorie: "magal" | "gamou" | "dahira" | "causerie" | "autre";
+  categorie: CategorieEvenement;
   date: string;
   reservation_bus_active: boolean;
   nb_bus: number | null;
   places_par_bus: number | null;
+  bus: Bus[];
+  ma_reservation: ReservationBus | null;
+  nb_reservations: number;
 }
+
+export type TypeContenu = "audio" | "video" | "texte";
 
 export interface ContenuMedia {
   id: number;
   titre: string;
   description: string;
-  type: "audio" | "video" | "texte";
+  type: TypeContenu;
   fichier: string | null;
   url_externe: string;
   auteur: string;
   evenement: number | null;
+  evenement_titre: string | null;
   nb_likes: number;
   nb_telechargements: number;
+  aime: boolean;
   date_publication: string;
 }
+
+export type ThemeQuestion = "jeune_ramadan" | "zakat" | "vie_dahira" | "autre";
 
 export interface Question {
   id: number;
   membre: number;
   membre_nom: string;
-  theme: "jeune_ramadan" | "zakat" | "vie_dahira" | "autre";
+  theme: ThemeQuestion;
   texte: string;
   audio: string | null;
   statut: "en_attente" | "repondu";
@@ -95,11 +219,41 @@ export interface Question {
   } | null;
 }
 
-interface Paginated<T> {
+export interface Parametres {
+  nom_dahira: string;
+  sigle: string;
+  logo: string | null;
+  nom_guide: string;
+  titre_guide: string;
+  photo_guide: string | null;
+  biographie_parcours: string;
+  biographie_vision: string;
+  biographie_enseignements: string;
+  citation_du_jour: string;
+  citation_auteur: string;
+  telephone_contact: string;
+  email_contact: string;
+  adresse: string;
+  montant_cotisation: string;
+  numero_wave: string;
+  numero_orange_money: string;
+}
+
+export interface Statistiques {
+  membres?: number;
+  nouveaux_membres_mois?: number;
+  cotisations_mois_payees?: number;
+  cotisations_mois_total?: number;
+  montant_encaisse_annee?: number | string;
+  cotisations_en_retard?: number;
+  questions_en_attente?: number;
+  contenus?: number;
+  evenements_a_venir?: number;
+}
+
+export interface Paginated<T> {
   count: number;
   next: string | null;
   previous: string | null;
   results: T[];
 }
-
-export type { Paginated };

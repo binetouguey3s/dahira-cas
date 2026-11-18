@@ -1,25 +1,27 @@
 import type { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "@/context/AuthContext";
+import type { Role } from "@/lib/api";
+import { aAcces } from "@/lib/navigation";
 
-interface Props {
-  children: ReactNode;
-  rolesAutorises?: string[];
+import { Logo } from "./layout/Logo";
+
+export function EcranChargement() {
+  return (
+    <div className="flex min-h-dvh items-center justify-center bg-bg-primary">
+      <Logo taille={56} className="animate-pulse" />
+    </div>
+  );
 }
 
-/** Protège une route : redirige vers /connexion si non connecté, ou vers / si le rôle ne convient pas. */
-export function ProtectedRoute({ children, rolesAutorises }: Props) {
+/** Protège une route : connexion obligatoire, et éventuellement un rôle précis. */
+export function ProtectedRoute({ children, roles }: { children: ReactNode; roles?: Role[] }) {
   const { membre, chargement } = useAuth();
+  const location = useLocation();
 
-  if (chargement) return null;
-  if (!membre) return <Navigate to="/connexion" replace />;
-  if (
-    rolesAutorises &&
-    !rolesAutorises.includes(membre.role) &&
-    membre.role !== "admin_general"
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  if (chargement) return <EcranChargement />;
+  if (!membre) return <Navigate to="/connexion" replace state={{ depuis: location.pathname }} />;
+  if (!aAcces(membre, roles)) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
