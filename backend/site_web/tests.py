@@ -103,3 +103,10 @@ class TermesProtegesTests(APITestCase):
         self.assertEqual(deproteger("التحضير لليلة <x>Leylatul Khadr</x>", "ar"), "التحضير لليلة القدر")
         self.assertEqual(deproteger("ليلة<x>Nisfou Shabaan</x>", "ar"), "ليلة النصف من شعبان")
         self.assertEqual(proteger("a < b & c"), "a &lt; b &amp; c")
+
+
+class SanteTests(APITestCase):
+    def test_sante_sans_base_de_donnees(self):
+        with self.assertNumQueries(0):
+            res = self.client.get("/api/sante/")
+        self.assertEqual(res.json(), {"ok": True})

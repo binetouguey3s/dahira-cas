@@ -1,10 +1,19 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import include, path
+
+
+def sante(_request):
+    """GET /api/sante/ — garde le serveur éveillé (service de « ping »). Ne touche jamais la base de
+    données : la base Neon peut ainsi se mettre en veille et ne consomme pas son quota gratuit."""
+    return JsonResponse({"ok": True})
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/sante/", sante, name="sante"),
     path("api/comptes/", include("comptes.urls")),
     path("api/finances/", include("finances.urls")),
     path("api/evenements/", include("evenements.urls")),
