@@ -95,8 +95,9 @@ class TermesProtegesTests(APITestCase):
         for texte in ["Magal de Touba", "Nisfou Shabaan", "Leylatul Khadr", "Cheikh Abdoulahi Seye", "Setaané, Gnétaané"]:
             self.assertEqual(proteger(texte), f"<x>{texte}</x>")
             self.assertEqual(deproteger(proteger(texte)), texte)
-        # Vers l'arabe : forme arabe usuelle, sinon le terme reste protégé.
-        self.assertEqual(proteger("Magal de Touba", "ar"), "ماغال طوبى")
-        self.assertEqual(proteger("Leylatoul Qadr", "ar"), "ليلة القدر")
-        self.assertEqual(proteger("Setaané, Gnétaané", "ar"), "<x>Setaané, Gnétaané</x>")
+        # Vers l'arabe : forme arabe usuelle remise après traduction, sinon le terme reste tel quel.
+        self.assertEqual(deproteger("الاستعداد لـ<x>Leylatul Khadr</x> مع الـ<x>Dahira</x>", "ar"), "الاستعداد لليلة القدر مع الدائرة")
+        self.assertEqual(deproteger("<x>Magal de Touba</x>", "ar"), "ماغال طوبى")
+        self.assertEqual(deproteger("يذكّر <x>Cheikh Abdoulahi Seye</x>: <x>Setaané, Gnétaané</x>", "ar"), "يذكّر الشيخ عبد الله سي: Setaané, Gnétaané")
+        self.assertEqual(deproteger("<x>Magal de Touba</x>", "en"), "Magal de Touba")
         self.assertEqual(proteger("a < b & c"), "a &lt; b &amp; c")

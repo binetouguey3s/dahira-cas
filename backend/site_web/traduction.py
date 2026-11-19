@@ -60,7 +60,7 @@ TERMES_PROTEGES = [
 _TERMES = [(re.compile(motif, re.IGNORECASE), arabe) for motif, arabe in TERMES_PROTEGES]
 _MOTIF_PROTEGE = re.compile(r"\b(?:" + "|".join(m for m, _ in TERMES_PROTEGES) + r")\b", re.IGNORECASE)
 # Changer cette version invalide les traductions déjà mémorisées (nouvelle règle de traduction).
-VERSION_TRADUCTION = "v3"
+VERSION_TRADUCTION = "v4"
 
 
 def _forme_arabe(terme):
@@ -70,23 +70,32 @@ def _forme_arabe(terme):
     return None
 
 
-def proteger(texte, langue=None):
-    """Échappe le texte en XML et entoure les termes protégés d'une balise ignorée par DeepL.
-
-    Vers l'arabe, un terme qui a une forme arabe usuelle est écrit directement en arabe :
-    DeepL l'intègre alors naturellement à la phrase.
-    """
+def proteger(texte):
+    """Échappe le texte en XML et entoure les termes protégés d'une balise ignorée par DeepL."""
     morceaux, position = [], 0
     for trouve in _MOTIF_PROTEGE.finditer(texte):
         morceaux.append(html.escape(texte[position : trouve.start()], quote=False))
-        arabe = _forme_arabe(trouve.group(0)) if langue == "ar" else None
-        morceaux.append(arabe if arabe else f"<x>{html.escape(trouve.group(0), quote=False)}</x>")
+        morceaux.append(f"<x>{html.escape(trouve.group(0), quote=False)}</x>")
         position = trouve.end()
     morceaux.append(html.escape(texte[position:], quote=False))
     return "".join(morceaux)
 
 
-def deproteger(texte):
+def deproteger(texte, langue=None):
+    """Retire les balises. Vers l'arabe, un terme protégé est remplacé APRÈS traduction par sa forme
+    arabe usuelle (le faire avant ferait croire à DeepL que le texte est déjà en arabe)."""
+    if langue == "ar":
+
+        def arabe(trouve):
+            terme = html.unescape(trouve.group(2))
+            forme = _forme_arabe(terme)
+            if not forme:
+                return trouve.group(1) + terme
+            # Article ajouté par DeepL devant le mot étranger (« الـ ») : la forme arabe le porte déjà.
+            prefixe = re.sub(r"(?:ال|ل)ـ?$", lambda m: "ل" if m.group(0).startswith("ل") and not m.group(0).startswith("ال") else "", trouve.group(1))
+            return prefixe + forme
+
+        texte = re.sub(r"((?:ال|ل)?ـ?)<x>(.*?)</x>", arabe, texte)
     return html.unescape(re.sub(r"</?x>", "", texte))
 
 
@@ -95,7 +104,7 @@ def _appeler_deepl(textes, langue):
     hote = "api-free.deepl.com" if cle.endswith(":fx") else "api.deepl.com"
     corps = json.dumps(
         {
-            "text": [proteger(t, langue) for t in textes],
+            "text": [proteger(t) for t in textes],
             "target_lang": LANGUES_DEEPL[langue],
             "tag_handling": "xml",
             "ignore_tags": ["x"],
@@ -111,7 +120,7 @@ def _appeler_deepl(textes, langue):
         resultats = json.loads(reponse.read())["translations"]
     return [
         # Si le texte est déjà dans la langue demandée, on garde l'original.
-        source if r.get("detected_source_language", "").lower() == langue else deproteger(r["text"])
+        source if r.get("detected_source_language", "").lower() == langue else deproteger(r["text"], langue)
         for source, r in zip(textes, resultats)
     ]
 
