@@ -86,3 +86,14 @@ class VideoGuideTests(APITestCase):
     def test_simple_membre_ne_peut_pas_modifier(self):
         self.client.force_authenticate(creer_membre("+221770000902"))
         self.assertEqual(self.client.patch(self.URL, {"video_guide_lien": "https://youtu.be/x"}, format="json").status_code, 403)
+
+
+class TermesProtegesTests(APITestCase):
+    def test_termes_religieux_non_traduits(self):
+        from site_web.traduction import deproteger, proteger
+
+        for texte in ["Magal de Touba", "Nisfou Shabaan", "Leylatul Khadr", "Cheikh Abdoulahi Seye", "Setaané, Gnétaané"]:
+            self.assertNotIn(" de <x>", proteger(texte).replace("<x>Magal</x> de <x>Touba</x>", ""))
+            self.assertEqual(deproteger(proteger(texte)), texte)
+        self.assertEqual(proteger("Magal de Touba"), "<x>Magal</x> de <x>Touba</x>")
+        self.assertEqual(proteger("a < b & c"), "a &lt; b &amp; c")
