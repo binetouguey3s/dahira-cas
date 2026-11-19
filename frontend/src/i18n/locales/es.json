@@ -538,5 +538,30 @@
     "lienExpire": "Este enlace ya no es válido.",
     "redemander": "Pedir un nuevo enlace",
     "retour": "Volver al inicio de sesión"
+  },
+  "rappels": {
+    "titre": "Recordatorios de cuota por correo",
+    "aide": "Un correo recuerda a cada miembro sus meses impagados, el total y los números de Wave / Orange Money.",
+    "emailsInactifs": "Los correos no están configurados en el servidor (falta la clave de Brevo): no se puede enviar ningún recordatorio.",
+    "automatique": "Envío automático cada mes",
+    "prochain": "Próximo envío: {{date}}",
+    "desactive": "Desactivado: no se envía ningún recordatorio automáticamente.",
+    "jour": "Día de envío",
+    "leJour": "El día {{jour}} del mes",
+    "concernes_one": "{{count}} miembro tiene cuotas impagadas",
+    "concernes_other": "{{count}} miembros tienen cuotas impagadas",
+    "avecEmail_one": "{{count}} recibirá un correo",
+    "avecEmail_other": "{{count}} recibirán un correo",
+    "sansEmail_one": "{{count}} no tiene correo: recuérdaselo por WhatsApp desde la lista.",
+    "sansEmail_other": "{{count}} no tienen correo: recuérdaselo por WhatsApp desde la lista.",
+    "dernierEnvoi": "Último envío manual: {{date}}",
+    "envoyerMaintenant": "Enviar los recordatorios ahora",
+    "generationAuto": "El día 1 de cada mes se crean automáticamente las cuotas del mes para cada miembro activo, y los meses anteriores impagados pasan a «con retraso».",
+    "confirmerTitre": "¿Enviar los recordatorios?",
+    "confirmerMessage_one": "{{count}} miembro recibirá un correo de recordatorio.",
+    "confirmerMessage_other": "{{count}} miembros recibirán un correo de recordatorio.",
+    "envoyer": "Enviar",
+    "envoyes_one": "{{count}} recordatorio enviado",
+    "envoyes_other": "{{count}} recordatorios enviados"
   }
 }

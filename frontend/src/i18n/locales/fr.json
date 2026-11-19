@@ -538,5 +538,30 @@
     "lienExpire": "Ce lien n'est plus valable.",
     "redemander": "Demander un nouveau lien",
     "retour": "Retour à la connexion"
+  },
+  "rappels": {
+    "titre": "Rappels de cotisation par e-mail",
+    "aide": "Un e-mail rappelle à chaque membre ses mois impayés, le total et les numéros Wave / Orange Money.",
+    "emailsInactifs": "Les e-mails ne sont pas configurés sur le serveur (clé Brevo manquante) : aucun rappel ne peut partir.",
+    "automatique": "Envoi automatique chaque mois",
+    "prochain": "Prochain envoi : {{date}}",
+    "desactive": "Désactivé : aucun rappel ne part tout seul.",
+    "jour": "Jour d'envoi",
+    "leJour": "Le {{jour}} du mois",
+    "concernes_one": "{{count}} membre a des cotisations impayées",
+    "concernes_other": "{{count}} membres ont des cotisations impayées",
+    "avecEmail_one": "{{count}} recevra un e-mail",
+    "avecEmail_other": "{{count}} recevront un e-mail",
+    "sansEmail_one": "{{count}} n'a pas d'e-mail : relancez-le par WhatsApp depuis la liste.",
+    "sansEmail_other": "{{count}} n'ont pas d'e-mail : relancez-les par WhatsApp depuis la liste.",
+    "dernierEnvoi": "Dernier envoi manuel : {{date}}",
+    "envoyerMaintenant": "Envoyer les rappels maintenant",
+    "generationAuto": "Le 1er de chaque mois, les cotisations du mois sont créées automatiquement pour chaque membre actif, et les mois précédents non payés passent « en retard ».",
+    "confirmerTitre": "Envoyer les rappels ?",
+    "confirmerMessage_one": "{{count}} membre va recevoir un e-mail de rappel.",
+    "confirmerMessage_other": "{{count}} membres vont recevoir un e-mail de rappel.",
+    "envoyer": "Envoyer",
+    "envoyes_one": "{{count}} rappel envoyé",
+    "envoyes_other": "{{count}} rappels envoyés"
   }
 }

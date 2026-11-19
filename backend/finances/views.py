@@ -1,16 +1,20 @@
+import secrets
+from datetime import timedelta
+
+from django.conf import settings
 from django.utils import timezone
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 
 from comptes.permissions import ROLES_FINANCE, a_un_role
 
-from comptes.models import Membre
-
-from .models import Cotisation
-from .serializers import CotisationSerializer, GenererCotisationsSerializer
+from .models import Cotisation, ReglagesRappels
+from .rappels import apercu, envoyer_rappels, generer_mois, prochain_envoi, taches_quotidiennes
+from .serializers import CotisationSerializer, GenererCotisationsSerializer, ReglagesRappelsSerializer
 
 
 class CotisationPermission(permissions.BasePermission):
@@ -68,11 +72,73 @@ class CotisationViewSet(viewsets.ModelViewSet):
         serializer = GenererCotisationsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         mois, annee, montant = (serializer.validated_data[k] for k in ("mois", "annee", "montant"))
-        deja = set(Cotisation.objects.filter(mois=mois, annee=annee).values_list("membre_id", flat=True))
-        nouvelles = [
-            Cotisation(membre_id=mid, mois=mois, annee=annee, montant=montant)
-            for mid in Membre.objects.filter(is_active=True).values_list("id", flat=True)
-            if mid not in deja
-        ]
-        Cotisation.objects.bulk_create(nouvelles)
-        return Response({"creees": len(nouvelles), "existantes": len(deja)}, status=201)
+        creees, existantes = generer_mois(mois, annee, montant)
+        return Response({"creees": creees, "existantes": existantes}, status=201)
+
+
+class RappelsView(APIView):
+    """GET / PATCH /api/finances/rappels/ — réglages des rappels et nombre de membres concernés (Finance)."""
+
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
+
+    def _reponse(self, reglages):
+        prochain = prochain_envoi(reglages)
+        return Response(
+            {
+                **ReglagesRappelsSerializer(reglages).data,
+                "prochain_envoi": prochain.isoformat() if prochain else None,
+                "apercu": apercu(),
+                "emails_actifs": bool(settings.BREVO_API_KEY) or "console" not in settings.EMAIL_BACKEND,
+            }
+        )
+
+    def get(self, request):
+        if not a_un_role(request.user, ROLES_FINANCE):
+            return Response({"detail": "Accès réservé."}, status=403)
+        return self._reponse(ReglagesRappels.charger())
+
+    def patch(self, request):
+        if not a_un_role(request.user, ROLES_FINANCE):
+            return Response({"detail": "Accès réservé."}, status=403)
+        serializer = ReglagesRappelsSerializer(ReglagesRappels.charger(), data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        return self._reponse(serializer.save())
+
+
+class EnvoyerRappelsView(APIView):
+    """POST /api/finances/rappels/envoyer/ — envoie les rappels maintenant (Finance).
+
+    Bloqué 10 minutes après un envoi, pour éviter les doubles clics qui enverraient deux e-mails.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not a_un_role(request.user, ROLES_FINANCE):
+            return Response({"detail": "Accès réservé."}, status=403)
+        reglages = ReglagesRappels.charger()
+        maintenant = timezone.now()
+        if reglages.dernier_envoi_manuel and maintenant - reglages.dernier_envoi_manuel < timedelta(minutes=10):
+            return Response({"detail": "Des rappels viennent d'être envoyés. Réessayez dans quelques minutes."}, status=409)
+        envoyes = envoyer_rappels()
+        reglages.dernier_envoi_manuel = maintenant
+        reglages.save(update_fields=["dernier_envoi_manuel"])
+        return Response({"envoyes": envoyes, **apercu()})
+
+
+class TachesQuotidiennesView(APIView):
+    """POST /api/finances/taches/ — appelée chaque jour par le robot GitHub (en-tête X-Cle-Taches).
+
+    Crée les cotisations du mois, passe les mois impayés « en retard » et envoie les rappels au jour choisi.
+    """
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        cle = settings.TACHES_CLE
+        recue = request.headers.get("X-Cle-Taches", "")
+        if not cle or not secrets.compare_digest(recue.encode(), cle.encode()):
+            return Response({"detail": "Clé invalide."}, status=403)
+        return Response(taches_quotidiennes())

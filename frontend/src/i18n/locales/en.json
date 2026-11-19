@@ -538,5 +538,30 @@
     "lienExpire": "This link is no longer valid.",
     "redemander": "Request a new link",
     "retour": "Back to sign in"
+  },
+  "rappels": {
+    "titre": "Contribution reminders by email",
+    "aide": "An email reminds each member of their unpaid months, the total and the Wave / Orange Money numbers.",
+    "emailsInactifs": "Emails are not configured on the server (missing Brevo key): no reminder can be sent.",
+    "automatique": "Automatic monthly sending",
+    "prochain": "Next sending: {{date}}",
+    "desactive": "Off: no reminder is sent automatically.",
+    "jour": "Sending day",
+    "leJour": "Day {{jour}} of the month",
+    "concernes_one": "{{count}} member has unpaid contributions",
+    "concernes_other": "{{count}} members have unpaid contributions",
+    "avecEmail_one": "{{count}} will receive an email",
+    "avecEmail_other": "{{count}} will receive an email",
+    "sansEmail_one": "{{count}} has no email: remind them on WhatsApp from the list.",
+    "sansEmail_other": "{{count}} have no email: remind them on WhatsApp from the list.",
+    "dernierEnvoi": "Last manual sending: {{date}}",
+    "envoyerMaintenant": "Send reminders now",
+    "generationAuto": "On the 1st of each month, the month's contributions are created automatically for every active member, and unpaid previous months become \"late\".",
+    "confirmerTitre": "Send the reminders?",
+    "confirmerMessage_one": "{{count}} member will receive a reminder email.",
+    "confirmerMessage_other": "{{count}} members will receive a reminder email.",
+    "envoyer": "Send",
+    "envoyes_one": "{{count}} reminder sent",
+    "envoyes_other": "{{count}} reminders sent"
   }
 }

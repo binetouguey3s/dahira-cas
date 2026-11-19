@@ -33,3 +33,24 @@ class Cotisation(models.Model):
 
     def __str__(self):
         return f"{self.membre} — {self.mois}/{self.annee} ({self.statut})"
+
+
+class ReglagesRappels(models.Model):
+    """Rappels de cotisation par e-mail (une seule ligne en base)."""
+
+    actifs = models.BooleanField(default=True)
+    jour_envoi = models.PositiveSmallIntegerField(default=10)  # 1 à 28
+    dernier_envoi_auto = models.DateField(blank=True, null=True)
+    dernier_envoi_manuel = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Réglages des rappels"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def charger(cls):
+        objet, _ = cls.objects.get_or_create(pk=1)
+        return objet

@@ -14,6 +14,13 @@ logger = logging.getLogger(__name__)
 
 TEXTES = {
     "fr": {
+        "rappel_sujet": "Rappel de cotisation",
+        "rappel_intro": "Sauf erreur de notre part, les cotisations suivantes ne sont pas encore réglées :",
+        "rappel_total": "Total à régler : {total} FCFA",
+        "rappel_payer": "Vous pouvez payer par {moyens}.",
+        "rappel_bouton": "Voir mes cotisations",
+        "rappel_deja": "Si vous avez déjà payé, merci de ne pas tenir compte de ce message : le responsable Finance le mettra à jour.",
+        "et": " ou ",
         "salut": "Assalamou aleykoum {nom},",
         "reinit_sujet": "Choisir un nouveau mot de passe",
         "reinit_intro": "Vous avez demandé à changer le mot de passe de votre compte ({telephone}).",
@@ -27,6 +34,13 @@ TEXTES = {
         "signature": "Dalal ak Diam !",
     },
     "en": {
+        "rappel_sujet": "Contribution reminder",
+        "rappel_intro": "Unless we are mistaken, the following contributions have not been paid yet:",
+        "rappel_total": "Total due: {total} FCFA",
+        "rappel_payer": "You can pay with {moyens}.",
+        "rappel_bouton": "See my contributions",
+        "rappel_deja": "If you have already paid, please disregard this message: the finance officer will update it.",
+        "et": " or ",
         "salut": "Assalamu alaikum {nom},",
         "reinit_sujet": "Choose a new password",
         "reinit_intro": "You asked to change the password of your account ({telephone}).",
@@ -40,6 +54,13 @@ TEXTES = {
         "signature": "Dalal ak Diam!",
     },
     "es": {
+        "rappel_sujet": "Recordatorio de cuota",
+        "rappel_intro": "Salvo error por nuestra parte, las siguientes cuotas aún no están pagadas:",
+        "rappel_total": "Total pendiente: {total} FCFA",
+        "rappel_payer": "Puedes pagar con {moyens}.",
+        "rappel_bouton": "Ver mis cuotas",
+        "rappel_deja": "Si ya has pagado, no tengas en cuenta este mensaje: el responsable de finanzas lo actualizará.",
+        "et": " o ",
         "salut": "Assalamu alaikum {nom}:",
         "reinit_sujet": "Elige una nueva contraseña",
         "reinit_intro": "Has pedido cambiar la contraseña de tu cuenta ({telephone}).",
@@ -53,6 +74,13 @@ TEXTES = {
         "signature": "¡Dalal ak Diam!",
     },
     "ar": {
+        "rappel_sujet": "تذكير بالاشتراك",
+        "rappel_intro": "ما لم نكن مخطئين، فإن الاشتراكات التالية لم تُسدَّد بعد:",
+        "rappel_total": "المجموع المستحق: {total} فرنك",
+        "rappel_payer": "يمكنك الدفع عبر {moyens}.",
+        "rappel_bouton": "عرض اشتراكاتي",
+        "rappel_deja": "إذا كنت قد دفعت بالفعل فتجاهل هذه الرسالة: سيقوم مسؤول المالية بتحديثها.",
+        "et": " أو ",
         "salut": "السلام عليكم {nom}،",
         "reinit_sujet": "اختيار كلمة مرور جديدة",
         "reinit_intro": "طلبتَ تغيير كلمة مرور حسابك ({telephone}).",
@@ -66,6 +94,18 @@ TEXTES = {
         "signature": "Dalal ak Diam!",
     },
 }
+
+
+MOIS = {
+    "fr": ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
+    "en": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "es": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+    "ar": ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+}
+
+
+def _montant(valeur):
+    return f"{int(valeur):,}".replace(",", " ")
 
 
 def _textes(membre):
@@ -91,7 +131,7 @@ def _html(langue, titre, paragraphes, bouton=None, lien=None, note=None):
 </td></tr></table></td></tr></table></body></html>"""
 
 
-def _envoyer(sujet, texte, html, destinataire):
+def _envoyer(sujet, texte, html, destinataire, en_arriere_plan=None):
     message = EmailMultiAlternatives(
         subject=sujet,
         body=texte,
@@ -106,7 +146,7 @@ def _envoyer(sujet, texte, html, destinataire):
         except Exception:  # noqa: BLE001 — un e-mail raté ne doit jamais casser la page
             logger.exception("Envoi d'e-mail impossible vers %s", destinataire)
 
-    if settings.EMAIL_EN_ARRIERE_PLAN:
+    if settings.EMAIL_EN_ARRIERE_PLAN if en_arriere_plan is None else en_arriere_plan:
         threading.Thread(target=tache, daemon=True).start()
     else:
         tache()
@@ -147,3 +187,20 @@ def envoyer_bienvenue(membre):
         membre.langue_preferee, t["bienvenue_sujet"], [salut, t["bienvenue_intro"], identifiant], t["bienvenue_bouton"], lien, t["signature"]
     )
     _envoyer(t["bienvenue_sujet"], texte, html, membre.email)
+
+
+def envoyer_rappel_cotisation(membre, cotisations, parametres, en_arriere_plan=None):
+    """Rappel des cotisations impayées d'un membre, avec le total et les moyens de paiement."""
+    t = _textes(membre)
+    langue = membre.langue_preferee if membre.langue_preferee in MOIS else "fr"
+    salut = t["salut"].format(nom=membre.nom_complet)
+    lignes = [f"• {MOIS[langue][c.mois - 1]} {c.annee} : {_montant(c.montant)} FCFA" for c in cotisations]
+    total = t["rappel_total"].format(total=_montant(sum(c.montant for c in cotisations)))
+    moyens = [f"{nom} ({numero})" for nom, numero in (("Wave", parametres.numero_wave), ("Orange Money", parametres.numero_orange_money)) if numero]
+    paragraphes = [salut, t["rappel_intro"], *lignes, total]
+    if moyens:
+        paragraphes.append(t["rappel_payer"].format(moyens=t["et"].join(moyens)))
+    lien = f"{settings.FRONTEND_URL}/cotisations"
+    texte = "\n\n".join([*paragraphes, lien, t["rappel_deja"], t["signature"]])
+    html = _html(langue, t["rappel_sujet"], paragraphes, t["rappel_bouton"], lien, t["rappel_deja"])
+    _envoyer(t["rappel_sujet"], texte, html, membre.email, en_arriere_plan=en_arriere_plan)

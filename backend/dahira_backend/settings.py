@@ -233,6 +233,9 @@ FRONTEND_URL = config(
     "FRONTEND_URL",
     default=next((o for o in CORS_ALLOWED_ORIGINS if o.startswith("https://")), "http://localhost:5173"),
 ).rstrip("/")
+# Clé secrète du robot qui lance les tâches quotidiennes (cotisations du mois, rappels).
+TACHES_CLE = config("TACHES_CLE", default="")
+
 # Validité du lien « mot de passe oublié » : 2 heures.
 PASSWORD_RESET_TIMEOUT = 2 * 60 * 60
 

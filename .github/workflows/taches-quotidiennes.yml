@@ -1,0 +1,27 @@
+# Robot quotidien du Dahira : chaque matin, il demande au serveur de
+# - créer les cotisations du mois (le 1er),
+# - passer « en retard » les mois précédents non payés,
+# - envoyer les rappels par e-mail au jour choisi dans l'espace Finance.
+# Le serveur ignore les appels en double : relancer le robot ne crée rien en trop.
+name: Tâches quotidiennes
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 8 h du matin à Dakar (UTC)
+  workflow_dispatch: # bouton « Run workflow » pour le lancer à la main
+
+permissions: {}
+
+jobs:
+  taches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Appeler le serveur
+        env:
+          TACHES_CLE: ${{ secrets.TACHES_CLE }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --retry 4 --retry-delay 30 --retry-all-errors --max-time 120 \
+            -X POST "https://dahira-cas.onrender.com/api/finances/taches/" \
+            -H "X-Cle-Taches: ${TACHES_CLE}"

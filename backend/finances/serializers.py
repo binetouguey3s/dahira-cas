@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Cotisation
+from .models import Cotisation, ReglagesRappels
 
 
 class CotisationSerializer(serializers.ModelSerializer):
@@ -45,3 +45,15 @@ class GenererCotisationsSerializer(serializers.Serializer):
     mois = serializers.IntegerField(min_value=1, max_value=12)
     annee = serializers.IntegerField(min_value=2000, max_value=2100)
     montant = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=1)
+
+
+class ReglagesRappelsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReglagesRappels
+        fields = ["actifs", "jour_envoi", "dernier_envoi_auto", "dernier_envoi_manuel"]
+        read_only_fields = ["dernier_envoi_auto", "dernier_envoi_manuel"]
+
+    def validate_jour_envoi(self, jour):
+        if not 1 <= jour <= 28:
+            raise serializers.ValidationError("Choisissez un jour entre 1 et 28.")
+        return jour

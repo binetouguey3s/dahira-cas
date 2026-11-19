@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { RappelsCotisation } from "@/components/metier/RappelsCotisation";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { Avatar, ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Stat, Vide } from "@/components/ui/Divers";
@@ -212,6 +213,8 @@ export default function AdminFinance() {
           valeur={`${liste.length ? Math.round((nbPayees / liste.length) * 100) : 0}%`}
         />
       </div>
+
+      <RappelsCotisation />
 
       <div className="mb-5 flex flex-col gap-3 md:flex-row">
         <div className="relative flex-1">
