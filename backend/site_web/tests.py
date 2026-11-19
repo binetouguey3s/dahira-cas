@@ -93,7 +93,10 @@ class TermesProtegesTests(APITestCase):
         from site_web.traduction import deproteger, proteger
 
         for texte in ["Magal de Touba", "Nisfou Shabaan", "Leylatul Khadr", "Cheikh Abdoulahi Seye", "Setaané, Gnétaané"]:
-            self.assertNotIn(" de <x>", proteger(texte).replace("<x>Magal</x> de <x>Touba</x>", ""))
+            self.assertEqual(proteger(texte), f"<x>{texte}</x>")
             self.assertEqual(deproteger(proteger(texte)), texte)
-        self.assertEqual(proteger("Magal de Touba"), "<x>Magal</x> de <x>Touba</x>")
+        # Vers l'arabe : forme arabe usuelle, sinon le terme reste protégé.
+        self.assertEqual(proteger("Magal de Touba", "ar"), "ماغال طوبى")
+        self.assertEqual(proteger("Leylatoul Qadr", "ar"), "ليلة القدر")
+        self.assertEqual(proteger("Setaané, Gnétaané", "ar"), "<x>Setaané, Gnétaané</x>")
         self.assertEqual(proteger("a < b & c"), "a &lt; b &amp; c")

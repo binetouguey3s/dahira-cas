@@ -22,25 +22,65 @@ LANGUES_SITE = tuple(LANGUES_DEEPL)
 
 # Termes religieux et noms propres à ne jamais traduire (DeepL transformait par exemple
 # « Magal de Touba » en « The great mausoleum of Touba »). Variantes d'orthographe acceptées.
+# Pour l'arabe, la forme arabe usuelle est écrite à la place (sinon le terme reste tel quel).
 TERMES_PROTEGES = [
-    r"Cheikh\s+Abdoula(?:h)?[iy]e?\s+Seye?", r"Cheikh\s+Ahmadou\s+Bamba(?:\s+Mback[ée])?", r"Serigne\s+Touba",
-    r"Nisf?ou?\s*(?:Sh|Ch|S)a+'?b+a+n+e?", r"L[ae][iy]?l[ae]?t(?:ou|u)l?\s*(?:Kh|Q|K)a?dr",
-    r"Kazu\s+Rajab", r"Maou?loud(?:\s+Nabi)?", r"Tamkharit", r"Tabaski", r"Korit[ée]",
-    r"Magal", r"Gamou", r"Dahira", r"Khidma", r"Touba", r"Tivaouane", r"Mback[ée]", r"Mouride?s?",
-    r"Mouridisme", r"Kh?assa[ïi]d(?:e|a)s?", r"Xassida", r"Wolofal", r"Wird", r"Sikar", r"Thiant",
-    r"Serigne", r"Cheikh", r"Oustaz", r"Setaan[ée],?\s*Gn[ée]taan[ée]", r"Dalal\s+ak\s+Diam",
+    (r"Grand\s+Magal\s+de\s+Touba", "الماغال الكبير في طوبى"),
+    (r"Magal\s+de\s+Touba", "ماغال طوبى"),
+    (r"Cheikh\s+Abdoula(?:h)?[iy]e?\s+Seye?", "الشيخ عبد الله سي"),
+    (r"Cheikh\s+Ahmadou\s+Bamba(?:\s+Mback[ée])?", "الشيخ أحمدو بمبا"),
+    (r"Serigne\s+Touba", "سرين طوبى"),
+    (r"Nisf?ou?\s*(?:Sh|Ch|S)a+'?b+a+n+e?", "ليلة النصف من شعبان"),
+    (r"L[ae][iy]?l[ae]?t(?:ou|u)l?\s*(?:Kh|Q|K)a?dr", "ليلة القدر"),
+    (r"Maou?loud(?:\s+Nabi)?", "المولد النبوي"),
+    (r"Tamkharit", "عاشوراء"),
+    (r"Tabaski", "عيد الأضحى"),
+    (r"Korit[ée]", "عيد الفطر"),
+    (r"Kazu\s+Rajab", None),
+    (r"Magal", "ماغال"),
+    (r"Gamou", "غامو"),
+    (r"Dahira", "الدائرة"),
+    (r"Khidma", "الخدمة"),
+    (r"Touba", "طوبى"),
+    (r"Tivaouane", "تيواون"),
+    (r"Mback[ée]", None),
+    (r"Mouridisme", "الطريقة المريدية"),
+    (r"Mouride?s?", None),
+    (r"Kh?assa[ïi]d(?:e|a)s?", "القصائد"),
+    (r"Xassida", "القصائد"),
+    (r"Wolofal", None),
+    (r"Wird", "الورد"),
+    (r"Sikar", "الذكر"),
+    (r"Thiant", None),
+    (r"Serigne", "سرين"),
+    (r"Cheikh", "الشيخ"),
+    (r"Oustaz", "الأستاذ"),
+    (r"Setaan[ée],?\s*Gn[ée]taan[ée]", None),
+    (r"Dalal\s+ak\s+Diam", None),
 ]
-_MOTIF_PROTEGE = re.compile(r"\b(?:" + "|".join(TERMES_PROTEGES) + r")\b", re.IGNORECASE)
+_TERMES = [(re.compile(motif, re.IGNORECASE), arabe) for motif, arabe in TERMES_PROTEGES]
+_MOTIF_PROTEGE = re.compile(r"\b(?:" + "|".join(m for m, _ in TERMES_PROTEGES) + r")\b", re.IGNORECASE)
 # Changer cette version invalide les traductions déjà mémorisées (nouvelle règle de traduction).
-VERSION_TRADUCTION = "v2"
+VERSION_TRADUCTION = "v3"
 
 
-def proteger(texte):
-    """Échappe le texte en XML et entoure les termes protégés d'une balise ignorée par DeepL."""
+def _forme_arabe(terme):
+    for motif, arabe in _TERMES:
+        if motif.fullmatch(terme):
+            return arabe
+    return None
+
+
+def proteger(texte, langue=None):
+    """Échappe le texte en XML et entoure les termes protégés d'une balise ignorée par DeepL.
+
+    Vers l'arabe, un terme qui a une forme arabe usuelle est écrit directement en arabe :
+    DeepL l'intègre alors naturellement à la phrase.
+    """
     morceaux, position = [], 0
     for trouve in _MOTIF_PROTEGE.finditer(texte):
         morceaux.append(html.escape(texte[position : trouve.start()], quote=False))
-        morceaux.append(f"<x>{html.escape(trouve.group(0), quote=False)}</x>")
+        arabe = _forme_arabe(trouve.group(0)) if langue == "ar" else None
+        morceaux.append(arabe if arabe else f"<x>{html.escape(trouve.group(0), quote=False)}</x>")
         position = trouve.end()
     morceaux.append(html.escape(texte[position:], quote=False))
     return "".join(morceaux)
@@ -55,7 +95,7 @@ def _appeler_deepl(textes, langue):
     hote = "api-free.deepl.com" if cle.endswith(":fx") else "api.deepl.com"
     corps = json.dumps(
         {
-            "text": [proteger(t) for t in textes],
+            "text": [proteger(t, langue) for t in textes],
             "target_lang": LANGUES_DEEPL[langue],
             "tag_handling": "xml",
             "ignore_tags": ["x"],
