@@ -100,4 +100,6 @@ class TermesProtegesTests(APITestCase):
         self.assertEqual(deproteger("<x>Magal de Touba</x>", "ar"), "ماغال طوبى")
         self.assertEqual(deproteger("يذكّر <x>Cheikh Abdoulahi Seye</x>: <x>Setaané, Gnétaané</x>", "ar"), "يذكّر الشيخ عبد الله سي: Setaané, Gnétaané")
         self.assertEqual(deproteger("<x>Magal de Touba</x>", "en"), "Magal de Touba")
+        self.assertEqual(deproteger("التحضير لليلة <x>Leylatul Khadr</x>", "ar"), "التحضير لليلة القدر")
+        self.assertEqual(deproteger("ليلة<x>Nisfou Shabaan</x>", "ar"), "ليلة النصف من شعبان")
         self.assertEqual(proteger("a < b & c"), "a &lt; b &amp; c")

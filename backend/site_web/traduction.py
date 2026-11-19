@@ -60,7 +60,7 @@ TERMES_PROTEGES = [
 _TERMES = [(re.compile(motif, re.IGNORECASE), arabe) for motif, arabe in TERMES_PROTEGES]
 _MOTIF_PROTEGE = re.compile(r"\b(?:" + "|".join(m for m, _ in TERMES_PROTEGES) + r")\b", re.IGNORECASE)
 # Changer cette version invalide les traductions déjà mémorisées (nouvelle règle de traduction).
-VERSION_TRADUCTION = "v4"
+VERSION_TRADUCTION = "v5"
 
 
 def _forme_arabe(terme):
@@ -96,6 +96,8 @@ def deproteger(texte, langue=None):
             return prefixe + forme
 
         texte = re.sub(r"((?:ال|ل)?ـ?)<x>(.*?)</x>", arabe, texte)
+        # « Nuit de Leylatul Khadr » → DeepL écrit déjà « ليلة » devant : on évite « ليلة ليلة القدر ».
+        texte = re.sub(r"\b(ل?ليلة)\s*ليلة\b", r"\1", texte)
     return html.unescape(re.sub(r"</?x>", "", texte))
 
 
