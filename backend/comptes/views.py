@@ -22,7 +22,7 @@ from dahira_backend.stockage import supprimer_fichier
 from .models import Membre
 from .emails import envoyer_bienvenue, envoyer_reinitialisation
 from .permissions import ROLES_ADMIN_GENERAL, ROLES_FINANCE, a_un_role, role_requis
-from .telephone import normaliser_telephone
+from .telephone import identifiants_possibles, normaliser_telephone
 from .serializers import (
     CarteVerificationSerializer,
     ChangerMotDePasseSerializer,
@@ -46,12 +46,15 @@ class ConnexionView(TokenObtainPairView):
 
     def post(self, request, *args, **kwargs):
         identifiant = str(request.data.get("username", "")).strip()
-        numero = normaliser_telephone(identifiant)
-        if numero and Membre.objects.filter(username=numero).exists():
-            donnees = {"username": numero, "password": request.data.get("password", "")}
-            serializer = self.get_serializer(data=donnees)
-            serializer.is_valid(raise_exception=True)
-            return Response(serializer.validated_data)
+        mot_de_passe = request.data.get("password", "")
+        # Un même numéro peut être enregistré sous plusieurs formes (+221771234567, 771234567…) :
+        # on essaie chaque compte correspondant et on garde celui dont le mot de passe est bon.
+        for candidat in identifiants_possibles(identifiant):
+            membre = Membre.objects.filter(username=candidat, is_active=True).first()
+            if membre and membre.check_password(mot_de_passe):
+                serializer = self.get_serializer(data={"username": candidat, "password": mot_de_passe})
+                serializer.is_valid(raise_exception=True)
+                return Response(serializer.validated_data)
         return super().post(request, *args, **kwargs)
 
 

@@ -35,3 +35,14 @@ def valider_pays(valeur: str) -> str:
     if valeur and valeur not in REGIONS:
         raise serializers.ValidationError("Pays inconnu.")
     return valeur
+
+
+def identifiants_possibles(saisie: str) -> list[str]:
+    """Écritures possibles d'un identifiant : tel quel, au format international, et sans indicatif."""
+    saisie = (saisie or "").strip()
+    candidats = [saisie]
+    numero = normaliser_telephone(saisie)
+    if numero:
+        national = str(phonenumbers.parse(numero).national_number)
+        candidats += [numero, national, numero.lstrip("+"), saisie.replace(" ", "")]
+    return list(dict.fromkeys(c for c in candidats if c))

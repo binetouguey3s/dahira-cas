@@ -72,3 +72,21 @@ class PaysTests(APITestCase):
         self.client.force_authenticate(membre)
         self.assertEqual(self.client.patch("/api/comptes/moi/", {"pays": "fr"}).data["pays"], "FR")
         self.assertEqual(self.client.patch("/api/comptes/moi/", {"pays": "ZZ"}).status_code, 400)
+
+
+class AnciensFormatsTests(APITestCase):
+    def setUp(self):
+        cache.clear()
+
+    def test_compte_enregistre_sans_indicatif_et_homonyme_au_format_international(self):
+        from comptes.models import Membre
+
+        # Superutilisateur créé en ligne de commande avec « 776787711 », et un 2e compte « +221776787711 ».
+        Membre.objects.create_superuser(username="776787711", telephone="776787711", password="SecretAdmin!2026", nom_complet="Admin")
+        creer_membre("+221776787711")
+        for saisie in ["+221776787711", "77 678 77 11", "776787711"]:
+            admin = self.client.post("/api/comptes/connexion/", {"username": saisie, "password": "SecretAdmin!2026"})
+            self.assertEqual(admin.status_code, 200, saisie)
+            membre = self.client.post("/api/comptes/connexion/", {"username": saisie, "password": MOT_DE_PASSE})
+            self.assertEqual(membre.status_code, 200, saisie)
+        self.assertEqual(self.client.post("/api/comptes/connexion/", {"username": "776787711", "password": "faux"}).status_code, 401)
