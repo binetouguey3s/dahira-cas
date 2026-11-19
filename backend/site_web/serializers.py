@@ -1,3 +1,4 @@
+from dahira_backend.stockage import supprimer_fichier
 from rest_framework import serializers
 
 from .models import Parametres
@@ -23,7 +24,7 @@ class ParametresSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         for champ in ("logo", "photo_guide"):
             if champ in validated_data and getattr(instance, champ):
-                getattr(instance, champ).delete(save=False)
+                supprimer_fichier(getattr(instance, champ))
         return super().update(instance, validated_data)
 
 

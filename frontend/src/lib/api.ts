@@ -66,6 +66,10 @@ export function messageErreur(erreur: unknown, parDefaut: string): string {
   const reponse = (erreur as AxiosError)?.response;
   if (!reponse) return (erreur as AxiosError)?.message === "Network Error" ? "Connexion au serveur impossible." : parDefaut;
   const data = reponse.data as unknown;
+  // Page HTML d'erreur du serveur : on n'affiche jamais le code brut.
+  if (typeof data === "string" && data.trimStart().startsWith("<")) {
+    return reponse.status >= 500 ? "Le serveur a rencontré un problème. Réessayez dans un instant." : parDefaut;
+  }
   const aplatir = (v: unknown): string[] => {
     if (typeof v === "string") return [v];
     if (Array.isArray(v)) return v.flatMap(aplatir);

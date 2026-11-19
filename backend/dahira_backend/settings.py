@@ -166,11 +166,20 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ),
     "PAGE_SIZE": 20,
+    "EXCEPTION_HANDLER": "dahira_backend.erreurs.gestionnaire_erreurs",
     "DEFAULT_THROTTLE_RATES": {
         "anon": "60/minute",
         "user": "600/minute",
         "traduction": "120/minute",
     },
+}
+
+# Journaux visibles dans l'onglet « Logs » de Render (erreurs serveur comprises).
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "WARNING"},
 }
 
 # Traduction automatique des textes saisis (DeepL). Laisser vide pour désactiver.

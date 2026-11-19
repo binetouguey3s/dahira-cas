@@ -1,3 +1,4 @@
+from dahira_backend.stockage import supprimer_fichier
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
@@ -55,7 +56,7 @@ class MembreSerializer(serializers.ModelSerializer):
             instance.username = validated_data["telephone"]
         # Remplacer une photo supprime l'ancienne du stockage.
         if "photo" in validated_data and instance.photo:
-            instance.photo.delete(save=False)
+            supprimer_fichier(instance.photo)
         return super().update(instance, validated_data)
 
 

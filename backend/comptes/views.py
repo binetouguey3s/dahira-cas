@@ -1,3 +1,4 @@
+from dahira_backend.stockage import supprimer_fichier
 import secrets
 
 from django.db.models import Count, Q, Sum
@@ -70,7 +71,9 @@ class SupprimerPhotoView(APIView):
 
     def delete(self, request):
         if request.user.photo:
-            request.user.photo.delete(save=True)
+            supprimer_fichier(request.user.photo)
+            request.user.photo = None
+            request.user.save(update_fields=["photo"])
         return Response(MembreSerializer(request.user, context={"request": request}).data)
 
 

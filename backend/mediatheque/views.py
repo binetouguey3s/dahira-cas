@@ -1,3 +1,4 @@
+from dahira_backend.stockage import supprimer_fichier
 from django.db import IntegrityError
 from django.db.models import F
 from rest_framework import permissions, viewsets
@@ -23,8 +24,7 @@ class ContenuMediaViewSet(viewsets.ModelViewSet):
     ordering_fields = ["date_publication", "nb_likes", "nb_telechargements", "titre"]
 
     def perform_destroy(self, instance):
-        if instance.fichier:
-            instance.fichier.delete(save=False)
+        supprimer_fichier(instance.fichier)
         instance.delete()
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
