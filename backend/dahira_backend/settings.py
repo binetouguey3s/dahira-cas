@@ -214,7 +214,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # --- E-mails (Brevo) -----------------------------------------------------
 # Avec BREVO_API_KEY, les e-mails partent par l'API de Brevo ; sinon ils s'affichent dans la console.
-BREVO_API_KEY = config("BREVO_API_KEY", default="")
+# Espaces et guillemets copiés par erreur autour de la clé : retirés.
+BREVO_API_KEY = config("BREVO_API_KEY", default="").strip().strip("'\"").strip()
 EMAIL_BACKEND = config(
     "EMAIL_BACKEND",
     default="dahira_backend.email_brevo.BrevoEmailBackend"

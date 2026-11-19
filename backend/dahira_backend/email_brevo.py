@@ -49,6 +49,13 @@ class BrevoEmailBackend(BaseEmailBackend):
                     envoyes += 1
             except urllib.error.HTTPError as erreur:
                 logger.error("Brevo a refusé l'e-mail (%s) : %s", erreur.code, erreur.read()[:500])
+                if erreur.code == 401:
+                    cle = settings.BREVO_API_KEY
+                    logger.error(
+                        "Clé Brevo refusée. Elle doit être une clé API (commence par « xkeysib- »)%s.",
+                        " — celle-ci est une clé SMTP (« xsmtpsib- »)" if cle.startswith("xsmtpsib-") else
+                        f" — celle-ci commence par « {cle[:8]} » et fait {len(cle)} caractères",
+                    )
                 if not self.fail_silently:
                     raise
             except (urllib.error.URLError, TimeoutError) as erreur:
