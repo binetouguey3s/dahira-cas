@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { CarteContenu, CarteEvenement } from "@/components/metier/Elements";
 import { ReseauxSociaux } from "@/components/metier/ReseauxSociaux";
+import { VideoGuide } from "@/components/metier/VideoGuide";
 import { Button } from "@/components/ui/Button";
 import { ElementAnime, ListeAnimee, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { useAuth } from "@/context/AuthContext";
@@ -125,6 +126,8 @@ export default function Accueil() {
           </ElementAnime>
         ))}
       </ListeAnimee>
+
+      {parametres.video_guide_accueil && <VideoGuide parametres={parametres} className="mb-10 min-w-0" />}
 
       <div className="grid gap-10 lg:grid-cols-2">
         <section className="min-w-0">

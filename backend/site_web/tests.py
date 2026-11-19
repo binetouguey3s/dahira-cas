@@ -44,3 +44,45 @@ class TraductionTests(APITestCase):
 
     def test_langue_inconnue_refusee(self):
         self.assertEqual(self.client.post(TRAD, {"textes": ["x"], "langue": "de"}, format="json").status_code, 400)
+
+
+from django.core.files.uploadedfile import SimpleUploadedFile  # noqa: E402
+
+from comptes.tests_utils import creer_membre  # noqa: E402
+
+
+class VideoGuideTests(APITestCase):
+    URL = "/api/site/parametres/"
+
+    def setUp(self):
+        self.admin = creer_membre("+221770000901", role="admin_contenus")
+        self.client.force_authenticate(self.admin)
+
+    def test_lien_video_et_affichage_accueil(self):
+        res = self.client.patch(
+            self.URL, {"video_guide_lien": "https://youtu.be/abc123", "video_guide_accueil": True}, format="json"
+        )
+        self.assertEqual(res.status_code, 200, res.data)
+        public = self.client.get(self.URL).data
+        self.assertEqual(public["video_guide_lien"], "https://youtu.be/abc123")
+        self.assertTrue(public["video_guide_accueil"])
+
+    def test_lien_non_web_refuse(self):
+        res = self.client.patch(self.URL, {"video_guide_lien": "javascript:alert(1)"}, format="json")
+        self.assertEqual(res.status_code, 400)
+
+    def test_fichier_video_puis_suppression(self):
+        video = SimpleUploadedFile("guide.mp4", b"\x00" * 2000, content_type="video/mp4")
+        res = self.client.patch(self.URL, {"video_guide": video}, format="multipart")
+        self.assertEqual(res.status_code, 200, res.data)
+        self.assertTrue(res.data["video_guide"])
+        res = self.client.patch(self.URL, {"supprimer_video_guide": "1"}, format="multipart")
+        self.assertIsNone(res.data["video_guide"])
+
+    def test_fichier_non_video_refuse(self):
+        faux = SimpleUploadedFile("x.pdf", b"%PDF", content_type="application/pdf")
+        self.assertEqual(self.client.patch(self.URL, {"video_guide": faux}, format="multipart").status_code, 400)
+
+    def test_simple_membre_ne_peut_pas_modifier(self):
+        self.client.force_authenticate(creer_membre("+221770000902"))
+        self.assertEqual(self.client.patch(self.URL, {"video_guide_lien": "https://youtu.be/x"}, format="json").status_code, 403)

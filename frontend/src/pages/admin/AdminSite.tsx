@@ -1,4 +1,4 @@
-import { ImageUp, Save } from "lucide-react";
+import { Film, ImageUp, Save, Trash2, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -8,12 +8,12 @@ import { IconeReseau, RESEAUX } from "@/components/metier/ReseauxSociaux";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EnTete } from "@/components/ui/Divers";
-import { Champ, Input, Textarea } from "@/components/ui/Input";
+import { Champ, Input, Interrupteur, Textarea } from "@/components/ui/Input";
 import { PHOTO_GUIDE_PAR_DEFAUT, useParametres } from "@/context/ParametresContext";
 import { useToast } from "@/context/ToastContext";
 import { api, messageErreur, type Parametres } from "@/lib/api";
 
-type Texte = Omit<Parametres, "logo" | "photo_guide">;
+type Texte = Omit<Parametres, "logo" | "photo_guide" | "video_guide">;
 
 function ChoixImage({ label, aide, actuelle, apercu, onFichier }: { label: string; aide: string; actuelle: string | null; apercu?: React.ReactNode; onFichier: (f: File) => void }) {
   const { t } = useTranslation();
@@ -33,6 +33,13 @@ function ChoixImage({ label, aide, actuelle, apercu, onFichier }: { label: strin
   );
 }
 
+/** Champs texte seulement : les fichiers (logo, photo, vidéo) sont envoyés à part. */
+function champsTexte(p: Parametres): Texte {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { logo, photo_guide, video_guide, ...texte } = p;
+  return texte;
+}
+
 function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
     <Card className="p-6">
@@ -46,12 +53,22 @@ export default function AdminSite() {
   const { t } = useTranslation();
   const { parametres, remplacer } = useParametres();
   const { notifier } = useToast();
-  const [form, setForm] = useState<Texte>(parametres);
+  const [form, setForm] = useState<Texte>(() => champsTexte(parametres));
+  const [video, setVideo] = useState<File | null>(null);
+  const [retirerVideo, setRetirerVideo] = useState(false);
+  const [progression, setProgression] = useState<number | null>(null);
+  const refVideo = useRef<HTMLInputElement>(null);
+
+  const choisirVideo = (f: File) => {
+    if (f.size > 100 * 1024 * 1024) return notifier(t("adminSite.videoTropLourde"), "erreur");
+    setVideo(f);
+    setRetirerVideo(false);
+  };
   const [images, setImages] = useState<{ logo?: File; photo_guide?: File }>({});
   const [apercus, setApercus] = useState<{ logo?: string; photo_guide?: string }>({});
   const [envoi, setEnvoi] = useState(false);
 
-  useEffect(() => setForm(parametres), [parametres]);
+  useEffect(() => setForm(champsTexte(parametres)), [parametres]);
 
   const choisir = (champ: "logo" | "photo_guide") => (f: File) => {
     setImages((i) => ({ ...i, [champ]: f }));
@@ -69,9 +86,15 @@ export default function AdminSite() {
     });
     if (images.logo) donnees.append("logo", images.logo);
     if (images.photo_guide) donnees.append("photo_guide", images.photo_guide);
+    if (video) donnees.append("video_guide", video);
+    else if (retirerVideo) donnees.append("supprimer_video_guide", "1");
     try {
-      const { data } = await api.patch<Parametres>("/site/parametres/", donnees);
+      const { data } = await api.patch<Parametres>("/site/parametres/", donnees, {
+        onUploadProgress: video ? (e) => e.total && setProgression(Math.round((e.loaded / e.total) * 100)) : undefined,
+      });
       remplacer(data);
+      setVideo(null);
+      setRetirerVideo(false);
       setImages({});
       setApercus({});
       notifier(t("commun.enregistre"));
@@ -79,6 +102,7 @@ export default function AdminSite() {
       notifier(messageErreur(err, t("commun.erreur")), "erreur");
     } finally {
       setEnvoi(false);
+      setProgression(null);
     }
   };
 
@@ -90,7 +114,7 @@ export default function AdminSite() {
         sousTitre={t("adminSite.sousTitre")}
         action={
           <Button onClick={enregistrer} chargement={envoi}>
-            <Save className="h-4 w-4" /> {t("commun.enregistrer")}
+            <Save className="h-4 w-4" /> {progression !== null ? t("adminSite.envoiEnCours", { pourcent: progression }) : t("commun.enregistrer")}
           </Button>
         }
       />
@@ -127,6 +151,63 @@ export default function AdminSite() {
               <Textarea id={id} rows={3} value={form.biographie_enseignements} onChange={maj("biographie_enseignements")} placeholder={t("biographie.texteEnseignements")} />
             )}
           </Champ>
+        </Section>
+
+        <Section titre={t("adminSite.video")}>
+          <p className="-mt-2 text-sm text-text-secondary sm:col-span-2">{t("adminSite.videoAide")}</p>
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border-subtle p-4 sm:col-span-2">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent-primary">
+              <Film className="h-5 w-5" />
+            </span>
+            <p className="min-w-0 flex-1 truncate text-sm font-semibold text-text-primary">
+              {video
+                ? t("adminSite.videoChoisie", { nom: video.name })
+                : parametres.video_guide && !retirerVideo
+                  ? t("adminSite.videoActuelle")
+                  : t("adminSite.videoFichier")}
+            </p>
+            {parametres.video_guide && !video && !retirerVideo && (
+              <Button variant="ghost" size="sm" onClick={() => setRetirerVideo(true)}>
+                <Trash2 className="h-4 w-4" /> {t("adminSite.videoRetirer")}
+              </Button>
+            )}
+            <Button variant="secondary" size="sm" onClick={() => refVideo.current?.click()}>
+              <Upload className="h-4 w-4" /> {t("adminSite.changer")}
+            </Button>
+            <input
+              ref={refVideo}
+              type="file"
+              accept="video/*"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files?.[0]) choisirVideo(e.target.files[0]);
+                e.target.value = "";
+              }}
+            />
+          </div>
+          <Champ label={t("adminSite.videoLien")} optionnel={t("commun.optionnel")} className="sm:col-span-2">
+            {(id) => (
+              <Input
+                id={id}
+                type="url"
+                inputMode="url"
+                placeholder="https://youtu.be/…"
+                value={form.video_guide_lien}
+                onChange={maj("video_guide_lien")}
+              />
+            )}
+          </Champ>
+          <Champ label={t("adminSite.videoTitre")} optionnel={t("commun.optionnel")} className="sm:col-span-2">
+            {(id) => <Input id={id} value={form.video_guide_titre} onChange={maj("video_guide_titre")} placeholder={t("videoGuide.titre")} />}
+          </Champ>
+          <div className="sm:col-span-2">
+            <Interrupteur
+              coche={form.video_guide_accueil}
+              onChange={(v) => setForm((f) => ({ ...f, video_guide_accueil: v }))}
+              label={t("adminSite.videoAccueil")}
+              description={t("adminSite.videoAccueilAide")}
+            />
+          </div>
         </Section>
 
         <Section titre={t("adminSite.citation")}>
@@ -177,7 +258,7 @@ export default function AdminSite() {
 
         <div className="flex justify-end">
           <Button size="lg" onClick={enregistrer} chargement={envoi}>
-            <Save className="h-4 w-4" /> {t("commun.enregistrer")}
+            <Save className="h-4 w-4" /> {progression !== null ? t("adminSite.envoiEnCours", { pourcent: progression }) : t("commun.enregistrer")}
           </Button>
         </div>
       </div>

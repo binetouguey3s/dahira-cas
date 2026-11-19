@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { CheckCircle2, Clock, Copy, Smartphone, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,6 +17,7 @@ export default function Cotisations() {
   const { parametres } = useParametres();
   const { notifier } = useToast();
   const [cotisations, setCotisations] = useState<Cotisation[] | null>(null);
+  const [moisActif, setMoisActif] = useState<number | null>(null);
   const annee = new Date().getFullYear();
 
   useEffect(() => {
@@ -71,16 +72,47 @@ export default function Cotisations() {
                   ? "bg-status-error-bg text-status-error"
                   : "bg-bg-secondary text-text-secondary";
             return (
-              <motion.div
-                key={m}
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: m * 0.03 }}
-                title={formatMois(m, annee)}
-                className={`flex h-11 items-center justify-center rounded-xl text-xs font-bold capitalize ${couleur}`}
-              >
-                {new Date(annee, m - 1).toLocaleDateString(locale(), { month: "narrow" })}
-              </motion.div>
+              <div key={m} className="relative">
+                <AnimatePresence>
+                  {moisActif === m && (
+                    <motion.div
+                      role="tooltip"
+                      id={`mois-${m}`}
+                      initial={{ opacity: 0, y: 6, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                      transition={{ duration: 0.16 }}
+                      className={`pointer-events-none absolute bottom-full z-20 mb-2 whitespace-nowrap rounded-xl bg-text-primary px-3 py-1.5 text-center text-xs font-semibold text-bg-primary shadow-lg ${
+                        m % 6 === 1 ? "start-0" : m % 6 === 0 ? "end-0" : "left-1/2 -translate-x-1/2"
+                      }`}
+                    >
+                      <span className="block capitalize">{formatMois(m, annee)}</span>
+                      <span className="block font-normal opacity-80">
+                        {c ? t(`cotisations.statuts.${c.statut}`) : t("cotisations.pasEncore")}
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <motion.button
+                  type="button"
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={{ delay: m * 0.03 }}
+                  onClick={() => setMoisActif((a) => (a === m ? null : m))}
+                  // Survol seulement à la souris : au doigt, c'est le toucher qui ouvre / ferme la bulle.
+                  onPointerEnter={(e) => e.pointerType === "mouse" && setMoisActif(m)}
+                  onPointerLeave={(e) => e.pointerType === "mouse" && setMoisActif((a) => (a === m ? null : a))}
+                  onBlur={() => setMoisActif((a) => (a === m ? null : a))}
+                  aria-label={`${formatMois(m, annee)} : ${c ? t(`cotisations.statuts.${c.statut}`) : t("cotisations.pasEncore")}`}
+                  aria-describedby={moisActif === m ? `mois-${m}` : undefined}
+                  className={`flex h-11 w-full items-center justify-center rounded-xl text-xs font-bold capitalize transition-shadow focus:outline-none focus-visible:ring-4 focus-visible:ring-accent-primary/25 ${couleur} ${
+                    moisActif === m ? "ring-2 ring-accent-primary/40" : ""
+                  }`}
+                >
+                  {new Date(annee, m - 1).toLocaleDateString(locale(), { month: "narrow" })}
+                </motion.button>
+              </div>
             );
           })}
         </div>

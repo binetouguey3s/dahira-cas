@@ -6,6 +6,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from comptes.permissions import ROLES_CONTENUS, a_un_role
+from dahira_backend.stockage import supprimer_fichier
 
 from .models import Parametres
 from .serializers import ParametresSerializer, TraductionSerializer
@@ -26,10 +27,12 @@ class ParametresView(APIView):
     def patch(self, request):
         if not a_un_role(request.user, ROLES_CONTENUS):
             return Response({"detail": "Accès réservé."}, status=403)
-        serializer = ParametresSerializer(
-            Parametres.charger(), data=request.data, partial=True, context={"request": request}
-        )
+        parametres = Parametres.charger()
+        serializer = ParametresSerializer(parametres, data=request.data, partial=True, context={"request": request})
         serializer.is_valid(raise_exception=True)
+        if request.data.get("supprimer_video_guide") == "1" and parametres.video_guide:
+            supprimer_fichier(parametres.video_guide)
+            parametres.video_guide = None
         serializer.save()
         return Response(serializer.data)
 

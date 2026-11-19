@@ -231,7 +231,8 @@
       "wave": "Wave",
       "orange_money": "Orange Money",
       "autre": "Cash / other"
-    }
+    },
+    "pasEncore": "Not recorded yet"
   },
   "profil": {
     "bienvenueAide": "Complete your profile and add a photo to get your membership card.",
@@ -481,7 +482,19 @@
     "montantCotisation": "Monthly contribution (FCFA)",
     "numeroWave": "Wave number",
     "numeroOM": "Orange Money number",
-    "reseaux": "Social media"
+    "reseaux": "Social media",
+    "video": "Guide's introduction video",
+    "videoAide": "Shown on the Biography page. Upload a file (100 MB max) or paste a YouTube, Vimeo, TikTok, Facebook… link.",
+    "videoFichier": "Upload a file",
+    "videoLien": "Video link",
+    "videoTitre": "Displayed title",
+    "videoAccueil": "Also show on the home page",
+    "videoAccueilAide": "The video appears below the shortcuts on the home page.",
+    "videoActuelle": "Uploaded video",
+    "videoChoisie": "New video: {{nom}}",
+    "videoRetirer": "Remove the video",
+    "videoTropLourde": "The video is larger than 100 MB. Use a YouTube link instead.",
+    "envoiEnCours": "Uploading: {{pourcent}}%"
   },
   "vocal": {
     "ouVocal": "Or send a voice message",
@@ -497,5 +510,10 @@
     "aucun": "No country found",
     "choisir": "Choose a country",
     "indicatif": "Dialling code"
+  },
+  "videoGuide": {
+    "titre": "Introducing the Guide",
+    "lire": "Play the video",
+    "regarder": "Watch the video"
   }
 }

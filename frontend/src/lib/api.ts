@@ -238,6 +238,10 @@ export interface Parametres {
   montant_cotisation: string;
   numero_wave: string;
   numero_orange_money: string;
+  video_guide: string | null;
+  video_guide_lien: string;
+  video_guide_titre: string;
+  video_guide_accueil: boolean;
   lien_tiktok: string;
   lien_whatsapp: string;
   lien_telegram: string;

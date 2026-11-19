@@ -2,6 +2,8 @@ import hashlib
 
 from django.db import models
 
+from dahira_backend.stockage import stockage_audio_video
+
 
 class Parametres(models.Model):
     """Contenus du site modifiables depuis l'interface (une seule ligne en base)."""
@@ -23,6 +25,11 @@ class Parametres(models.Model):
     montant_cotisation = models.DecimalField(max_digits=10, decimal_places=2, default=1000)
     numero_wave = models.CharField(max_length=30, blank=True)
     numero_orange_money = models.CharField(max_length=30, blank=True)
+    # Vidéo de présentation du Guide (page Biographie, et en option sur l'accueil) : fichier OU lien.
+    video_guide = models.FileField(upload_to="site/videos/", storage=stockage_audio_video, blank=True, null=True)
+    video_guide_lien = models.URLField(blank=True)
+    video_guide_titre = models.CharField(max_length=150, blank=True)
+    video_guide_accueil = models.BooleanField(default=False)
     # Réseaux sociaux (bloc « Nos canaux » de l'accueil) — laisser vide pour masquer un réseau.
     lien_tiktok = models.URLField(blank=True, default="https://www.tiktok.com/@dcas_officiel")
     lien_whatsapp = models.URLField(blank=True, default="https://whatsapp.com/channel/0029VbEGug0Ae5Vz74Gb8B0j")

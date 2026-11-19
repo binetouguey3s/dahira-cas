@@ -1,4 +1,6 @@
 import { motion } from "motion/react";
+
+import { VideoGuide } from "@/components/metier/VideoGuide";
 import { Compass, Lightbulb, Route } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -48,6 +50,8 @@ export default function Biographie() {
           <Traduit texte={parametres.titre_guide || t("biographie.titreGuide")} />
         </p>
       </motion.section>
+
+      <VideoGuide parametres={parametres} className="mx-auto mb-10 max-w-3xl" />
 
       <ListeAnimee className="relative mx-auto flex max-w-3xl flex-col gap-6">
         {sections.map(({ icone: Icone, titre, texte }) => (

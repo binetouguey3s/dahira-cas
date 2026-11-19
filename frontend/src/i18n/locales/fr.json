@@ -231,7 +231,8 @@
       "wave": "Wave",
       "orange_money": "Orange Money",
       "autre": "Espèces / autre"
-    }
+    },
+    "pasEncore": "Pas encore enregistrée"
   },
   "profil": {
     "bienvenueAide": "Complétez votre profil et ajoutez une photo pour obtenir votre carte de membre.",
@@ -481,7 +482,19 @@
     "montantCotisation": "Cotisation mensuelle (FCFA)",
     "numeroWave": "Numéro Wave",
     "numeroOM": "Numéro Orange Money",
-    "reseaux": "Réseaux sociaux"
+    "reseaux": "Réseaux sociaux",
+    "video": "Vidéo de présentation du Guide",
+    "videoAide": "Affichée sur la page Biographie. Envoyez un fichier (100 Mo maximum) ou collez un lien YouTube, Vimeo, TikTok, Facebook…",
+    "videoFichier": "Envoyer un fichier",
+    "videoLien": "Lien de la vidéo",
+    "videoTitre": "Titre affiché",
+    "videoAccueil": "Afficher aussi sur l'accueil",
+    "videoAccueilAide": "La vidéo apparaît sous les raccourcis de la page d'accueil.",
+    "videoActuelle": "Vidéo envoyée",
+    "videoChoisie": "Nouvelle vidéo : {{nom}}",
+    "videoRetirer": "Retirer la vidéo",
+    "videoTropLourde": "La vidéo dépasse 100 Mo. Utilisez plutôt un lien YouTube.",
+    "envoiEnCours": "Envoi : {{pourcent}} %"
   },
   "vocal": {
     "ouVocal": "Ou envoyez un message vocal",
@@ -497,5 +510,10 @@
     "aucun": "Aucun pays trouvé",
     "choisir": "Choisir un pays",
     "indicatif": "Indicatif"
+  },
+  "videoGuide": {
+    "titre": "Présentation du Guide",
+    "lire": "Lire la vidéo",
+    "regarder": "Regarder la vidéo"
   }
 }
