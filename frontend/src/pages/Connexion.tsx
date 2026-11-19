@@ -9,13 +9,12 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Champ, MotDePasseInput } from "@/components/ui/Input";
 import { TelephoneInput } from "@/components/ui/TelephoneInput";
+import { MotDePasseOublie } from "@/components/metier/MotDePasseOublie";
 import { useAuth } from "@/context/AuthContext";
-import { useParametres } from "@/context/ParametresContext";
 
 export default function Connexion() {
   const { t } = useTranslation();
   const { connecter } = useAuth();
-  const { parametres } = useParametres();
   const navigate = useNavigate();
   const location = useLocation();
   const depuis = (location.state as { depuis?: string } | null)?.depuis ?? "/";
@@ -24,7 +23,8 @@ export default function Connexion() {
   const [motDePasse, setMotDePasse] = useState("");
   const [erreur, setErreur] = useState("");
   const [envoi, setEnvoi] = useState(false);
-  const [aideOuverte, setAideOuverte] = useState(false);
+  // « /connexion?oublie=1 » ouvre directement la fenêtre (lien expiré, par exemple).
+  const [aideOuverte, setAideOuverte] = useState(() => new URLSearchParams(location.search).get("oublie") === "1");
 
   const soumettre = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,29 +100,7 @@ export default function Connexion() {
       </form>
 
       <Modal ouvert={aideOuverte} onFermer={() => setAideOuverte(false)} titre={t("connexion.oublieTitre")}>
-        <p className="text-sm leading-relaxed text-text-secondary">{t("connexion.oublieMessage")}</p>
-        {(parametres.telephone_contact || parametres.email_contact) && (
-          <div className="mt-4 flex flex-col gap-2">
-            {parametres.telephone_contact && (
-              <a
-                href={`https://wa.me/${parametres.telephone_contact.replace(/[^\d]/g, "")}`}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-xl bg-accent-soft px-4 py-3 text-sm font-semibold text-accent-primary"
-              >
-                WhatsApp : {parametres.telephone_contact}
-              </a>
-            )}
-            {parametres.email_contact && (
-              <a
-                href={`mailto:${parametres.email_contact}`}
-                className="rounded-xl bg-bg-secondary px-4 py-3 text-sm font-semibold text-text-primary"
-              >
-                {parametres.email_contact}
-              </a>
-            )}
-          </div>
-        )}
+        <MotDePasseOublie identifiantInitial={/[a-z@]/i.test(telephone) ? "" : telephone} />
       </Modal>
     </AuthLayout>
   );

@@ -250,7 +250,8 @@
     "confirmerMotDePasse": "Confirm new password",
     "motsDePasseDifferents": "The two passwords do not match.",
     "motDePasseModifie": "Password changed",
-    "deconnexion": "Sign out"
+    "deconnexion": "Sign out",
+    "aideEmail": "Useful to receive a link if you forget your password."
   },
   "photo": {
     "photo": "ID photo",
@@ -515,5 +516,27 @@
     "titre": "Introducing the Guide",
     "lire": "Play the video",
     "regarder": "Watch the video"
+  },
+  "oublie": {
+    "intro": "Enter your phone number or email: we will send you a link to choose a new password.",
+    "identifiant": "Phone or email",
+    "identifiantExemple": "77 123 45 67 or awa@example.com",
+    "envoyer": "Get the link",
+    "envoyeTitre": "Check your email",
+    "envoyeMessage": "If this account has an email address, a link has just been sent to it (check your spam folder). It is valid for 2 hours.",
+    "sansEmail": "No email in your profile? Contact the Dahira administration: they will give you a temporary password.",
+    "tropDeDemandes": "Too many requests. Try again in an hour."
+  },
+  "reinitialiser": {
+    "titre": "New password",
+    "sousTitre": "Choose a password you don't use anywhere else.",
+    "nouveau": "New password",
+    "confirmation": "Confirm the password",
+    "differents": "The two passwords do not match.",
+    "bouton": "Save and sign in",
+    "succes": "Password changed.",
+    "lienExpire": "This link is no longer valid.",
+    "redemander": "Request a new link",
+    "retour": "Back to sign in"
   }
 }

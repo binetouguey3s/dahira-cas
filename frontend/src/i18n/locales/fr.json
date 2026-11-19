@@ -250,7 +250,8 @@
     "confirmerMotDePasse": "Confirmer le nouveau mot de passe",
     "motsDePasseDifferents": "Les deux mots de passe ne correspondent pas.",
     "motDePasseModifie": "Mot de passe modifié",
-    "deconnexion": "Déconnexion"
+    "deconnexion": "Déconnexion",
+    "aideEmail": "Utile pour recevoir un lien si vous oubliez votre mot de passe."
   },
   "photo": {
     "photo": "Photo d'identité",
@@ -515,5 +516,27 @@
     "titre": "Présentation du Guide",
     "lire": "Lire la vidéo",
     "regarder": "Regarder la vidéo"
+  },
+  "oublie": {
+    "intro": "Saisissez votre numéro de téléphone ou votre e-mail : nous vous envoyons un lien pour choisir un nouveau mot de passe.",
+    "identifiant": "Téléphone ou e-mail",
+    "identifiantExemple": "77 123 45 67 ou awa@exemple.com",
+    "envoyer": "Recevoir le lien",
+    "envoyeTitre": "Vérifiez vos e-mails",
+    "envoyeMessage": "Si ce compte a une adresse e-mail, un lien vient d'y être envoyé (pensez aux courriers indésirables). Il est valable 2 heures.",
+    "sansEmail": "Pas d'e-mail dans votre profil ? Contactez l'administration du Dahira : elle vous donnera un mot de passe provisoire.",
+    "tropDeDemandes": "Trop de demandes. Réessayez dans une heure."
+  },
+  "reinitialiser": {
+    "titre": "Nouveau mot de passe",
+    "sousTitre": "Choisissez un mot de passe que vous n'utilisez pas ailleurs.",
+    "nouveau": "Nouveau mot de passe",
+    "confirmation": "Confirmez le mot de passe",
+    "differents": "Les deux mots de passe ne sont pas identiques.",
+    "bouton": "Enregistrer et me connecter",
+    "succes": "Mot de passe modifié.",
+    "lienExpire": "Ce lien n'est plus valable.",
+    "redemander": "Demander un nouveau lien",
+    "retour": "Retour à la connexion"
   }
 }

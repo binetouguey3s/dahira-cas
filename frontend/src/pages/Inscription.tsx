@@ -80,7 +80,7 @@ export default function Inscription() {
             <TelephoneInput id={id} valeur={telephone} onChange={setTelephone} required />
           )}
         </Champ>
-        <Champ label={t("champs.email")} optionnel={t("commun.optionnel")}>
+        <Champ label={t("champs.email")} optionnel={t("commun.optionnel")} aide={t("profil.aideEmail")}>
           {(id) => (
             <Input id={id} type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           )}

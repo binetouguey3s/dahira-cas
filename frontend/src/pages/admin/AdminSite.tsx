@@ -68,7 +68,9 @@ export default function AdminSite() {
   const [apercus, setApercus] = useState<{ logo?: string; photo_guide?: string }>({});
   const [envoi, setEnvoi] = useState(false);
 
-  useEffect(() => setForm(champsTexte(parametres)), [parametres]);
+  useEffect(() => {
+    setForm(champsTexte(parametres));
+  }, [parametres]);
 
   const choisir = (champ: "logo" | "photo_guide") => (f: File) => {
     setImages((i) => ({ ...i, [champ]: f }));

@@ -88,7 +88,7 @@ export function FormulaireProfil({
         </Champ>
       )}
       {visible("email") && !seulement && (
-        <Champ label={t("champs.email")} optionnel={t("commun.optionnel")} erreur={erreurs.email}>
+        <Champ label={t("champs.email")} optionnel={t("commun.optionnel")} erreur={erreurs.email} aide={t("profil.aideEmail")}>
           {(id) => <Input id={id} type="email" value={valeurs.email} onChange={maj("email")} autoComplete="email" />}
         </Champ>
       )}

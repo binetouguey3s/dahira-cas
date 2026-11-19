@@ -25,6 +25,7 @@ const QuestionsReponses = lazyPage(() => import("@/pages/QuestionsReponses"));
 const Cotisations = lazyPage(() => import("@/pages/Cotisations"));
 const Profil = lazyPage(() => import("@/pages/Profil"));
 const Carte = lazyPage(() => import("@/pages/Carte"));
+const Reinitialiser = lazyPage(() => import("@/pages/Reinitialiser"));
 const VerifierCarte = lazyPage(() => import("@/pages/VerifierCarte"));
 const Introuvable = lazyPage(() => import("@/pages/Introuvable"));
 const AdminDashboard = lazyPage(() => import("@/pages/admin/AdminDashboard"));
@@ -37,7 +38,11 @@ const AdminSite = lazyPage(() => import("@/pages/admin/AdminSite"));
 
 function RemonterEnHaut() {
   const { pathname } = useLocation();
-  useEffect(() => window.scrollTo({ top: 0 }), [pathname]);
+  // Accolades obligatoires : dans les Chrome récents, scrollTo renvoie une promesse ; la renvoyer
+  // à React (qui attend une fonction de nettoyage) faisait planter chaque changement de page.
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [pathname]);
   return null;
 }
 
@@ -48,6 +53,7 @@ function Routage() {
       <Routes location={location}>
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/connexion" element={<Connexion />} />
+        <Route path="/reinitialiser/:uid/:jeton" element={<Reinitialiser />} />
         <Route path="/verifier/:numero" element={<VerifierCarte />} />
 
         <Route path="/" element={<Accueil />} />

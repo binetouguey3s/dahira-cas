@@ -2,6 +2,7 @@
 Django settings for dahira_backend project.
 """
 
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -182,6 +183,7 @@ REST_FRAMEWORK = {
         "traduction": "120/minute",
         "connexion": "10/minute",
         "inscription": "20/hour",
+        "mot_de_passe_oublie": "5/hour",
     },
 }
 
@@ -210,15 +212,28 @@ CORS_ALLOWED_ORIGINS = config(
 )
 CORS_ALLOW_CREDENTIALS = True
 
-# --- Email (utilisé en secours ; les notifications passent normalement par n8n) --
+# --- E-mails (Brevo) -----------------------------------------------------
+# Avec BREVO_API_KEY, les e-mails partent par l'API de Brevo ; sinon ils s'affichent dans la console.
+BREVO_API_KEY = config("BREVO_API_KEY", default="")
 EMAIL_BACKEND = config(
-    "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
+    "EMAIL_BACKEND",
+    default="dahira_backend.email_brevo.BrevoEmailBackend"
+    if BREVO_API_KEY
+    else "django.core.mail.backends.console.EmailBackend",
 )
-EMAIL_HOST = config("EMAIL_HOST", default="smtp-relay.brevo.com")
-EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+# Adresse d'expédition : doit être validée dans Brevo (Expéditeurs & IP > Expéditeurs).
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="no-reply@dahira-cas.local")
+EMAIL_NOM_EXPEDITEUR = config("EMAIL_NOM_EXPEDITEUR", default="Dahira Cheikh Abdoulahi Seye")
+# Les e-mails partent en arrière-plan (la page répond tout de suite) ; synchrone pendant les tests.
+EMAIL_EN_ARRIERE_PLAN = "test" not in sys.argv
+
+# Adresse du site (liens dans les e-mails). Par défaut : la première origine HTTPS autorisée.
+FRONTEND_URL = config(
+    "FRONTEND_URL",
+    default=next((o for o in CORS_ALLOWED_ORIGINS if o.startswith("https://")), "http://localhost:5173"),
+).rstrip("/")
+# Validité du lien « mot de passe oublié » : 2 heures.
+PASSWORD_RESET_TIMEOUT = 2 * 60 * 60
 
 # --- n8n (webhooks sortants pour les automatisations) ---------------------
 N8N_WEBHOOK_URL = config("N8N_WEBHOOK_URL", default="")

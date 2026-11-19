@@ -58,7 +58,9 @@ export function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => setOuvert(false), [location.pathname]);
+  useEffect(() => {
+    setOuvert(false);
+  }, [location.pathname]);
 
   const raccourcis = RACCOURCIS.filter((r) => r.to !== "/questions-reponses" || membre);
   const fermer = () => setOuvert(false);

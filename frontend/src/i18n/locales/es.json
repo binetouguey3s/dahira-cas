@@ -250,7 +250,8 @@
     "confirmerMotDePasse": "Confirmar la nueva contraseña",
     "motsDePasseDifferents": "Las dos contraseñas no coinciden.",
     "motDePasseModifie": "Contraseña cambiada",
-    "deconnexion": "Cerrar sesión"
+    "deconnexion": "Cerrar sesión",
+    "aideEmail": "Útil para recibir un enlace si olvidas tu contraseña."
   },
   "photo": {
     "photo": "Foto de identidad",
@@ -515,5 +516,27 @@
     "titre": "Presentación del Guía",
     "lire": "Reproducir el vídeo",
     "regarder": "Ver el vídeo"
+  },
+  "oublie": {
+    "intro": "Introduce tu número de teléfono o tu correo: te enviaremos un enlace para elegir una nueva contraseña.",
+    "identifiant": "Teléfono o correo",
+    "identifiantExemple": "77 123 45 67 o awa@ejemplo.com",
+    "envoyer": "Recibir el enlace",
+    "envoyeTitre": "Revisa tu correo",
+    "envoyeMessage": "Si esta cuenta tiene un correo, acabamos de enviarle un enlace (revisa también el correo no deseado). Es válido durante 2 horas.",
+    "sansEmail": "¿No tienes correo en tu perfil? Contacta con la administración de la Dahira: te dará una contraseña provisional.",
+    "tropDeDemandes": "Demasiadas solicitudes. Inténtalo de nuevo en una hora."
+  },
+  "reinitialiser": {
+    "titre": "Nueva contraseña",
+    "sousTitre": "Elige una contraseña que no uses en otro sitio.",
+    "nouveau": "Nueva contraseña",
+    "confirmation": "Confirma la contraseña",
+    "differents": "Las dos contraseñas no coinciden.",
+    "bouton": "Guardar e iniciar sesión",
+    "succes": "Contraseña cambiada.",
+    "lienExpire": "Este enlace ya no es válido.",
+    "redemander": "Pedir un nuevo enlace",
+    "retour": "Volver al inicio de sesión"
   }
 }

@@ -1,8 +1,13 @@
 import secrets
 
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ValidationError
 from django.db.models import Count, Q, Sum
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from rest_framework import generics, mixins, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -15,6 +20,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from dahira_backend.stockage import supprimer_fichier
 
 from .models import Membre
+from .emails import envoyer_bienvenue, envoyer_reinitialisation
 from .permissions import ROLES_ADMIN_GENERAL, ROLES_FINANCE, a_un_role, role_requis
 from .telephone import normaliser_telephone
 from .serializers import (
@@ -24,6 +30,8 @@ from .serializers import (
     MembreAdminSerializer,
     MembreResumeSerializer,
     MembreSerializer,
+    MotDePasseOublieSerializer,
+    ReinitialiserMotDePasseSerializer,
 )
 
 
@@ -60,6 +68,7 @@ class InscriptionView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         membre = serializer.save()
+        envoyer_bienvenue(membre)
         refresh = RefreshToken.for_user(membre)
         return Response(
             {
@@ -218,3 +227,55 @@ class StatistiquesView(APIView):
         if a_un_role(user, ("admin_contenus", "admin_general")):
             stats["evenements_a_venir"] = Evenement.objects.filter(date__gte=maintenant).count()
         return Response(stats)
+
+
+class MotDePasseOublieView(APIView):
+    """POST /api/comptes/mot-de-passe/oublie/ — {identifiant : téléphone ou e-mail}.
+
+    Envoie un lien de réinitialisation à l'e-mail du compte. La réponse est toujours la même,
+    que le compte existe ou non : impossible de s'en servir pour deviner qui est inscrit.
+    """
+
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "mot_de_passe_oublie"
+
+    def post(self, request):
+        serializer = MotDePasseOublieSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        identifiant = serializer.validated_data["identifiant"].strip()
+        actifs = Membre.objects.filter(is_active=True).exclude(email="")
+        if "@" in identifiant:
+            membres = actifs.filter(email__iexact=identifiant)
+        else:
+            numero = normaliser_telephone(identifiant)
+            membres = actifs.filter(Q(username=identifiant) | Q(username=numero or identifiant))
+        for membre in membres[:5]:
+            envoyer_reinitialisation(membre)
+        return Response({"detail": "envoye"})
+
+
+class ReinitialiserMotDePasseView(APIView):
+    """POST /api/comptes/mot-de-passe/reinitialiser/ — {uid, jeton, nouveau}. Lien valable 2 h, une seule fois."""
+
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "connexion"
+
+    def post(self, request):
+        serializer = ReinitialiserMotDePasseSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        donnees = serializer.validated_data
+        try:
+            membre = Membre.objects.get(pk=force_str(urlsafe_base64_decode(donnees["uid"])), is_active=True)
+        except (Membre.DoesNotExist, ValueError, TypeError, OverflowError):
+            membre = None
+        if not membre or not default_token_generator.check_token(membre, donnees["jeton"]):
+            return Response({"detail": "Ce lien n'est plus valable. Refaites une demande."}, status=400)
+        try:
+            validate_password(donnees["nouveau"], membre)
+        except ValidationError as erreurs:
+            return Response({"nouveau": list(erreurs.messages)}, status=400)
+        membre.set_password(donnees["nouveau"])
+        membre.save(update_fields=["password"])
+        return Response({"detail": "Mot de passe modifié.", "telephone": membre.telephone or membre.username})

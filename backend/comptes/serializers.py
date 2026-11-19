@@ -160,3 +160,13 @@ class ChangerMotDePasseSerializer(serializers.Serializer):
         if not self.context["request"].user.check_password(valeur):
             raise serializers.ValidationError("Mot de passe actuel incorrect.")
         return valeur
+
+
+class MotDePasseOublieSerializer(serializers.Serializer):
+    identifiant = serializers.CharField(max_length=254)
+
+
+class ReinitialiserMotDePasseSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    jeton = serializers.CharField()
+    nouveau = serializers.CharField()

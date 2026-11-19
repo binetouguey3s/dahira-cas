@@ -76,7 +76,9 @@ export function Avatar({
   className?: string;
 }) {
   const [echec, setEchec] = useState(false);
-  useEffect(() => setEchec(false), [photo]);
+  useEffect(() => {
+    setEchec(false);
+  }, [photo]);
   return photo && !echec ? (
     <img
       src={photo}
