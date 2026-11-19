@@ -23,10 +23,15 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 3600  # 1 h ; à augmenter une fois le site stable
+    SECURE_HSTS_SECONDS = 31536000  # 1 an : le navigateur refuse toute connexion non chiffrée
+    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
     CSRF_TRUSTED_ORIGINS = [
         f"https://{host}" for host in ALLOWED_HOSTS if host not in ("localhost", "127.0.0.1")
     ]
+
+# Taille maximale d'une requête (hors fichiers) et nombre de champs : limite les abus.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 500
 
 # --- Applications ---------------------------------------------------------
 INSTALLED_APPS = [
@@ -167,10 +172,16 @@ REST_FRAMEWORK = {
     ),
     "PAGE_SIZE": 20,
     "EXCEPTION_HANDLER": "dahira_backend.erreurs.gestionnaire_erreurs",
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ),
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "60/minute",
+        "anon": "120/minute",
         "user": "600/minute",
         "traduction": "120/minute",
+        "connexion": "10/minute",
+        "inscription": "20/hour",
     },
 }
 

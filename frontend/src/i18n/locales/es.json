@@ -71,7 +71,8 @@
     "oublieMessage": "Contacta con la administración de la Dahira: te enviará una contraseña provisional que podrás cambiar después en tu perfil.",
     "pasDeCompte": "¿Aún no eres miembro?",
     "sInscrire": "Crear una cuenta",
-    "continuerSansCompte": "Continuar sin cuenta"
+    "continuerSansCompte": "Continuar sin cuenta",
+    "tropDeTentatives": "Demasiados intentos. Espera un minuto antes de volver a intentarlo."
   },
   "inscription": {
     "titre": "Crear mi cuenta",
@@ -95,7 +96,9 @@
     "conseilDuJour": "Consejo del día",
     "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "Próximos eventos",
-    "derniersEnseignements": "Últimas enseñanzas"
+    "derniersEnseignements": "Últimas enseñanzas",
+    "nosCanaux": "Nuestros canales",
+    "nosCanauxAide": "Sigue al Dahira en las redes sociales."
   },
   "biographie": {
     "titreGuide": "Guía religioso de la Dahira",
@@ -144,6 +147,8 @@
       "gamou": "Gamou",
       "dahira": "Dahira",
       "causerie": "Charla",
+      "nisfou_shabaan": "Nisfou Shabaan",
+      "leylatul_khadr": "Leylatul Khadr",
       "autre": "Otro"
     },
     "aucunAVenir": "No hay próximos eventos por ahora.",
@@ -475,7 +480,8 @@
     "telephoneContactAide": "Se ofrece a los miembros que olvidan su contraseña.",
     "montantCotisation": "Cuota mensual (FCFA)",
     "numeroWave": "Número de Wave",
-    "numeroOM": "Número de Orange Money"
+    "numeroOM": "Número de Orange Money",
+    "reseaux": "Redes sociales"
   },
   "vocal": {
     "ouVocal": "O envía un mensaje de voz",
@@ -485,5 +491,11 @@
     "supprimer": "Eliminar el mensaje de voz",
     "micRefuse": "No se puede acceder al micrófono. Permítelo en tu navegador.",
     "nonDisponible": "La grabación de voz no está disponible en este navegador."
+  },
+  "pays": {
+    "rechercher": "Buscar un país o un prefijo",
+    "aucun": "No se encontró ningún país",
+    "choisir": "Elegir un país",
+    "indicatif": "Prefijo"
   }
 }

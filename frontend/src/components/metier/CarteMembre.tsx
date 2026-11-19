@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Logo } from "@/components/layout/Logo";
 import { useParametres } from "@/context/ParametresContext";
 import type { Membre } from "@/lib/api";
+import { nomPays } from "@/lib/pays";
 import { initiales } from "@/lib/utils";
 
 /**
@@ -105,7 +106,7 @@ export const RectoCarte = forwardRef<HTMLDivElement, { membre: Membre }>(({ memb
 RectoCarte.displayName = "RectoCarte";
 
 export const VersoCarte = forwardRef<HTMLDivElement, { membre: Membre }>(({ membre }, ref) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { parametres } = useParametres();
   const [qr, setQr] = useState("");
 
@@ -153,7 +154,7 @@ export const VersoCarte = forwardRef<HTMLDivElement, { membre: Membre }>(({ memb
                 <div>
                   <p className="text-[2cqw] font-semibold uppercase tracking-[0.12em] text-[#8a6d2a]">{t("carte.adresse")}</p>
                   <p className="line-clamp-2 text-[3cqw] font-semibold leading-tight">
-                    {[membre.adresse, membre.pays].filter(Boolean).join(", ")}
+                    {[membre.adresse, nomPays(membre.pays, i18n.language)].filter(Boolean).join(", ")}
                   </p>
                 </div>
               )}

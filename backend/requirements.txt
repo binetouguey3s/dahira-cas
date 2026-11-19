@@ -7,6 +7,7 @@ dj-database-url==3.1.2
 psycopg[binary]==3.3.9
 python-decouple==3.8
 Pillow==12.3.0
+phonenumbers==9.0.43
 whitenoise==6.12.0
 gunicorn==27.0.1
 # Stockage médias sur Cloudinary (actif seulement si CLOUDINARY_* est défini) :

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { Logo } from "@/components/layout/Logo";
+import { IconeReseau, RESEAUX } from "@/components/metier/ReseauxSociaux";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EnTete } from "@/components/ui/Divers";
@@ -147,6 +148,31 @@ export default function AdminSite() {
           <div />
           <Champ label={t("adminSite.numeroWave")}>{(id) => <Input id={id} type="tel" value={form.numero_wave} onChange={maj("numero_wave")} />}</Champ>
           <Champ label={t("adminSite.numeroOM")}>{(id) => <Input id={id} type="tel" value={form.numero_orange_money} onChange={maj("numero_orange_money")} />}</Champ>
+        </Section>
+
+        <Section titre={t("adminSite.reseaux")}>
+          {RESEAUX.map(({ champ, nom, icone }) => (
+            <Champ
+              key={champ}
+              label={
+                <span className="inline-flex items-center gap-2">
+                  <IconeReseau icone={icone} className="h-4 w-4 text-text-secondary" /> {nom}
+                </span>
+              }
+              optionnel={t("commun.optionnel")}
+            >
+              {(id) => (
+                <Input
+                  id={id}
+                  type="url"
+                  inputMode="url"
+                  placeholder="https://"
+                  value={String(form[champ as keyof Texte] ?? "")}
+                  onChange={maj(champ as keyof Texte)}
+                />
+              )}
+            </Champ>
+          ))}
         </Section>
 
         <div className="flex justify-end">

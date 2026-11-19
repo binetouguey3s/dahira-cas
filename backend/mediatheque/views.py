@@ -1,4 +1,3 @@
-from dahira_backend.stockage import supprimer_fichier
 from django.db import IntegrityError
 from django.db.models import F
 from rest_framework import permissions, viewsets
@@ -8,6 +7,7 @@ from rest_framework.response import Response
 
 from comptes.permissions import ROLES_CONTENUS, role_ou_lecture_seule
 
+from dahira_backend.stockage import supprimer_fichier
 from .models import ContenuMedia, Like
 from .serializers import ContenuMediaSerializer
 

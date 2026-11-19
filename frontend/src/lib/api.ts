@@ -166,7 +166,7 @@ export interface ReservationBus {
   date_reservation: string;
 }
 
-export type CategorieEvenement = "magal" | "gamou" | "dahira" | "causerie" | "autre";
+export type CategorieEvenement = "magal" | "gamou" | "dahira" | "causerie" | "nisfou_shabaan" | "leylatul_khadr" | "autre";
 
 export interface Evenement {
   id: number;
@@ -238,6 +238,12 @@ export interface Parametres {
   montant_cotisation: string;
   numero_wave: string;
   numero_orange_money: string;
+  lien_tiktok: string;
+  lien_whatsapp: string;
+  lien_telegram: string;
+  lien_facebook: string;
+  lien_instagram: string;
+  lien_youtube: string;
 }
 
 export interface Statistiques {

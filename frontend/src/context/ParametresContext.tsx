@@ -23,6 +23,12 @@ const PAR_DEFAUT: Parametres = {
   montant_cotisation: "1000",
   numero_wave: "",
   numero_orange_money: "",
+  lien_tiktok: "https://www.tiktok.com/@dcas_officiel",
+  lien_whatsapp: "https://whatsapp.com/channel/0029VbEGug0Ae5Vz74Gb8B0j",
+  lien_telegram: "https://t.me/dahira_cheikh_abdoulaye_seye",
+  lien_facebook: "https://www.facebook.com/share/1UtYp8t6y7/",
+  lien_instagram: "https://www.instagram.com/dahira_cheikh_abdoulaye_seye_o",
+  lien_youtube: "https://youtube.com/@dahiracheikhabdoulayeseyeoffic",
 };
 
 interface ParametresContextValue {

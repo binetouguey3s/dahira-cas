@@ -1,6 +1,6 @@
-from dahira_backend.stockage import supprimer_fichier
 from rest_framework import serializers
 
+from dahira_backend.stockage import supprimer_fichier
 from .models import Parametres
 from .traduction import LANGUES_SITE
 

@@ -8,7 +8,7 @@ import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from
 import { api, type CategorieEvenement, type Evenement, type Paginated } from "@/lib/api";
 import { locale } from "@/lib/utils";
 
-const CATEGORIES: (CategorieEvenement | "toutes")[] = ["toutes", "magal", "gamou", "dahira", "causerie", "autre"];
+const CATEGORIES: (CategorieEvenement | "toutes")[] = ["toutes", "magal", "gamou", "dahira", "causerie", "nisfou_shabaan", "leylatul_khadr", "autre"];
 
 export default function Evenements() {
   const { t } = useTranslation();

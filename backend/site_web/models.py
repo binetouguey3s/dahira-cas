@@ -23,6 +23,13 @@ class Parametres(models.Model):
     montant_cotisation = models.DecimalField(max_digits=10, decimal_places=2, default=1000)
     numero_wave = models.CharField(max_length=30, blank=True)
     numero_orange_money = models.CharField(max_length=30, blank=True)
+    # Réseaux sociaux (bloc « Nos canaux » de l'accueil) — laisser vide pour masquer un réseau.
+    lien_tiktok = models.URLField(blank=True, default="https://www.tiktok.com/@dcas_officiel")
+    lien_whatsapp = models.URLField(blank=True, default="https://whatsapp.com/channel/0029VbEGug0Ae5Vz74Gb8B0j")
+    lien_telegram = models.URLField(blank=True, default="https://t.me/dahira_cheikh_abdoulaye_seye")
+    lien_facebook = models.URLField(blank=True, default="https://www.facebook.com/share/1UtYp8t6y7/")
+    lien_instagram = models.URLField(blank=True, default="https://www.instagram.com/dahira_cheikh_abdoulaye_seye_o")
+    lien_youtube = models.URLField(blank=True, default="https://youtube.com/@dahiracheikhabdoulayeseyeoffic")
     modifie_le = models.DateTimeField(auto_now=True)
 
     class Meta:

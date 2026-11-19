@@ -7,7 +7,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { Champ, Input, MotDePasseInput } from "@/components/ui/Input";
+import { Champ, MotDePasseInput } from "@/components/ui/Input";
+import { TelephoneInput } from "@/components/ui/TelephoneInput";
 import { useAuth } from "@/context/AuthContext";
 import { useParametres } from "@/context/ParametresContext";
 
@@ -32,8 +33,9 @@ export default function Connexion() {
     try {
       await connecter(telephone, motDePasse);
       navigate(depuis, { replace: true });
-    } catch {
-      setErreur(t("connexion.erreur"));
+    } catch (err) {
+      const statut = (err as { response?: { status?: number } }).response?.status;
+      setErreur(t(statut === 429 ? "connexion.tropDeTentatives" : "connexion.erreur"));
     } finally {
       setEnvoi(false);
     }
@@ -44,16 +46,7 @@ export default function Connexion() {
       <form onSubmit={soumettre} className="flex flex-col gap-4">
         <Champ label={t("champs.telephone")}>
           {(id) => (
-            <Input
-              id={id}
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              value={telephone}
-              onChange={(e) => setTelephone(e.target.value)}
-              placeholder="+221 77 123 45 67"
-              required
-            />
+            <TelephoneInput id={id} valeur={telephone} onChange={setTelephone} libre required />
           )}
         </Champ>
         <Champ label={t("champs.motDePasse")}>

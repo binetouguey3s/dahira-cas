@@ -1,9 +1,10 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     ChangerMotDePasseView,
+    ConnexionView,
     InscriptionView,
     MembreAdminViewSet,
     MembreAnnuaireView,
@@ -18,7 +19,7 @@ router.register("membres", MembreAdminViewSet, basename="membre")
 
 urlpatterns = [
     path("inscription/", InscriptionView.as_view(), name="inscription"),
-    path("connexion/", TokenObtainPairView.as_view(), name="connexion"),
+    path("connexion/", ConnexionView.as_view(), name="connexion"),
     path("connexion/rafraichir/", TokenRefreshView.as_view(), name="connexion-rafraichir"),
     path("moi/", MoiView.as_view(), name="moi"),
     path("moi/photo/", SupprimerPhotoView.as_view(), name="moi-photo"),

@@ -9,11 +9,14 @@ import { Button } from "@/components/ui/Button";
 import { Badge, CardInteractive } from "@/components/ui/Card";
 import { Avatar, ElementAnime, EnTete, ListeAnimee, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { Champ, Input, Interrupteur, Select } from "@/components/ui/Input";
+import { SelecteurPays } from "@/components/ui/SelecteurPays";
+import { TelephoneInput } from "@/components/ui/TelephoneInput";
 import { Confirmation, Modal } from "@/components/ui/Modal";
 import { useAuth } from "@/context/AuthContext";
 import { useParametres } from "@/context/ParametresContext";
 import { useToast } from "@/context/ToastContext";
 import { api, messageErreur, type MembreAdmin, type Paginated, type Role } from "@/lib/api";
+import { estCodePays } from "@/lib/pays";
 import { formatDate } from "@/lib/utils";
 
 const ROLES: Role[] = ["membre", "responsable_finance", "oustaz", "admin_contenus", "admin_general"];
@@ -26,7 +29,7 @@ const VIDE: Formulaire = {
   email: "",
   profession: "",
   adresse: "",
-  pays: "Sénégal",
+  pays: "SN",
   role: "membre",
   is_active: true,
 };
@@ -80,7 +83,7 @@ export default function AdminMembres() {
         email: edition.email,
         profession: edition.profession,
         adresse: edition.adresse,
-        pays: edition.pays,
+        pays: estCodePays(edition.pays) ? edition.pays.toUpperCase() : "SN",
         role: edition.role,
         is_active: edition.is_active,
       });
@@ -93,7 +96,7 @@ export default function AdminMembres() {
 
   const enregistrer = async () => {
     setEnvoi(true);
-    const donnees = { ...form, telephone: form.telephone.replace(/\s+/g, "") };
+    const donnees = { ...form };
     try {
       if (edition === "nouveau") {
         const { data } = await api.post<MembreAdmin & { mot_de_passe_provisoire: string }>("/comptes/membres/", donnees);
@@ -258,7 +261,15 @@ export default function AdminMembres() {
             {(id) => <Input id={id} value={form.nom_complet} onChange={maj("nom_complet")} required />}
           </Champ>
           <Champ label={t("champs.telephone")}>
-            {(id) => <Input id={id} type="tel" value={form.telephone} onChange={maj("telephone")} required />}
+            {(id) => (
+              <TelephoneInput
+                id={id}
+                valeur={form.telephone}
+                onChange={(telephone) => setForm((f) => ({ ...f, telephone }))}
+                paysParDefaut={form.pays}
+                required
+              />
+            )}
           </Champ>
           <Champ label={t("champs.email")} optionnel={t("commun.optionnel")}>
             {(id) => <Input id={id} type="email" value={form.email} onChange={maj("email")} />}
@@ -270,7 +281,7 @@ export default function AdminMembres() {
             {(id) => <Input id={id} value={form.adresse} onChange={maj("adresse")} />}
           </Champ>
           <Champ label={t("champs.pays")}>
-            {(id) => <Input id={id} value={form.pays} onChange={maj("pays")} />}
+            {(id) => <SelecteurPays id={id} valeur={form.pays} onChange={(pays) => setForm((f) => ({ ...f, pays }))} />}
           </Champ>
           <Champ label={t("admin.role")} aide={estMoi ? t("admin.propreRole") : t(`admin.rolesAide.${form.role}`)} className="sm:col-span-2">
             {(id) => (

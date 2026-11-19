@@ -20,7 +20,7 @@ import {
 } from "@/lib/api";
 import { formatDateHeure, versDatetimeLocal } from "@/lib/utils";
 
-const CATEGORIES: CategorieEvenement[] = ["magal", "gamou", "dahira", "causerie", "autre"];
+const CATEGORIES: CategorieEvenement[] = ["magal", "gamou", "dahira", "causerie", "nisfou_shabaan", "leylatul_khadr", "autre"];
 
 interface Formulaire {
   titre: string;

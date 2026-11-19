@@ -1,4 +1,3 @@
-from dahira_backend.stockage import supprimer_fichier
 import secrets
 
 from django.db.models import Count, Q, Sum
@@ -8,12 +7,16 @@ from rest_framework import generics, mixins, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
+from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from dahira_backend.stockage import supprimer_fichier
 
 from .models import Membre
 from .permissions import ROLES_ADMIN_GENERAL, ROLES_FINANCE, a_un_role, role_requis
+from .telephone import normaliser_telephone
 from .serializers import (
     CarteVerificationSerializer,
     ChangerMotDePasseSerializer,
@@ -24,13 +27,34 @@ from .serializers import (
 )
 
 
+class ConnexionView(TokenObtainPairView):
+    """POST /api/comptes/connexion/ — le numéro peut être saisi avec ou sans indicatif.
+
+    Limité à 10 tentatives par minute et par adresse IP (protection contre les essais de mots de passe).
+    """
+
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "connexion"
+
+    def post(self, request, *args, **kwargs):
+        identifiant = str(request.data.get("username", "")).strip()
+        numero = normaliser_telephone(identifiant)
+        if numero and Membre.objects.filter(username=numero).exists():
+            donnees = {"username": numero, "password": request.data.get("password", "")}
+            serializer = self.get_serializer(data=donnees)
+            serializer.is_valid(raise_exception=True)
+            return Response(serializer.validated_data)
+        return super().post(request, *args, **kwargs)
+
+
 class InscriptionView(generics.CreateAPIView):
     """POST /api/comptes/inscription/ — crée un membre et renvoie ses jetons JWT."""
 
     queryset = Membre.objects.all()
     serializer_class = InscriptionSerializer
     permission_classes = [permissions.AllowAny]
-    throttle_classes = [AnonRateThrottle]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "inscription"
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

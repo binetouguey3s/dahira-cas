@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { CarteContenu, CarteEvenement } from "@/components/metier/Elements";
+import { ReseauxSociaux } from "@/components/metier/ReseauxSociaux";
 import { Button } from "@/components/ui/Button";
 import { ElementAnime, ListeAnimee, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { useAuth } from "@/context/AuthContext";
@@ -170,6 +171,19 @@ export default function Accueil() {
           )}
         </section>
       </div>
+
+      {/* Nos canaux (réseaux sociaux du Dahira) */}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        className="mt-10 min-w-0"
+      >
+        <h2 className="mb-1 text-lg font-bold text-text-primary">{t("accueil.nosCanaux")}</h2>
+        <p className="mb-4 text-sm text-text-secondary">{t("accueil.nosCanauxAide")}</p>
+        <ReseauxSociaux parametres={parametres} />
+      </motion.section>
     </AppShell>
   );
 }

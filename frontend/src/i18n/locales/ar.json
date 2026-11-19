@@ -71,7 +71,8 @@
     "oublieMessage": "تواصل مع إدارة الدائرة: سترسل إليك كلمة مرور مؤقتة يمكنك تغييرها لاحقًا من ملفك الشخصي.",
     "pasDeCompte": "لست عضوًا بعد؟",
     "sInscrire": "إنشاء حساب",
-    "continuerSansCompte": "المتابعة بدون حساب"
+    "continuerSansCompte": "المتابعة بدون حساب",
+    "tropDeTentatives": "محاولات كثيرة. يرجى الانتظار دقيقة قبل المحاولة مجددًا."
   },
   "inscription": {
     "titre": "إنشاء حسابي",
@@ -95,7 +96,9 @@
     "conseilDuJour": "نصيحة اليوم",
     "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "الفعاليات القادمة",
-    "derniersEnseignements": "أحدث الدروس"
+    "derniersEnseignements": "أحدث الدروس",
+    "nosCanaux": "قنواتنا",
+    "nosCanauxAide": "تابعوا الدائرة على شبكات التواصل الاجتماعي."
   },
   "biographie": {
     "titreGuide": "المرشد الديني للدائرة",
@@ -144,6 +147,8 @@
       "gamou": "المولد",
       "dahira": "الدائرة",
       "causerie": "محاضرة",
+      "nisfou_shabaan": "ليلة النصف من شعبان",
+      "leylatul_khadr": "ليلة القدر",
       "autre": "أخرى"
     },
     "aucunAVenir": "لا توجد فعاليات قادمة حاليًا.",
@@ -503,7 +508,8 @@
     "telephoneContactAide": "يُعرض على الأعضاء الذين نسوا كلمة المرور.",
     "montantCotisation": "الاشتراك الشهري (فرنك)",
     "numeroWave": "رقم Wave",
-    "numeroOM": "رقم Orange Money"
+    "numeroOM": "رقم Orange Money",
+    "reseaux": "شبكات التواصل الاجتماعي"
   },
   "vocal": {
     "ouVocal": "أو أرسل رسالة صوتية",
@@ -513,5 +519,11 @@
     "supprimer": "حذف الرسالة الصوتية",
     "micRefuse": "تعذّر الوصول إلى الميكروفون. اسمح به في المتصفح.",
     "nonDisponible": "التسجيل الصوتي غير متاح في هذا المتصفح."
+  },
+  "pays": {
+    "rechercher": "ابحث عن بلد أو رمز اتصال",
+    "aucun": "لم يتم العثور على أي بلد",
+    "choisir": "اختر بلدًا",
+    "indicatif": "رمز الاتصال"
   }
 }

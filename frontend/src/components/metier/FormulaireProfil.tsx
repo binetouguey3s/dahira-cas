@@ -3,17 +3,14 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/Button";
 import { Champ, Input, Select } from "@/components/ui/Input";
+import { SelecteurPays } from "@/components/ui/SelecteurPays";
+import { TelephoneInput } from "@/components/ui/TelephoneInput";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import { LANGUES, NOMS_LANGUES } from "@/i18n";
 import { messageErreur, type Membre } from "@/lib/api";
 import type { ChampCarte } from "@/lib/carte";
-
-const PAYS = [
-  "Sénégal", "Gambie", "Mali", "Mauritanie", "Guinée", "Guinée-Bissau", "Côte d'Ivoire", "Burkina Faso",
-  "France", "Italie", "Espagne", "Belgique", "Allemagne", "Royaume-Uni", "États-Unis", "Canada",
-  "Maroc", "Gabon", "Cameroun", "Congo", "Autre",
-];
+import { estCodePays } from "@/lib/pays";
 
 type Champs = Pick<Membre, "nom_complet" | "telephone" | "email" | "profession" | "adresse" | "pays" | "langue_preferee">;
 
@@ -38,7 +35,7 @@ export function FormulaireProfil({
     email: membre?.email ?? "",
     profession: membre?.profession ?? "",
     adresse: membre?.adresse ?? "",
-    pays: membre?.pays || "Sénégal",
+    pays: estCodePays(membre?.pays) ? membre!.pays.toUpperCase() : "SN",
     langue_preferee: membre?.langue_preferee ?? "fr",
   }));
 
@@ -55,7 +52,6 @@ export function FormulaireProfil({
     (Object.keys(valeurs) as (keyof Champs)[]).forEach((c) => {
       if (visible(c) || !seulement) donnees[c] = valeurs[c].trim?.() ?? valeurs[c];
     });
-    if ("telephone" in donnees && donnees.telephone) donnees.telephone = donnees.telephone.replace(/\s+/g, "");
     try {
       const m = await mettreAJour(donnees as Partial<Membre>);
       notifier(t("commun.enregistre"));
@@ -80,7 +76,15 @@ export function FormulaireProfil({
       )}
       {visible("telephone") && (
         <Champ label={t("champs.telephone")} erreur={erreurs.telephone} aide={!seulement ? t("profil.aideTelephone") : undefined}>
-          {(id) => <Input id={id} type="tel" value={valeurs.telephone} onChange={maj("telephone")} required />}
+          {(id) => (
+            <TelephoneInput
+              id={id}
+              valeur={valeurs.telephone}
+              onChange={(telephone) => setValeurs((v) => ({ ...v, telephone }))}
+              paysParDefaut={valeurs.pays}
+              required
+            />
+          )}
         </Champ>
       )}
       {visible("email") && !seulement && (
@@ -108,13 +112,7 @@ export function FormulaireProfil({
       )}
       {visible("pays") && (
         <Champ label={t("champs.pays")}>
-          {(id) => (
-            <Select id={id} value={valeurs.pays} onChange={maj("pays")}>
-              {[...new Set([valeurs.pays, ...PAYS])].filter(Boolean).map((p) => (
-                <option key={p}>{p}</option>
-              ))}
-            </Select>
-          )}
+          {(id) => <SelecteurPays id={id} valeur={valeurs.pays} onChange={(pays) => setValeurs((v) => ({ ...v, pays }))} />}
         </Champ>
       )}
       {!seulement && (

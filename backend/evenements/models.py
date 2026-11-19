@@ -8,6 +8,8 @@ class Evenement(models.Model):
         GAMOU = "gamou", "Gamou"
         DAHIRA = "dahira", "Dahira"
         CAUSERIE = "causerie", "Causerie"
+        NISFOU_SHABAAN = "nisfou_shabaan", "Nisfou Shabaan"
+        LEYLATUL_KHADR = "leylatul_khadr", "Leylatul Khadr"
         AUTRE = "autre", "Autre"
 
     titre = models.CharField(max_length=150)

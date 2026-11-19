@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/Button";
 import { Champ, Input, MotDePasseInput } from "@/components/ui/Input";
+import { TelephoneInput } from "@/components/ui/TelephoneInput";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import type { Langue } from "@/i18n";
@@ -76,16 +77,7 @@ export default function Inscription() {
         </Champ>
         <Champ label={t("champs.telephone")} aide={t("inscription.aideTelephone")}>
           {(id) => (
-            <Input
-              id={id}
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              value={telephone}
-              onChange={(e) => setTelephone(e.target.value)}
-              placeholder="+221 77 123 45 67"
-              required
-            />
+            <TelephoneInput id={id} valeur={telephone} onChange={setTelephone} required />
           )}
         </Champ>
         <Champ label={t("champs.email")} optionnel={t("commun.optionnel")}>

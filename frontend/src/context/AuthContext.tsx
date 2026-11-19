@@ -56,6 +56,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Quand on revient sur l'onglet, le profil (rôle, photo…) est remis à jour sans recharger la page.
+  useEffect(() => {
+    let dernier = Date.now();
+    const rafraichir = () => {
+      if (document.visibilityState !== "visible" || !jetons.acces() || Date.now() - dernier < 30_000) return;
+      dernier = Date.now();
+      api
+        .get<Membre>("/comptes/moi/")
+        .then(({ data }) => setMembre(data))
+        .catch(() => {
+          /* hors ligne : on garde le profil affiché */
+        });
+    };
+    document.addEventListener("visibilitychange", rafraichir);
+    window.addEventListener("focus", rafraichir);
+    return () => {
+      document.removeEventListener("visibilitychange", rafraichir);
+      window.removeEventListener("focus", rafraichir);
+    };
+  }, []);
+
   useEffect(() => {
     chargerProfil();
     const surDeconnexion = () => setMembre(null);

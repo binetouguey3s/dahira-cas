@@ -1,5 +1,5 @@
 import { MotionConfig } from "motion/react";
-import { lazy, Suspense, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 
 import { EcranChargement, ProtectedRoute } from "@/components/ProtectedRoute";
@@ -8,6 +8,7 @@ import { ParametresProvider } from "@/context/ParametresContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { TraductionProvider } from "@/context/TraductionContext";
+import { lazyPage } from "@/lib/chargement";
 import { ROLES_ADMIN } from "@/lib/navigation";
 
 import Accueil from "@/pages/Accueil";
@@ -15,24 +16,24 @@ import Connexion from "@/pages/Connexion";
 import Inscription from "@/pages/Inscription";
 
 // Les autres pages sont chargées à la demande : le site s'ouvre plus vite.
-const Biographie = lazy(() => import("@/pages/Biographie"));
-const Mediatheque = lazy(() => import("@/pages/Mediatheque"));
-const MediaDetail = lazy(() => import("@/pages/MediaDetail"));
-const Evenements = lazy(() => import("@/pages/Evenements"));
-const EvenementDetail = lazy(() => import("@/pages/EvenementDetail"));
-const QuestionsReponses = lazy(() => import("@/pages/QuestionsReponses"));
-const Cotisations = lazy(() => import("@/pages/Cotisations"));
-const Profil = lazy(() => import("@/pages/Profil"));
-const Carte = lazy(() => import("@/pages/Carte"));
-const VerifierCarte = lazy(() => import("@/pages/VerifierCarte"));
-const Introuvable = lazy(() => import("@/pages/Introuvable"));
-const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
-const AdminMembres = lazy(() => import("@/pages/admin/AdminMembres"));
-const AdminFinance = lazy(() => import("@/pages/admin/AdminFinance"));
-const AdminMediatheque = lazy(() => import("@/pages/admin/AdminMediatheque"));
-const AdminEvenements = lazy(() => import("@/pages/admin/AdminEvenements"));
-const AdminOustaz = lazy(() => import("@/pages/admin/AdminOustaz"));
-const AdminSite = lazy(() => import("@/pages/admin/AdminSite"));
+const Biographie = lazyPage(() => import("@/pages/Biographie"));
+const Mediatheque = lazyPage(() => import("@/pages/Mediatheque"));
+const MediaDetail = lazyPage(() => import("@/pages/MediaDetail"));
+const Evenements = lazyPage(() => import("@/pages/Evenements"));
+const EvenementDetail = lazyPage(() => import("@/pages/EvenementDetail"));
+const QuestionsReponses = lazyPage(() => import("@/pages/QuestionsReponses"));
+const Cotisations = lazyPage(() => import("@/pages/Cotisations"));
+const Profil = lazyPage(() => import("@/pages/Profil"));
+const Carte = lazyPage(() => import("@/pages/Carte"));
+const VerifierCarte = lazyPage(() => import("@/pages/VerifierCarte"));
+const Introuvable = lazyPage(() => import("@/pages/Introuvable"));
+const AdminDashboard = lazyPage(() => import("@/pages/admin/AdminDashboard"));
+const AdminMembres = lazyPage(() => import("@/pages/admin/AdminMembres"));
+const AdminFinance = lazyPage(() => import("@/pages/admin/AdminFinance"));
+const AdminMediatheque = lazyPage(() => import("@/pages/admin/AdminMediatheque"));
+const AdminEvenements = lazyPage(() => import("@/pages/admin/AdminEvenements"));
+const AdminOustaz = lazyPage(() => import("@/pages/admin/AdminOustaz"));
+const AdminSite = lazyPage(() => import("@/pages/admin/AdminSite"));
 
 function RemonterEnHaut() {
   const { pathname } = useLocation();

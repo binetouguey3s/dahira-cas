@@ -1,8 +1,9 @@
-from dahira_backend.stockage import supprimer_fichier
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
+from dahira_backend.stockage import supprimer_fichier
 from .models import Membre
+from .telephone import valider_pays, valider_telephone
 
 TAILLE_MAX_PHOTO = 5 * 1024 * 1024  # 5 Mo
 
@@ -14,7 +15,7 @@ def valider_photo(photo):
 
 
 def valider_telephone_unique(valeur, instance=None):
-    valeur = valeur.strip()
+    valeur = valider_telephone(valeur)
     autres = Membre.objects.exclude(pk=getattr(instance, "pk", None))
     if autres.filter(telephone=valeur).exists() or autres.filter(username=valeur).exists():
         raise serializers.ValidationError("Ce numéro de téléphone est déjà utilisé.")
@@ -49,6 +50,9 @@ class MembreSerializer(serializers.ModelSerializer):
 
     def validate_telephone(self, valeur):
         return valider_telephone_unique(valeur, self.instance)
+
+    def validate_pays(self, valeur):
+        return valider_pays(valeur)
 
     def update(self, instance, validated_data):
         # Le téléphone sert d'identifiant de connexion : on garde les deux synchronisés.
@@ -89,6 +93,9 @@ class MembreAdminSerializer(serializers.ModelSerializer):
 
     def validate_telephone(self, valeur):
         return valider_telephone_unique(valeur, self.instance)
+
+    def validate_pays(self, valeur):
+        return valider_pays(valeur)
 
     def validate(self, attrs):
         demandeur = self.context["request"].user
