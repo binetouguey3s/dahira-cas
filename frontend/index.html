@@ -24,7 +24,7 @@
         font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
         overflow: hidden;
         /* Sécurité : si le site ne se charge pas, l'écran s'efface quand même. */
-        animation: accueil-secours 0.5s ease 6s forwards;
+        animation: accueil-secours 0.5s ease 8s forwards;
       }
       #ecran-accueil.sortie {
         animation: accueil-sortie 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -41,7 +41,10 @@
         position: relative;
         width: min(68vw, 280px);
         aspect-ratio: 1;
-        animation: accueil-logo 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both;
+        /* Entrée avec rebond, puis le logo « respire » doucement jusqu'à l'ouverture du site. */
+        animation:
+          accueil-logo 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both,
+          accueil-respire 2.6s ease-in-out 1.2s infinite;
       }
       .accueil-medaillon img {
         position: absolute;
@@ -84,7 +87,10 @@
         left: -60%;
         background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.85) 50%, transparent 100%);
         transform: skewX(-12deg);
-        animation: accueil-reflet 0.9s ease-in-out 1.15s both;
+        /* Reflet de lumière : une première fois, puis une seconde avant l'ouverture. */
+        animation:
+          accueil-reflet 0.9s ease-in-out 1.15s both,
+          accueil-reflet 0.9s ease-in-out 3.3s both;
       }
       .accueil-salut {
         position: relative;
@@ -117,6 +123,10 @@
         to { opacity: 1; transform: scale(1); filter: blur(0); }
       }
       @keyframes accueil-trace { to { stroke-dashoffset: 0; } }
+      @keyframes accueil-respire {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.035); }
+      }
       @keyframes accueil-reflet { from { left: -60%; } to { left: 130%; } }
       @keyframes accueil-texte {
         from { opacity: 0; transform: translateY(10px); }
