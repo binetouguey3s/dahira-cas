@@ -23,7 +23,7 @@ class TraductionTests(APITestCase):
     @override_settings(DEEPL_API_KEY="")
     def test_sans_cle_renvoie_les_textes_dorigine(self):
         res = self.client.post(TRAD, {"textes": ["Bonjour"], "langue": "en"}, format="json")
-        self.assertEqual(res.data, {"traductions": ["Bonjour"], "active": False})
+        self.assertEqual(res.data, {"traductions": ["Bonjour"], "active": False, "version": "v6-0"})
 
     @override_settings(DEEPL_API_KEY="cle:fx")
     def test_traduit_une_seule_fois_puis_utilise_la_memoire(self):
@@ -31,7 +31,7 @@ class TraductionTests(APITestCase):
             for _ in range(2):
                 res = self.client.post(TRAD, {"textes": ["Bonjour", "Bonjour"], "langue": "en"}, format="json")
                 self.assertEqual(res.data["traductions"], ["Hello", "Hello"])
-        deepl.assert_called_once_with(["Bonjour"], "en")
+        deepl.assert_called_once_with(["Bonjour"], "en", ())
         self.assertEqual(Traduction.objects.count(), 1)
 
     @override_settings(DEEPL_API_KEY="cle:fx")
@@ -103,6 +103,41 @@ class TermesProtegesTests(APITestCase):
         self.assertEqual(deproteger("التحضير لليلة <x>Leylatul Khadr</x>", "ar"), "التحضير لليلة القدر")
         self.assertEqual(deproteger("ليلة<x>Nisfou Shabaan</x>", "ar"), "ليلة النصف من شعبان")
         self.assertEqual(proteger("a < b & c"), "a &lt; b &amp; c")
+
+
+class NomsPropresEtAnneesTests(APITestCase):
+    """Adresses, noms propres et années restent tels quels."""
+
+    def test_adresses_et_noms_proteges(self):
+        from site_web.traduction import proteger
+
+        self.assertEqual(proteger("Rendez-vous à Keur Ndiaye Lo"), "Rendez-vous à <x>Keur Ndiaye Lo</x>")
+        self.assertIn("<x>Kourel</x>", proteger("Le Kourel chantera"))
+        self.assertIn("<x>Moussa</x> <x>Fall</x>", proteger("Accueil par Moussa Fall"))
+        # Sans majuscule, ce n'est pas un nom : « fall » reste un mot ordinaire.
+        self.assertNotIn("<x>", proteger("the leaves fall"))
+        self.assertIn("<x>Darou Salam</x>", proteger("Départ de Darou Salam"))
+
+    def test_mots_personnalises(self):
+        from site_web.traduction import proteger
+
+        self.assertEqual(proteger("Chez la famille Seck Bou", ("Seck Bou",)), "Chez la famille <x>Seck Bou</x>")
+
+    def test_annee_sans_mot_ajoute(self):
+        from site_web.traduction import deproteger, proteger
+
+        self.assertEqual(proteger("Magal 2026"), "<x>Magal</x> <x>2026</x>")
+        self.assertEqual(deproteger("Magal de l'an <x>2026</x>", "fr", "Magal 2026"), "Magal de 2026")
+        self.assertEqual(deproteger("The year <x>2026</x> Magal", "en", "Magal 2026"), "2026 Magal")
+        self.assertEqual(deproteger("ماغال عام <x>2026</x>", "ar", "Magal 2026"), "ماغال 2026")
+        self.assertEqual(deproteger("ماغال <x>2026</x>م", "ar", "Magal 2026"), "ماغال 2026")
+        # Si l'auteur a lui-même écrit « l'an 2026 », on respecte son texte.
+        self.assertEqual(deproteger("the year <x>2026</x>", "en", "l'an 2026"), "the year 2026")
+
+    def test_lieu_complet_vers_arabe(self):
+        from site_web.traduction import deproteger
+
+        self.assertEqual(deproteger("في <x>Keur Ndiaye Lo</x>", "ar"), "في Keur Ndiaye Lo")
 
 
 class SanteTests(APITestCase):

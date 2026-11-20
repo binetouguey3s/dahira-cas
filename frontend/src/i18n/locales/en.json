@@ -86,7 +86,11 @@
     "erreur": "Registration failed. Please check your details.",
     "bienvenue": "Welcome to the community!",
     "dejaMembre": "Already a member?",
-    "seConnecter": "Sign in"
+    "seConnecter": "Sign in",
+    "confirmerTelephone": "Confirm your number",
+    "aideConfirmerTelephone": "Type it a second time to avoid any mistake.",
+    "numerosDifferents": "The two numbers do not match. Please check them.",
+    "numerosIdentiques": "Both numbers match."
   },
   "accueil": {
     "bonjour": "Good morning {{nom}}",
@@ -499,7 +503,10 @@
     "videoChoisie": "New video: {{nom}}",
     "videoRetirer": "Remove the video",
     "videoTropLourde": "The video is larger than 100 MB. Use a YouTube link instead.",
-    "envoiEnCours": "Uploading: {{pourcent}}%"
+    "envoiEnCours": "Uploading: {{pourcent}}%",
+    "motsNonTraduits": "Automatic translation",
+    "motsNonTraduitsLabel": "Words never to translate",
+    "motsNonTraduitsAide": "One name, place or expression per line: they stay exactly as written in every language. Event locations, common names (Ndiaye, Fall, Moussa…), “Keur …”, “Darou …”, “Kourel” and years are already protected automatically."
   },
   "vocal": {
     "ouVocal": "Or send a voice message",

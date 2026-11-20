@@ -51,7 +51,7 @@ export function CarteEvenement({ evenement }: { evenement: Evenement }) {
             {evenement.lieu && (
               <>
                 {" · "}
-                <Traduit texte={evenement.lieu} />
+                {evenement.lieu}
               </>
             )}
           </p>

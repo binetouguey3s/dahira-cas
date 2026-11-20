@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from dahira_backend.stockage import supprimer_fichier
 from .models import Membre
-from .telephone import valider_pays, valider_telephone
+from .telephone import normaliser_telephone, valider_pays, valider_telephone
 
 TAILLE_MAX_PHOTO = 5 * 1024 * 1024  # 5 Mo
 
@@ -130,14 +130,24 @@ class CarteVerificationSerializer(serializers.ModelSerializer):
 
 class InscriptionSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
+    # Numéro saisi une deuxième fois (facultatif pour les anciens clients) : doit être identique.
+    telephone_confirmation = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = Membre
-        fields = ["nom_complet", "telephone", "email", "password", "langue_preferee"]
+        fields = ["nom_complet", "telephone", "telephone_confirmation", "email", "password", "langue_preferee"]
         extra_kwargs = {"langue_preferee": {"required": False}}
 
     def validate_telephone(self, valeur):
         return valider_telephone_unique(valeur)
+
+    def validate(self, attrs):
+        confirmation = attrs.pop("telephone_confirmation", "")
+        if confirmation and normaliser_telephone(confirmation) != attrs["telephone"]:
+            raise serializers.ValidationError(
+                {"telephone_confirmation": "Les deux numéros ne sont pas identiques."}
+            )
+        return attrs
 
     def create(self, validated_data):
         membre = Membre(

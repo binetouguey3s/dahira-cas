@@ -31,22 +31,31 @@ export default function Inscription() {
 
   const [nomComplet, setNomComplet] = useState("");
   const [telephone, setTelephone] = useState("");
+  const [telephoneConfirme, setTelephoneConfirme] = useState("");
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [erreur, setErreur] = useState("");
   const [envoi, setEnvoi] = useState(false);
 
   const force = forceMotDePasse(motDePasse);
+  // Le numéro est saisi deux fois : une faute de frappe empêcherait le membre de se reconnecter.
+  const numerosDifferents = Boolean(telephone && telephoneConfirme) && telephone !== telephoneConfirme;
+  const numerosIdentiques = Boolean(telephone) && telephone === telephoneConfirme;
   const couleursForce = ["bg-status-error", "bg-status-error", "bg-status-warning", "bg-accent-primary", "bg-accent-primary"];
 
   const soumettre = async (e: React.FormEvent) => {
     e.preventDefault();
     setErreur("");
+    if (telephone !== telephoneConfirme) {
+      setErreur(t("inscription.numerosDifferents"));
+      return;
+    }
     setEnvoi(true);
     try {
       await inscrire({
         nom_complet: nomComplet.trim(),
         telephone,
+        telephone_confirmation: telephoneConfirme,
         email: email.trim(),
         password: motDePasse,
         langue_preferee: i18n.language as Langue,
@@ -78,6 +87,23 @@ export default function Inscription() {
         <Champ label={t("champs.telephone")} aide={t("inscription.aideTelephone")}>
           {(id) => (
             <TelephoneInput id={id} valeur={telephone} onChange={setTelephone} required />
+          )}
+        </Champ>
+        <Champ label={t("inscription.confirmerTelephone")} aide={t("inscription.aideConfirmerTelephone")}>
+          {(id) => (
+            <>
+              <TelephoneInput id={id} valeur={telephoneConfirme} onChange={setTelephoneConfirme} required />
+              {numerosDifferents && (
+                <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-status-error" role="alert">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {t("inscription.numerosDifferents")}
+                </p>
+              )}
+              {numerosIdentiques && (
+                <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-accent-primary">
+                  <Check className="h-3.5 w-3.5 shrink-0" /> {t("inscription.numerosIdentiques")}
+                </p>
+              )}
+            </>
           )}
         </Champ>
         <Champ label={t("champs.email")} optionnel={t("commun.optionnel")} aide={t("profil.aideEmail")}>
@@ -136,7 +162,7 @@ export default function Inscription() {
           )}
         </AnimatePresence>
 
-        <Button type="submit" chargement={envoi} size="lg" className="w-full">
+        <Button type="submit" chargement={envoi} disabled={numerosDifferents} size="lg" className="w-full">
           {t("inscription.bouton")}
         </Button>
 

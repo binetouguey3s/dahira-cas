@@ -219,6 +219,20 @@ export default function AdminSite() {
           <Champ label={t("adminSite.citationAuteur")}>{(id) => <Input id={id} value={form.citation_auteur} onChange={maj("citation_auteur")} placeholder={form.nom_guide} />}</Champ>
         </Section>
 
+        <Section titre={t("adminSite.motsNonTraduits")}>
+          <Champ label={t("adminSite.motsNonTraduitsLabel")} className="sm:col-span-2" aide={t("adminSite.motsNonTraduitsAide")}>
+            {(id) => (
+              <Textarea
+                id={id}
+                rows={4}
+                value={form.mots_non_traduits}
+                onChange={maj("mots_non_traduits")}
+                placeholder={"Keur Serigne Mbaye\nKourel Hizbut Tarqiyyah\nMédina Gounass"}
+              />
+            )}
+          </Champ>
+        </Section>
+
         <Section titre={t("adminSite.contactPaiement")}>
           <Champ label={t("adminSite.telephoneContact")} aide={t("adminSite.telephoneContactAide")}>
             {(id) => <Input id={id} type="tel" value={form.telephone_contact} onChange={maj("telephone_contact")} />}

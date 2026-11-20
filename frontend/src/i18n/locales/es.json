@@ -86,7 +86,11 @@
     "erreur": "No se pudo completar el registro. Revisa tus datos.",
     "bienvenue": "¡Bienvenido a la comunidad!",
     "dejaMembre": "¿Ya eres miembro?",
-    "seConnecter": "Iniciar sesión"
+    "seConnecter": "Iniciar sesión",
+    "confirmerTelephone": "Confirma tu número",
+    "aideConfirmerTelephone": "Escríbelo por segunda vez para evitar errores.",
+    "numerosDifferents": "Los dos números no coinciden. Compruébalos.",
+    "numerosIdentiques": "Los dos números coinciden."
   },
   "accueil": {
     "bonjour": "Buenos días, {{nom}}",
@@ -499,7 +503,10 @@
     "videoChoisie": "Nuevo vídeo: {{nom}}",
     "videoRetirer": "Quitar el vídeo",
     "videoTropLourde": "El vídeo supera los 100 MB. Usa mejor un enlace de YouTube.",
-    "envoiEnCours": "Subiendo: {{pourcent}} %"
+    "envoiEnCours": "Subiendo: {{pourcent}} %",
+    "motsNonTraduits": "Traducción automática",
+    "motsNonTraduitsLabel": "Palabras que nunca se traducen",
+    "motsNonTraduitsAide": "Un nombre, lugar o expresión por línea: se mantienen tal cual en todos los idiomas. Los lugares de los eventos, los nombres comunes (Ndiaye, Fall, Moussa…), «Keur …», «Darou …», «Kourel» y los años ya están protegidos automáticamente."
   },
   "vocal": {
     "ouVocal": "O envía un mensaje de voz",

@@ -250,6 +250,7 @@ export interface Parametres {
   lien_facebook: string;
   lien_instagram: string;
   lien_youtube: string;
+  mots_non_traduits: string;
 }
 
 export interface Statistiques {

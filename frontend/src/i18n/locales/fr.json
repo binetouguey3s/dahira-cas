@@ -86,7 +86,11 @@
     "erreur": "Inscription impossible. Vérifiez vos informations.",
     "bienvenue": "Bienvenue dans la communauté !",
     "dejaMembre": "Déjà membre ?",
-    "seConnecter": "Se connecter"
+    "seConnecter": "Se connecter",
+    "confirmerTelephone": "Confirmez votre numéro",
+    "aideConfirmerTelephone": "Écrivez-le une deuxième fois pour éviter toute erreur.",
+    "numerosDifferents": "Les deux numéros ne sont pas identiques. Vérifiez-les.",
+    "numerosIdentiques": "Les deux numéros sont identiques."
   },
   "accueil": {
     "bonjour": "Bonjour {{nom}}",
@@ -499,7 +503,10 @@
     "videoChoisie": "Nouvelle vidéo : {{nom}}",
     "videoRetirer": "Retirer la vidéo",
     "videoTropLourde": "La vidéo dépasse 100 Mo. Utilisez plutôt un lien YouTube.",
-    "envoiEnCours": "Envoi : {{pourcent}} %"
+    "envoiEnCours": "Envoi : {{pourcent}} %",
+    "motsNonTraduits": "Traduction automatique",
+    "motsNonTraduitsLabel": "Mots à ne jamais traduire",
+    "motsNonTraduitsAide": "Un nom, un lieu ou une expression par ligne : ils restent écrits tels quels dans toutes les langues. Les lieux des événements, les noms courants (Ndiaye, Fall, Moussa…), « Keur … », « Darou … », « Kourel » et les années sont déjà protégés automatiquement."
   },
   "vocal": {
     "ouVocal": "Ou envoyez un message vocal",

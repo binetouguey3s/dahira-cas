@@ -14,7 +14,8 @@ import { api } from "@/lib/api";
 
 type Memoire = Record<string, Record<string, string>>; // langue → texte source → traduction
 
-const CLE_STOCKAGE = "dahira_traductions_v1";
+const CLE_STOCKAGE = "dahira_traductions_v2";
+const CLE_VERSION = "dahira_traductions_version";
 const MAX_PAR_LANGUE = 800;
 const TAILLE_LOT = 50;
 
@@ -23,6 +24,22 @@ function chargerMemoire(): Memoire {
     return JSON.parse(localStorage.getItem(CLE_STOCKAGE) ?? "{}") as Memoire;
   } catch {
     return {};
+  }
+}
+
+function lireVersion() {
+  try {
+    return localStorage.getItem(CLE_VERSION);
+  } catch {
+    return null;
+  }
+}
+
+function ecrireVersion(version: string) {
+  try {
+    localStorage.setItem(CLE_VERSION, version);
+  } catch {
+    /* indisponible */
   }
 }
 
@@ -66,13 +83,18 @@ export function TraductionProvider({ children }: { children: ReactNode }) {
     for (let i = 0; i < textes.length; i += TAILLE_LOT) {
       const lot = textes.slice(i, i + TAILLE_LOT);
       try {
-        const { data } = await api.post<{ traductions: string[]; active: boolean }>("/site/traduire/", {
+        const { data } = await api.post<{ traductions: string[]; active: boolean; version?: string }>("/site/traduire/", {
           textes: lot,
           langue: cible,
         });
         if (!data.active) {
           serviceActif.current = false;
           return;
+        }
+        // Règles de traduction changées (ex. nouveaux mots à ne pas traduire) : on oublie les anciennes traductions.
+        if (data.version && lireVersion() !== data.version) {
+          memoire.current = {};
+          ecrireVersion(data.version);
         }
         const pourLangue = (memoire.current[cible] ??= {});
         lot.forEach((t, j) => (pourLangue[t] = data.traductions[j] ?? t));

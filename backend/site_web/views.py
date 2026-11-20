@@ -10,7 +10,7 @@ from dahira_backend.stockage import supprimer_fichier
 
 from .models import Parametres
 from .serializers import ParametresSerializer, TraductionSerializer
-from .traduction import traduire
+from .traduction import traduire, version_traduction
 
 
 class ParametresView(APIView):
@@ -49,4 +49,11 @@ class TraductionView(APIView):
         serializer.is_valid(raise_exception=True)
         textes = serializer.validated_data["textes"]
         langue = serializer.validated_data["langue"]
-        return Response({"traductions": traduire(textes, langue), "active": bool(settings.DEEPL_API_KEY)})
+        return Response(
+            {
+                "traductions": traduire(textes, langue),
+                "active": bool(settings.DEEPL_API_KEY),
+                # Le navigateur oublie ses anciennes traductions quand les règles changent.
+                "version": version_traduction(),
+            }
+        )

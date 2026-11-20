@@ -90,3 +90,30 @@ class AnciensFormatsTests(APITestCase):
             membre = self.client.post("/api/comptes/connexion/", {"username": saisie, "password": MOT_DE_PASSE})
             self.assertEqual(membre.status_code, 200, saisie)
         self.assertEqual(self.client.post("/api/comptes/connexion/", {"username": "776787711", "password": "faux"}).status_code, 401)
+
+
+class ConfirmationTelephoneInscriptionTests(APITestCase):
+    """Le numéro saisi deux fois à l'inscription doit être identique."""
+
+    def setUp(self):
+        cache.clear()
+
+    def _inscrire(self, confirmation):
+        return self.client.post(
+            "/api/comptes/inscription/",
+            {
+                "nom_complet": "Awa Ndiaye",
+                "telephone": "77 123 45 67",
+                "telephone_confirmation": confirmation,
+                "password": "MotDePasse-Solide-42",
+            },
+            format="json",
+        )
+
+    def test_numeros_differents_refuses(self):
+        reponse = self._inscrire("77 123 45 68")
+        self.assertEqual(reponse.status_code, 400)
+        self.assertIn("telephone_confirmation", reponse.data)
+
+    def test_meme_numero_ecrit_autrement_accepte(self):
+        self.assertEqual(self._inscrire("+221771234567").status_code, 201)

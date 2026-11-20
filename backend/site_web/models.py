@@ -37,6 +37,8 @@ class Parametres(models.Model):
     lien_facebook = models.URLField(blank=True, default="https://www.facebook.com/share/1UtYp8t6y7/")
     lien_instagram = models.URLField(blank=True, default="https://www.instagram.com/dahira_cheikh_abdoulaye_seye_o")
     lien_youtube = models.URLField(blank=True, default="https://youtube.com/@dahiracheikhabdoulayeseyeoffic")
+    # Mots ou expressions que la traduction automatique doit laisser tels quels (un par ligne).
+    mots_non_traduits = models.TextField(blank=True)
     modifie_le = models.DateTimeField(auto_now=True)
 
     class Meta:

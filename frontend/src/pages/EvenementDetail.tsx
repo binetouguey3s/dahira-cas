@@ -195,7 +195,7 @@ export default function EvenementDetail() {
               >
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-primary" />
                 <span className="underline decoration-border-subtle underline-offset-4">
-                  <Traduit texte={evenement.lieu} />
+                  {evenement.lieu}
                 </span>
               </a>
             )}

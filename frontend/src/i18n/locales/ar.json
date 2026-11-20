@@ -86,7 +86,11 @@
     "erreur": "تعذّر التسجيل. تحقّق من بياناتك.",
     "bienvenue": "مرحبًا بك في الجماعة!",
     "dejaMembre": "عضو بالفعل؟",
-    "seConnecter": "تسجيل الدخول"
+    "seConnecter": "تسجيل الدخول",
+    "confirmerTelephone": "أكّد رقم هاتفك",
+    "aideConfirmerTelephone": "اكتبه مرة ثانية لتجنّب أي خطأ.",
+    "numerosDifferents": "الرقمان غير متطابقين. يرجى التحقق منهما.",
+    "numerosIdentiques": "الرقمان متطابقان."
   },
   "accueil": {
     "bonjour": "صباح الخير يا {{nom}}",
@@ -527,7 +531,10 @@
     "videoChoisie": "فيديو جديد: {{nom}}",
     "videoRetirer": "إزالة الفيديو",
     "videoTropLourde": "حجم الفيديو يتجاوز 100 ميغابايت. استخدم رابط يوتيوب بدلًا من ذلك.",
-    "envoiEnCours": "جارٍ الإرسال: {{pourcent}}٪"
+    "envoiEnCours": "جارٍ الإرسال: {{pourcent}}٪",
+    "motsNonTraduits": "الترجمة التلقائية",
+    "motsNonTraduitsLabel": "كلمات لا تُترجم أبدًا",
+    "motsNonTraduitsAide": "اسم أو مكان أو عبارة في كل سطر: تبقى مكتوبة كما هي في جميع اللغات. أماكن الفعاليات والأسماء الشائعة (Ndiaye وFall وMoussa…) و«Keur …» و«Darou …» و«Kourel» والسنوات محمية تلقائيًا."
   },
   "vocal": {
     "ouVocal": "أو أرسل رسالة صوتية",

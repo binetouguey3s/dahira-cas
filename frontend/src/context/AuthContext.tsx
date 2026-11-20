@@ -6,6 +6,7 @@ import { api, jetons, type Membre } from "@/lib/api";
 interface DonneesInscription {
   nom_complet: string;
   telephone: string;
+  telephone_confirmation?: string;
   email?: string;
   password: string;
   langue_preferee?: Langue;

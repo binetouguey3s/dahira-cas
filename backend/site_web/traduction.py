@@ -4,6 +4,8 @@ Sans clé DEEPL_API_KEY, les textes sont renvoyés tels quels : le site fonction
 simplement sans traduction automatique.
 """
 
+import functools
+import hashlib
 import html
 import json
 import logging
@@ -58,9 +60,73 @@ TERMES_PROTEGES = [
     (r"Dalal\s+ak\s+Diam", None),
 ]
 _TERMES = [(re.compile(motif, re.IGNORECASE), arabe) for motif, arabe in TERMES_PROTEGES]
-_MOTIF_PROTEGE = re.compile(r"\b(?:" + "|".join(m for m, _ in TERMES_PROTEGES) + r")\b", re.IGNORECASE)
+
+# Noms de lieux et adresses : « Keur Ndiaye Lo » ne doit jamais devenir « Maison Ndiaye Lo ».
+# Le mot de lieu wolof est gardé avec tous les mots en majuscule qui le suivent.
+_MOT_PROPRE = r"[A-ZÀ-ÖØ-ÞŊ0-9][\w'’-]*"
+LIEUX = rf"(?:Keur|Kër|Ker|Darou|Daaru|Daru|Ndame|Ndiarème|Ndiareme)(?:\s+{_MOT_PROPRE})+|Kourel(?:\s+{_MOT_PROPRE})*"
+# Noms et prénoms courants : reconnus seulement avec une majuscule (« Fall », pas « fall »).
+NOMS_PROPRES = [
+    # Noms de famille
+    "Ndiaye", "Diop", "Fall", "Seye", "Sèye", "Sy", "Mbaye", "Sall", "Lo", "Ly", "Gueye", "Guèye", "Faye",
+    "Diouf", "Sarr", "Ba", "Kane", "Cissé", "Cisse", "Thiam", "Niang", "Ndao", "Dieng", "Diagne", "Sow",
+    "Sène", "Sene", "Wade", "Mbodj", "Diallo", "Touré", "Toure", "Ka", "Kâ", "Samb", "Ndour", "Badiane",
+    "Camara", "Tall", "Mbengue", "Seck", "Diaw", "Ndoye", "Mboup", "Gaye", "Dramé", "Thiaw", "Diakhaté",
+    "Mbow", "Ndong", "Ngom", "Diatta", "Sagna", "Coly", "Mendy", "Sambou", "Diakhité", "Kébé", "Kebe",
+    "Mbacké", "Mbacke", "Ndiongue", "Sakho", "Sylla", "Konaté", "Bâ", "Dia", "Ndir", "Fofana", "Wane",
+    "Ciss", "Dione", "Diome", "Diedhiou", "Senghor", "Lô", "Ndiour", "Pouye", "Kandji", "Gning", "Dior",
+    # Prénoms
+    "Moussa", "Awa", "Fatou", "Fatoumata", "Mamadou", "Ibrahima", "Modou", "Aliou", "Abdou", "Abdoulaye",
+    "Astou", "Khady", "Khadija", "Aminata", "Mariama", "Ousmane", "Babacar", "Mor", "Pape", "Ndeye", "Ndèye",
+    "Sokhna", "Bineta", "Binetou", "Coumba", "Adama", "Amadou", "Assane", "Lamine", "Moustapha", "Saliou",
+    "Fallou", "Mame", "Massamba", "Bassirou", "Mbaye", "Omar", "Oumar", "Daouda", "Elhadji", "El Hadji",
+    "Ousseynou", "Alioune", "Malick", "Ndiaga", "Samba", "Demba", "Penda", "Dieynaba", "Marème", "Mareme",
+    "Seynabou", "Rokhaya", "Yacine", "Codou", "Maimouna", "Maïmouna", "Arame", "Anta", "Ndella", "Soda",
+    "Absa", "Oumou", "Rama", "Dibor", "Faty", "Thierno", "Matar", "Mbacké", "Ablaye", "Aïda", "Aida",
+]
+# Années de l'ère chrétienne : écrites seulement en chiffres (« 2026 », pas « an 2026 » ni « عام 2026 »).
+ANNEE = r"(?:1[89]|2[01])\d\d"
+_MOTS_ANNEE = {
+    "fr": r"(?:en\s+l['’]an|l['’]an(?:née)?|année|an)\s+",
+    "en": r"(?:the\s+year|year)\s+",
+    "es": r"(?:el\s+año|año)\s+",
+    "ar": r"(?:(?<=\s)|^)(?:العام|عام|السنة|سنة)\s+",
+}
+_ANNEE_PRECISEE = re.compile(
+    rf"\b(?:an|année|year|año)\s+{ANNEE}\b|(?:عام|سنة)\s+{ANNEE}|{ANNEE}\s?م(?![\u0600-\u06FF])", re.IGNORECASE
+)
+
 # Changer cette version invalide les traductions déjà mémorisées (nouvelle règle de traduction).
-VERSION_TRADUCTION = "v5"
+VERSION_TRADUCTION = "v6"
+
+
+def mots_personnalises():
+    """Mots ou expressions à ne jamais traduire, saisis par l'administration (un par ligne ou séparés par des virgules)."""
+    from .models import Parametres
+
+    texte = Parametres.charger().mots_non_traduits or ""
+    mots = {m.strip() for m in re.split(r"[\n,;]+", texte) if len(m.strip()) >= 2}
+    return tuple(sorted(mots, key=len, reverse=True))
+
+
+def version_traduction(mots=None):
+    """Version des règles : change aussi quand l'administration modifie la liste de mots."""
+    mots = mots_personnalises() if mots is None else mots
+    empreinte = hashlib.sha1("\n".join(mots).encode("utf-8")).hexdigest()[:8] if mots else "0"
+    return f"{VERSION_TRADUCTION}-{empreinte}"
+
+
+@functools.lru_cache(maxsize=16)
+def _motif_protege(mots=()):
+    perso = [r"\s+".join(re.escape(p) for p in m.split()) for m in mots]
+    alternatives = (
+        [f"(?i:{m})" for m in perso]
+        + [LIEUX]
+        + [f"(?i:{m})" for m, _ in TERMES_PROTEGES]
+        + [re.escape(n).replace(r"\ ", r"\s+") for n in sorted(set(NOMS_PROPRES), key=len, reverse=True)]
+        + [ANNEE]
+    )
+    return re.compile(r"(?<![\w])(?:" + "|".join(alternatives) + r")(?![\w])")
 
 
 def _forme_arabe(terme):
@@ -70,10 +136,10 @@ def _forme_arabe(terme):
     return None
 
 
-def proteger(texte):
+def proteger(texte, mots=()):
     """Échappe le texte en XML et entoure les termes protégés d'une balise ignorée par DeepL."""
     morceaux, position = [], 0
-    for trouve in _MOTIF_PROTEGE.finditer(texte):
+    for trouve in _motif_protege(tuple(mots)).finditer(texte):
         morceaux.append(html.escape(texte[position : trouve.start()], quote=False))
         morceaux.append(f"<x>{html.escape(trouve.group(0), quote=False)}</x>")
         position = trouve.end()
@@ -81,9 +147,23 @@ def proteger(texte):
     return "".join(morceaux)
 
 
-def deproteger(texte, langue=None):
+def retirer_mots_annee(texte, langue, source=""):
+    """DeepL ajoute parfois « an », « year », « عام » ou « م » devant/après une année : on garde le chiffre seul
+    (sauf si le texte d'origine le précisait lui-même)."""
+    if _ANNEE_PRECISEE.search(source):
+        return texte
+    mots = _MOTS_ANNEE.get(langue)
+    if mots:
+        texte = re.sub(rf"{mots}(<x>{ANNEE}</x>)", r"\1", texte, flags=re.IGNORECASE)
+    if langue == "ar":
+        texte = re.sub(rf"(<x>{ANNEE}</x>)\s?م(?![\u0600-\u06FF])", r"\1", texte)
+    return texte
+
+
+def deproteger(texte, langue=None, source=""):
     """Retire les balises. Vers l'arabe, un terme protégé est remplacé APRÈS traduction par sa forme
     arabe usuelle (le faire avant ferait croire à DeepL que le texte est déjà en arabe)."""
+    texte = retirer_mots_annee(texte, langue, source)
     if langue == "ar":
 
         def arabe(trouve):
@@ -101,12 +181,12 @@ def deproteger(texte, langue=None):
     return html.unescape(re.sub(r"</?x>", "", texte))
 
 
-def _appeler_deepl(textes, langue):
+def _appeler_deepl(textes, langue, mots=()):
     cle = settings.DEEPL_API_KEY
     hote = "api-free.deepl.com" if cle.endswith(":fx") else "api.deepl.com"
     corps = json.dumps(
         {
-            "text": [proteger(t) for t in textes],
+            "text": [proteger(t, mots) for t in textes],
             "target_lang": LANGUES_DEEPL[langue],
             "tag_handling": "xml",
             "ignore_tags": ["x"],
@@ -122,7 +202,7 @@ def _appeler_deepl(textes, langue):
         resultats = json.loads(reponse.read())["translations"]
     return [
         # Si le texte est déjà dans la langue demandée, on garde l'original.
-        source if r.get("detected_source_language", "").lower() == langue else deproteger(r["text"], langue)
+        source if r.get("detected_source_language", "").lower() == langue else deproteger(r["text"], langue, source)
         for source, r in zip(textes, resultats)
     ]
 
@@ -132,7 +212,9 @@ def traduire(textes, langue):
     if langue not in LANGUES_DEEPL or not settings.DEEPL_API_KEY:
         return list(textes)
 
-    empreintes = [Traduction.calculer_empreinte(f"{VERSION_TRADUCTION}:{t}") for t in textes]
+    mots = mots_personnalises()
+    version = version_traduction(mots)
+    empreintes = [Traduction.calculer_empreinte(f"{version}:{t}") for t in textes]
     connues = dict(
         Traduction.objects.filter(empreinte__in=empreintes, langue=langue).values_list("empreinte", "texte_traduit")
     )
@@ -142,7 +224,7 @@ def traduire(textes, langue):
 
     if a_traduire:
         try:
-            traduits = _appeler_deepl([t for _, t in a_traduire], langue)
+            traduits = _appeler_deepl([t for _, t in a_traduire], langue, mots)
         except (urllib.error.URLError, TimeoutError, KeyError, ValueError) as erreur:
             logger.warning("Traduction DeepL indisponible : %s", erreur)
             traduits = None

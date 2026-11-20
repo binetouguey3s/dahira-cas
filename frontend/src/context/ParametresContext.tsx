@@ -33,6 +33,7 @@ const PAR_DEFAUT: Parametres = {
   lien_facebook: "https://www.facebook.com/share/1UtYp8t6y7/",
   lien_instagram: "https://www.instagram.com/dahira_cheikh_abdoulaye_seye_o",
   lien_youtube: "https://youtube.com/@dahiracheikhabdoulayeseyeoffic",
+  mots_non_traduits: "",
 };
 
 interface ParametresContextValue {
