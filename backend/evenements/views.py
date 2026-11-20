@@ -11,6 +11,8 @@ from rest_framework.response import Response
 
 from comptes.permissions import ROLES_EVENEMENTS, a_un_role, role_ou_lecture_seule
 
+from dahira_backend.archives import ArchivesMixin
+
 from . import bus as regles
 from .models import Evenement, PaiementBus, PassagerBus, ReservationBus, ResponsableBus
 from .serializers import (
@@ -27,7 +29,7 @@ def _exiger_responsable(user, evenement):
         raise PermissionDenied("Réservé aux responsables des bus de cet événement.")
 
 
-class EvenementViewSet(viewsets.ModelViewSet):
+class EvenementViewSet(ArchivesMixin, viewsets.ModelViewSet):
     """Lecture ouverte à tous ; création/modification réservée aux admins contenus."""
 
     queryset = Evenement.objects.all()
@@ -36,9 +38,10 @@ class EvenementViewSet(viewsets.ModelViewSet):
     filterset_fields = ["categorie", "reservation_bus_active"]
     search_fields = ["titre", "description", "lieu"]
     ordering_fields = ["date", "titre", "cree_le"]
+    roles_archives = ROLES_EVENEMENTS
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = self.filtrer_archives(super().get_queryset())
         periode = self.request.query_params.get("periode")
         if periode == "a_venir":
             qs = qs.filter(date__gte=timezone.now())
@@ -53,7 +56,7 @@ class EvenementViewSet(viewsets.ModelViewSet):
     def espace_bus(self, request):
         """Événements dont l'utilisateur gère les bus (tous pour les admins), à venir ou de la semaine passée."""
         depuis = timezone.now() - timedelta(days=7)
-        qs = Evenement.objects.filter(reservation_bus_active=True, date__gte=depuis)
+        qs = Evenement.objects.filter(reservation_bus_active=True, date__gte=depuis, archive_le__isnull=True)
         if not a_un_role(request.user, ROLES_EVENEMENTS):
             qs = qs.filter(responsables_bus__membre=request.user)
         donnees = []

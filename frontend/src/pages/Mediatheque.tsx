@@ -1,5 +1,5 @@
 import { Play, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -7,7 +7,8 @@ import { AppShell } from "@/components/layout/AppShell";
 import { CarteContenu } from "@/components/metier/Elements";
 import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { Input } from "@/components/ui/Input";
-import { api, type CategorieEvenement, type ContenuMedia, type Paginated } from "@/lib/api";
+import { Pagination, usePageServeur } from "@/components/ui/Pagination";
+import { type CategorieEvenement, type ContenuMedia } from "@/lib/api";
 import { CATEGORIES } from "@/lib/categories";
 import { cn } from "@/lib/utils";
 
@@ -15,40 +16,31 @@ type Filtre = "tous" | "audio" | "video" | "texte";
 
 export default function Mediatheque() {
   const { t } = useTranslation();
-  const [contenus, setContenus] = useState<ContenuMedia[] | null>(null);
   const [filtre, setFiltre] = useState<Filtre>("tous");
   const [recherche, setRecherche] = useState("");
   const [tri, setTri] = useState("-date_publication");
-  const [suivante, setSuivante] = useState<string | null>(null);
   const [params, setParams] = useSearchParams();
   const categorie = (params.get("categorie") ?? "") as CategorieEvenement | "";
   const choisirCategorie = (c: CategorieEvenement | "") =>
     setParams(c ? { categorie: c } : {}, { replace: true });
 
+  // La recherche part 300 ms après la dernière lettre tapée.
+  const [rechercheEnvoyee, setRechercheEnvoyee] = useState("");
   useEffect(() => {
+    const minuterie = window.setTimeout(() => setRechercheEnvoyee(recherche.trim()), recherche ? 300 : 0);
+    return () => window.clearTimeout(minuterie);
+  }, [recherche]);
+
+  // 10 contenus par page.
+  const url = useMemo(() => {
     const requete = new URLSearchParams({ ordering: tri });
     if (filtre !== "tous") requete.set("type", filtre);
     if (categorie) requete.set("categorie", categorie);
-    if (recherche.trim()) requete.set("search", recherche.trim());
-    setContenus(null);
-    const minuterie = window.setTimeout(() => {
-      api
-        .get<Paginated<ContenuMedia>>(`/mediatheque/contenus/?${requete}`)
-        .then((res) => {
-          setContenus(res.data.results);
-          setSuivante(res.data.next);
-        })
-        .catch(() => setContenus([]));
-    }, recherche ? 300 : 0);
-    return () => window.clearTimeout(minuterie);
-  }, [filtre, recherche, tri, categorie]);
-
-  const chargerPlus = async () => {
-    if (!suivante) return;
-    const { data } = await api.get<Paginated<ContenuMedia>>(suivante);
-    setContenus((c) => [...(c ?? []), ...data.results]);
-    setSuivante(data.next);
-  };
+    if (rechercheEnvoyee) requete.set("search", rechercheEnvoyee);
+    return `/mediatheque/contenus/?${requete}`;
+  }, [filtre, rechercheEnvoyee, tri, categorie]);
+  const pages = usePageServeur<ContenuMedia>(url);
+  const contenus = pages.elements;
 
   return (
     <AppShell>
@@ -112,23 +104,16 @@ export default function Mediatheque() {
       {contenus === null ? (
         <SqueletteListe lignes={4} />
       ) : contenus.length ? (
-        <>
-          <ListeAnimee key={`${filtre}-${tri}`} className="grid gap-3 md:grid-cols-2">
+        <div ref={pages.ref}>
+          <ListeAnimee key={`${filtre}-${tri}-${pages.page}`} className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {contenus.map((c) => (
               <ElementAnime key={c.id}>
                 <CarteContenu contenu={c} />
               </ElementAnime>
             ))}
           </ListeAnimee>
-          {suivante && (
-            <button
-              onClick={chargerPlus}
-              className="mx-auto mt-6 block rounded-full border border-border-subtle px-5 py-2.5 text-sm font-semibold text-text-primary hover:bg-bg-secondary"
-            >
-              {t("commun.voirPlus")}
-            </button>
-          )}
-        </>
+          <Pagination page={pages.page} nbPages={pages.nbPages} onChange={pages.changer} />
+        </div>
       ) : (
         <Vide icone={Play} titre={t("mediatheque.aucunResultat")} message={t("mediatheque.aucunResultatAide")} />
       )}

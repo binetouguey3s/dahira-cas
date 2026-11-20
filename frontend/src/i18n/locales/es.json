@@ -97,13 +97,14 @@
     "bonjour": "Buenos días, {{nom}}",
     "bonApresMidi": "Buenas tardes, {{nom}}",
     "bonsoir": "Buenas noches, {{nom}}",
-    "bienvenueVisiteur": "Assalamu alaykum, bienvenido",
+    "bienvenueVisiteur": "Assalamou Aleykoum Wa Rahmatoullah, ¡Dalal ak Diam!",
     "conseilDuJour": "Consejo del día",
     "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "Próximos eventos",
     "derniersEnseignements": "Últimas enseñanzas",
     "nosCanaux": "Nuestros canales",
-    "nosCanauxAide": "Sigue al Dahira en las redes sociales."
+    "nosCanauxAide": "Sigue al Dahira en las redes sociales.",
+    "salutationMembre": "Assalamou Aleykoum Wa Rahmatoullah, {{nom}}"
   },
   "biographie": {
     "titreGuide": "Guía religioso de la Dahira",
@@ -214,7 +215,7 @@
     "aucuneQuestion": "Todavía no has hecho ninguna pregunta.",
     "aucuneQuestionAide": "El Oustaz responde a todas las preguntas sobre la fe y la vida de la Dahira.",
     "supprimerTitre": "¿Eliminar esta pregunta?",
-    "supprimerMessage": "La pregunta se eliminará definitivamente."
+    "supprimerMessage": "La pregunta se retirará de tu lista."
   },
   "cotisations": {
     "sousTitre": "Sigue tus cuotas mensuales a la Dahira.",
@@ -412,8 +413,8 @@
     "aucunResultat": "Ninguna cuota coincide.",
     "aucuneCeMois": "No hay cuotas para este mes.",
     "aucuneCeMoisAide": "Genera las cuotas del mes para todos los miembros con un clic.",
-    "supprimerTitre": "¿Eliminar esta cuota?",
-    "supprimerMessage": "Se eliminará la cuota de {{nom}}.",
+    "supprimerTitre": "¿Archivar esta cuota?",
+    "supprimerMessage": "La cuota de {{nom}} se archivará. Podrás restaurarla desde «Archivo».",
     "generees": "{{count}} cuotas creadas"
   },
   "adminMedia": {
@@ -435,8 +436,8 @@
     "texte": "Texto de la enseñanza",
     "description": "Descripción",
     "traductionAuto": "Escribe en tu idioma: el texto se traducirá automáticamente para cada visitante.",
-    "supprimerTitre": "¿Eliminar esta enseñanza?",
-    "supprimerMessage": "«{{titre}}» se eliminará definitivamente.",
+    "supprimerTitre": "¿Archivar esta enseñanza?",
+    "supprimerMessage": "«{{titre}}» dejará de ser visible en el sitio. Podrás restaurarla desde «Archivo».",
     "categorie": "Categoría (ocasión)",
     "categoriePrecision": "Especifica",
     "categoriePrecisionExemple": "P. ej. Kazu Rajab, Tamkharit…"
@@ -458,8 +459,8 @@
     "listeTitre": "Reservas de autobús",
     "exporter": "Exportar (Excel)",
     "aucuneReservation": "Todavía no hay reservas.",
-    "supprimerTitre": "¿Eliminar este evento?",
-    "supprimerMessage": "«{{titre}}» y sus reservas se eliminarán.",
+    "supprimerTitre": "¿Archivar este evento?",
+    "supprimerMessage": "«{{titre}}» dejará de ser visible en el sitio. Podrás restaurarlo desde «Archivo».",
     "reserves": "{{count}} reservados"
   },
   "oustaz": {
@@ -696,5 +697,28 @@
     "toutEstAJour": "Todo al día: nada pendiente.",
     "valider": "Validar",
     "annulerLaReservation": "Cancelar la reserva"
+  },
+  "pagination": {
+    "titre": "Páginas",
+    "precedente": "Página anterior",
+    "suivante": "Página siguiente"
+  },
+  "archives": {
+    "titre": "Archivo",
+    "aide": "Los elementos archivados ya no son visibles en el sitio. Puedes restaurarlos o eliminarlos definitivamente.",
+    "archiver": "Archivar",
+    "archive": "Archivado. Puedes restaurarlo desde «Archivo».",
+    "archiveLe": "Archivado el {{date}}",
+    "par": "por {{nom}}",
+    "restaurer": "Restaurar",
+    "restaure": "Restaurado: vuelve a ser visible.",
+    "supprimer": "Eliminar definitivamente",
+    "supprimeDefinitivement": "Eliminado definitivamente.",
+    "supprimerTitre": "¿Eliminar definitivamente?",
+    "supprimerMessage": "Esta acción es irreversible: el elemento ya no podrá restaurarse.",
+    "vide": "Ningún elemento archivado.",
+    "archiverQuestionTitre": "¿Archivar esta pregunta?",
+    "archiverMessage": "Desaparecerá de la lista. Podrás restaurarla desde «Archivo».",
+    "questionVocale": "Pregunta de voz"
   }
 }

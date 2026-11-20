@@ -37,12 +37,15 @@ class ReponseSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
+    archive_par_nom = serializers.CharField(source="archive_par.nom_complet", read_only=True, default="")
     reponse = ReponseSerializer(read_only=True)
     membre_nom = serializers.CharField(source="membre.nom_complet", read_only=True)
 
     class Meta:
         model = Question
         fields = [
+            "archive_le",
+            "archive_par_nom",
             "id",
             "membre",
             "membre_nom",
@@ -53,7 +56,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "date_creation",
             "reponse",
         ]
-        read_only_fields = ["id", "membre", "statut", "date_creation"]
+        read_only_fields = ["archive_le", "id", "membre", "statut", "date_creation"]
 
     validate_audio = staticmethod(valider_audio)
 

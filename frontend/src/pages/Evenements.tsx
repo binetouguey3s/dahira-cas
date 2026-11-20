@@ -1,12 +1,13 @@
 import { Calendar } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { CarteEvenement } from "@/components/metier/Elements";
 import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
+import { Pagination, usePageServeur } from "@/components/ui/Pagination";
 import { CATEGORIES } from "@/lib/categories";
-import { api, type CategorieEvenement, type Evenement, type Paginated } from "@/lib/api";
+import { type CategorieEvenement, type Evenement } from "@/lib/api";
 import { locale } from "@/lib/utils";
 
 const CATEGORIES_FILTRE: (CategorieEvenement | "toutes")[] = ["toutes", ...CATEGORIES];
@@ -15,18 +16,15 @@ export default function Evenements() {
   const { t } = useTranslation();
   const [periode, setPeriode] = useState<"a_venir" | "passes">("a_venir");
   const [categorie, setCategorie] = useState<CategorieEvenement | "toutes">("toutes");
-  const [evenements, setEvenements] = useState<Evenement[] | null>(null);
-
-  useEffect(() => {
+  // 10 événements par page.
+  const url = useMemo(() => {
     const params = new URLSearchParams({ periode });
     if (periode === "a_venir") params.set("ordering", "date");
     if (categorie !== "toutes") params.set("categorie", categorie);
-    setEvenements(null);
-    api
-      .get<Paginated<Evenement>>(`/evenements/evenements/?${params}`)
-      .then((res) => setEvenements(res.data.results))
-      .catch(() => setEvenements([]));
+    return `/evenements/evenements/?${params}`;
   }, [periode, categorie]);
+  const pages = usePageServeur<Evenement>(url);
+  const evenements = pages.elements;
 
   // Regroupe par mois pour une lecture plus agréable.
   const parMois = (evenements ?? []).reduce<Record<string, Evenement[]>>((acc, ev) => {
@@ -68,7 +66,7 @@ export default function Evenements() {
       {evenements === null ? (
         <SqueletteListe lignes={3} />
       ) : evenements.length ? (
-        <div className="flex flex-col gap-8">
+        <div ref={pages.ref} key={pages.page} className="flex flex-col gap-8">
           {Object.entries(parMois).map(([mois, liste]) => (
             <section key={mois}>
               <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.12em] text-text-secondary">{mois}</h2>
@@ -81,6 +79,7 @@ export default function Evenements() {
               </ListeAnimee>
             </section>
           ))}
+          <Pagination className="mt-0" page={pages.page} nbPages={pages.nbPages} onChange={pages.changer} />
         </div>
       ) : (
         <Vide

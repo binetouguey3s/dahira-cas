@@ -56,7 +56,7 @@ export function EnTete({
         <h1 className="text-2xl font-bold tracking-tight text-text-primary md:text-3xl">{titre}</h1>
         {sousTitre && <p className="mt-1 max-w-2xl text-sm text-text-secondary">{sousTitre}</p>}
       </div>
-      {action && <div className="flex shrink-0 flex-wrap gap-2">{action}</div>}
+      {action && <div className="flex min-w-0 max-w-full flex-wrap gap-2">{action}</div>}
     </div>
   );
 }

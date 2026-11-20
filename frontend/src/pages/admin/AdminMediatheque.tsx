@@ -1,9 +1,10 @@
 import { motion } from "motion/react";
-import { Download, FileUp, Heart, Link2, Pencil, Play, Plus, Search, Trash2, UploadCloud } from "lucide-react";
+import { Archive, Download, FileUp, Heart, Link2, Pencil, Play, Plus, Search, UploadCloud } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+import { Archives, BoutonArchives } from "@/components/metier/Archives";
 import { ICONES_CONTENU } from "@/components/metier/Elements";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +12,7 @@ import { Badge, Card } from "@/components/ui/Card";
 import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { Champ, Input, Select, Textarea } from "@/components/ui/Input";
 import { Confirmation, Modal } from "@/components/ui/Modal";
+import { Pagination, usePageLocale } from "@/components/ui/Pagination";
 import { useParametres } from "@/context/ParametresContext";
 import { useToast } from "@/context/ToastContext";
 import { CATEGORIES } from "@/lib/categories";
@@ -44,6 +46,7 @@ export default function AdminMediatheque() {
   const [fichier, setFichier] = useState<File | null>(null);
   const [progression, setProgression] = useState<number | null>(null);
   const [aSupprimer, setASupprimer] = useState<ContenuMedia | null>(null);
+  const [archives, setArchives] = useState(false);
   const [envoi, setEnvoi] = useState(false);
   const champFichier = useRef<HTMLInputElement>(null);
 
@@ -114,7 +117,7 @@ export default function AdminMediatheque() {
     try {
       await api.delete(`/mediatheque/contenus/${aSupprimer.id}/`);
       setContenus((c) => c?.filter((x) => x.id !== aSupprimer.id) ?? null);
-      notifier(t("commun.supprime"));
+      notifier(t("archives.archive"));
       setASupprimer(null);
     } catch (err) {
       notifier(messageErreur(err, t("commun.erreur")), "erreur");
@@ -128,6 +131,7 @@ export default function AdminMediatheque() {
       (filtre === "tous" || c.type === filtre) &&
       (!recherche.trim() || `${c.titre} ${c.auteur}`.toLowerCase().includes(recherche.trim().toLowerCase())),
   );
+  const pages = usePageLocale(visibles, `${filtre}|${recherche}`);
   const fichierExistant = edition && edition !== "nouveau" && edition.fichier;
   const valide =
     form.titre.trim() &&
@@ -145,9 +149,12 @@ export default function AdminMediatheque() {
         titre={t("admin.mediatheque")}
         sousTitre={t("adminMedia.sousTitre")}
         action={
-          <Button onClick={() => setEdition("nouveau")}>
-            <Plus className="h-4 w-4" /> {t("adminMedia.publier")}
-          </Button>
+          <>
+            <BoutonArchives onClick={() => setArchives(true)} />
+            <Button onClick={() => setEdition("nouveau")}>
+              <Plus className="h-4 w-4" /> {t("adminMedia.publier")}
+            </Button>
+          </>
         }
       />
 
@@ -172,8 +179,9 @@ export default function AdminMediatheque() {
       {contenus === null ? (
         <SqueletteListe lignes={4} />
       ) : visibles.length ? (
-        <ListeAnimee key={filtre} className="flex flex-col gap-2">
-          {visibles.map((c) => {
+        <div ref={pages.ref}>
+        <ListeAnimee key={`${filtre}-${pages.page}`} className="flex flex-col gap-2">
+          {(pages.elements ?? []).map((c) => {
             const Icone = ICONES_CONTENU[c.type];
             return (
               <ElementAnime key={c.id}>
@@ -197,14 +205,16 @@ export default function AdminMediatheque() {
                   <Button variant="ghost" size="icon" onClick={() => setEdition(c)} aria-label={t("commun.modifier")}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-status-error" onClick={() => setASupprimer(c)} aria-label={t("commun.supprimer")}>
-                    <Trash2 className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" className="text-status-error" onClick={() => setASupprimer(c)} aria-label={t("archives.archiver")}>
+                    <Archive className="h-4 w-4" />
                   </Button>
                 </Card>
               </ElementAnime>
             );
           })}
         </ListeAnimee>
+        <Pagination page={pages.page} nbPages={pages.nbPages} onChange={pages.changer} />
+        </div>
       ) : (
         <Vide
           icone={Play}
@@ -373,8 +383,23 @@ export default function AdminMediatheque() {
         onConfirmer={supprimer}
         titre={t("adminMedia.supprimerTitre")}
         message={t("adminMedia.supprimerMessage", { titre: aSupprimer?.titre })}
-        libelleConfirmer={t("commun.supprimer")}
+        libelleConfirmer={t("archives.archiver")}
         chargement={envoi}
+      />
+
+      <Archives<ContenuMedia>
+        ouvert={archives}
+        onFermer={() => setArchives(false)}
+        base="/mediatheque/contenus/"
+        onChange={charger}
+        rendu={(c) => (
+          <>
+            <p className="truncate font-semibold text-text-primary">{c.titre}</p>
+            <p className="text-xs text-text-secondary">
+              {t(`mediatheque.types.${c.type}`)} · {c.auteur} · {formatDate(c.date_publication)}
+            </p>
+          </>
+        )}
       />
     </AppShell>
   );

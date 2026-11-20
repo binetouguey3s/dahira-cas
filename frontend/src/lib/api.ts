@@ -137,6 +137,8 @@ export interface CarteVerification {
 }
 
 export interface Cotisation {
+  archive_le?: string | null;
+  archive_par_nom?: string;
   id: number;
   membre: number;
   membre_nom: string;
@@ -256,6 +258,8 @@ export interface GestionBus {
 export type CategorieEvenement = "magal" | "gamou" | "dahira" | "causerie" | "nisfou_shabaan" | "leylatul_khadr" | "autre";
 
 export interface Evenement {
+  archive_le?: string | null;
+  archive_par_nom?: string;
   id: number;
   titre: string;
   description: string;
@@ -277,6 +281,8 @@ export interface Evenement {
 export type TypeContenu = "audio" | "video" | "texte";
 
 export interface ContenuMedia {
+  archive_le?: string | null;
+  archive_par_nom?: string;
   id: number;
   titre: string;
   description: string;
@@ -297,6 +303,8 @@ export interface ContenuMedia {
 export type ThemeQuestion = "jeune_ramadan" | "zakat" | "vie_dahira" | "autre";
 
 export interface Question {
+  archive_le?: string | null;
+  archive_par_nom?: string;
   id: number;
   membre: number;
   membre_nom: string;

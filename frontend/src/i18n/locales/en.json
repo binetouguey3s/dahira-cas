@@ -97,13 +97,14 @@
     "bonjour": "Good morning {{nom}}",
     "bonApresMidi": "Good afternoon {{nom}}",
     "bonsoir": "Good evening {{nom}}",
-    "bienvenueVisiteur": "Assalamu alaykum, welcome",
+    "bienvenueVisiteur": "Assalamou Aleykoum Wa Rahmatoullah, Dalal ak Diam!",
     "conseilDuJour": "Advice of the day",
     "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "Upcoming events",
     "derniersEnseignements": "Latest teachings",
     "nosCanaux": "Our channels",
-    "nosCanauxAide": "Follow the Dahira on social media."
+    "nosCanauxAide": "Follow the Dahira on social media.",
+    "salutationMembre": "Assalamou Aleykoum Wa Rahmatoullah, {{nom}}"
   },
   "biographie": {
     "titreGuide": "Religious guide of the Dahira",
@@ -214,7 +215,7 @@
     "aucuneQuestion": "You have not asked any questions yet.",
     "aucuneQuestionAide": "The Oustaz answers all questions about faith and Dahira life.",
     "supprimerTitre": "Delete this question?",
-    "supprimerMessage": "The question will be permanently deleted."
+    "supprimerMessage": "The question will be removed from your list."
   },
   "cotisations": {
     "sousTitre": "Track your monthly contributions to the Dahira.",
@@ -412,8 +413,8 @@
     "aucunResultat": "No matching contributions.",
     "aucuneCeMois": "No contributions for this month.",
     "aucuneCeMoisAide": "Generate this month's contributions for all members in one click.",
-    "supprimerTitre": "Delete this contribution?",
-    "supprimerMessage": "{{nom}}'s contribution will be deleted.",
+    "supprimerTitre": "Archive this contribution?",
+    "supprimerMessage": "{{nom}}'s contribution will be archived. You can restore it from “Archives”.",
     "generees": "{{count}} contributions created"
   },
   "adminMedia": {
@@ -435,8 +436,8 @@
     "texte": "Teaching text",
     "description": "Description",
     "traductionAuto": "Write in your own language: the text will be translated automatically for each visitor.",
-    "supprimerTitre": "Delete this teaching?",
-    "supprimerMessage": "“{{titre}}” will be permanently deleted.",
+    "supprimerTitre": "Archive this teaching?",
+    "supprimerMessage": "“{{titre}}” will no longer be visible on the site. You can restore it from “Archives”.",
     "categorie": "Category (occasion)",
     "categoriePrecision": "Specify",
     "categoriePrecisionExemple": "E.g. Kazu Rajab, Tamkharit…"
@@ -458,8 +459,8 @@
     "listeTitre": "Bus bookings",
     "exporter": "Export (Excel)",
     "aucuneReservation": "No bookings yet.",
-    "supprimerTitre": "Delete this event?",
-    "supprimerMessage": "“{{titre}}” and its bookings will be deleted.",
+    "supprimerTitre": "Archive this event?",
+    "supprimerMessage": "“{{titre}}” will no longer be visible on the site. You can restore it from “Archives”.",
     "reserves": "{{count}} booked"
   },
   "oustaz": {
@@ -696,5 +697,28 @@
     "toutEstAJour": "All up to date: nothing to do.",
     "valider": "Validate",
     "annulerLaReservation": "Cancel the booking"
+  },
+  "pagination": {
+    "titre": "Pages",
+    "precedente": "Previous page",
+    "suivante": "Next page"
+  },
+  "archives": {
+    "titre": "Archives",
+    "aide": "Archived items are no longer visible on the site. You can restore them or delete them permanently.",
+    "archiver": "Archive",
+    "archive": "Archived. You can restore it from “Archives”.",
+    "archiveLe": "Archived on {{date}}",
+    "par": "by {{nom}}",
+    "restaurer": "Restore",
+    "restaure": "Restored: it is visible again.",
+    "supprimer": "Delete permanently",
+    "supprimeDefinitivement": "Permanently deleted.",
+    "supprimerTitre": "Delete permanently?",
+    "supprimerMessage": "This cannot be undone: the item can no longer be restored.",
+    "vide": "No archived items.",
+    "archiverQuestionTitre": "Archive this question?",
+    "archiverMessage": "It will disappear from the list. You can restore it from “Archives”.",
+    "questionVocale": "Voice question"
   }
 }

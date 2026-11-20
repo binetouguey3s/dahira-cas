@@ -1,10 +1,12 @@
 from django.conf import settings
 from django.db import models
 
+from dahira_backend.archives import Archivable
+
 from dahira_backend.stockage import stockage_audio_video
 
 
-class Question(models.Model):
+class Question(Archivable):
     class Theme(models.TextChoices):
         JEUNE_RAMADAN = "jeune_ramadan", "Jeûne & Ramadan"
         ZAKAT = "zakat", "Zakat"

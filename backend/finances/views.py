@@ -10,6 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 
+from dahira_backend.archives import ArchivesMixin
+
 from comptes.permissions import ROLES_FINANCE, a_un_role
 
 from .models import Cotisation, ReglagesRappels
@@ -32,16 +34,17 @@ class CotisationPermission(permissions.BasePermission):
         return a_un_role(request.user, ROLES_FINANCE)
 
 
-class CotisationViewSet(viewsets.ModelViewSet):
+class CotisationViewSet(ArchivesMixin, viewsets.ModelViewSet):
     serializer_class = CotisationSerializer
     permission_classes = [CotisationPermission]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["membre", "statut", "mois", "annee"]
     search_fields = ["membre__nom_complet", "membre__telephone", "membre__carte_numero"]
     ordering_fields = ["annee", "mois", "montant", "statut", "date_paiement", "membre__nom_complet"]
+    roles_archives = ROLES_FINANCE
 
     def get_queryset(self):
-        qs = Cotisation.objects.select_related("membre")
+        qs = self.filtrer_archives(Cotisation.objects.select_related("membre"))
         if a_un_role(self.request.user, ROLES_FINANCE):
             return qs
         return qs.filter(membre=self.request.user)

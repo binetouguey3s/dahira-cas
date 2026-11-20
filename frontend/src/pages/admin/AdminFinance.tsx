@@ -1,14 +1,16 @@
-import { Banknote, CalendarPlus, CheckCircle2, MessageCircle, Plus, Search, Trash2, Wallet } from "lucide-react";
+import { Archive, Banknote, CalendarPlus, CheckCircle2, MessageCircle, Plus, Search, Wallet } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { Archives, BoutonArchives } from "@/components/metier/Archives";
 import { RappelsCotisation } from "@/components/metier/RappelsCotisation";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { Avatar, ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Stat, Vide } from "@/components/ui/Divers";
 import { Champ, Input, Select } from "@/components/ui/Input";
 import { Confirmation, Modal } from "@/components/ui/Modal";
+import { Pagination, usePageLocale } from "@/components/ui/Pagination";
 import { useParametres } from "@/context/ParametresContext";
 import { useToast } from "@/context/ToastContext";
 import { api, messageErreur, toutesLesPages, type Cotisation, type MembreResume } from "@/lib/api";
@@ -40,6 +42,7 @@ export default function AdminFinance() {
   const [rechercheMembre, setRechercheMembre] = useState("");
   const [montantAjout, setMontantAjout] = useState(parametres.montant_cotisation);
   const [aSupprimer, setASupprimer] = useState<Cotisation | null>(null);
+  const [archives, setArchives] = useState(false);
 
   const charger = () => {
     setCotisations(null);
@@ -145,7 +148,7 @@ export default function AdminFinance() {
     setEnvoi(true);
     try {
       await api.delete(`/finances/cotisations/${aSupprimer.id}/`);
-      notifier(t("commun.supprime"));
+      notifier(t("archives.archive"));
       setASupprimer(null);
       charger();
     } catch (err) {
@@ -154,6 +157,8 @@ export default function AdminFinance() {
       setEnvoi(false);
     }
   };
+
+  const pages = usePageLocale(visibles, `${mois}-${annee}-${statut}-${recherche}`);
 
   const rappel = (c: Cotisation) =>
     `https://wa.me/${c.membre_telephone.replace(/[^\d]/g, "")}?text=${encodeURIComponent(
@@ -177,6 +182,7 @@ export default function AdminFinance() {
         sousTitre={t("finance.sousTitre")}
         action={
           <>
+            <BoutonArchives onClick={() => setArchives(true)} />
             <Button variant="outline" onClick={() => setAjout(true)}>
               <Plus className="h-4 w-4" /> {t("finance.ajouter")}
             </Button>
@@ -236,8 +242,9 @@ export default function AdminFinance() {
       {cotisations === null ? (
         <SqueletteListe lignes={5} />
       ) : visibles.length ? (
-        <ListeAnimee key={`${mois}-${annee}-${statut}`} className="flex flex-col gap-2">
-          {visibles.map((c) => (
+        <div ref={pages.ref}>
+        <ListeAnimee key={`${mois}-${annee}-${statut}-${pages.page}`} className="flex flex-col gap-2">
+          {(pages.elements ?? []).map((c) => (
             <ElementAnime key={c.id}>
               <Card className="flex flex-wrap items-center gap-3">
                 <Avatar nom={c.membre_nom} taille={40} />
@@ -267,14 +274,16 @@ export default function AdminFinance() {
                       </Button>
                     </>
                   )}
-                  <Button variant="ghost" size="sm" className="text-status-error" onClick={() => setASupprimer(c)} aria-label={t("commun.supprimer")}>
-                    <Trash2 className="h-4 w-4" />
+                  <Button variant="ghost" size="sm" className="text-status-error" onClick={() => setASupprimer(c)} aria-label={t("archives.archiver")}>
+                    <Archive className="h-4 w-4" />
                   </Button>
                 </div>
               </Card>
             </ElementAnime>
           ))}
         </ListeAnimee>
+        <Pagination page={pages.page} nbPages={pages.nbPages} onChange={pages.changer} />
+        </div>
       ) : (
         <Vide
           icone={Wallet}
@@ -397,8 +406,23 @@ export default function AdminFinance() {
         onConfirmer={supprimer}
         titre={t("finance.supprimerTitre")}
         message={t("finance.supprimerMessage", { nom: aSupprimer?.membre_nom })}
-        libelleConfirmer={t("commun.supprimer")}
+        libelleConfirmer={t("archives.archiver")}
         chargement={envoi}
+      />
+
+      <Archives<Cotisation>
+        ouvert={archives}
+        onFermer={() => setArchives(false)}
+        base="/finances/cotisations/"
+        onChange={charger}
+        rendu={(c) => (
+          <>
+            <p className="truncate font-semibold text-text-primary">{c.membre_nom}</p>
+            <p className="text-xs capitalize text-text-secondary">
+              {formatMois(c.mois, c.annee)} · {formatMontant(c.montant)} · {t(`cotisations.statuts.${c.statut}`)}
+            </p>
+          </>
+        )}
       />
     </AppShell>
   );

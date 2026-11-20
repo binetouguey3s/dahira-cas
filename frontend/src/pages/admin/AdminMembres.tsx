@@ -12,6 +12,7 @@ import { Champ, Input, Interrupteur, Select } from "@/components/ui/Input";
 import { SelecteurPays } from "@/components/ui/SelecteurPays";
 import { TelephoneInput } from "@/components/ui/TelephoneInput";
 import { Confirmation, Modal } from "@/components/ui/Modal";
+import { PAR_PAGE, Pagination } from "@/components/ui/Pagination";
 import { useAuth } from "@/context/AuthContext";
 import { useParametres } from "@/context/ParametresContext";
 import { useToast } from "@/context/ToastContext";
@@ -46,7 +47,7 @@ export default function AdminMembres() {
   const [params, setParams] = useSearchParams();
   const [membres, setMembres] = useState<MembreAdmin[] | null>(null);
   const [total, setTotal] = useState(0);
-  const [suivante, setSuivante] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const [recherche, setRecherche] = useState("");
   const [role, setRole] = useState<string>("");
   const [actif, setActif] = useState<string>("");
@@ -61,18 +62,24 @@ export default function AdminMembres() {
     if (recherche.trim()) q.set("search", recherche.trim());
     if (role) q.set("role", role);
     if (actif) q.set("is_active", actif);
+    q.set("page", String(page));
+    q.set("page_size", String(PAR_PAGE));
     return api.get<Paginated<MembreAdmin>>(`/comptes/membres/?${q}`).then((res) => {
       setMembres(res.data.results);
       setTotal(res.data.count);
-      setSuivante(res.data.next);
     });
   };
+
+  // Nouveau filtre : retour à la première page.
+  useEffect(() => {
+    setPage(1);
+  }, [recherche, role, actif]);
 
   useEffect(() => {
     const m = window.setTimeout(() => charger().catch(() => setMembres([])), recherche ? 300 : 0);
     return () => window.clearTimeout(m);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recherche, role, actif]);
+  }, [recherche, role, actif, page]);
 
   useEffect(() => {
     if (edition === "nouveau") setForm(VIDE);
@@ -132,13 +139,6 @@ export default function AdminMembres() {
     }
   };
 
-  const chargerPlus = async () => {
-    if (!suivante) return;
-    const { data } = await api.get<Paginated<MembreAdmin>>(suivante);
-    setMembres((m) => [...(m ?? []), ...data.results]);
-    setSuivante(data.next);
-  };
-
   const maj = (c: keyof Formulaire) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [c]: e.target.value }));
   const estMoi = edition !== "nouveau" && edition?.id === moi?.id;
@@ -189,7 +189,7 @@ export default function AdminMembres() {
         <SqueletteListe lignes={5} />
       ) : membres.length ? (
         <>
-          <ListeAnimee className="grid gap-3 lg:grid-cols-2">
+          <ListeAnimee key={page} className="grid grid-cols-1 gap-3 lg:grid-cols-2">
             {membres.map((m) => (
               <ElementAnime key={m.id}>
                 <CardInteractive onClick={() => setEdition(m)} className={`flex items-center gap-3 ${m.is_active ? "" : "opacity-60"}`}>
@@ -208,11 +208,14 @@ export default function AdminMembres() {
               </ElementAnime>
             ))}
           </ListeAnimee>
-          {suivante && (
-            <button onClick={chargerPlus} className="mx-auto mt-6 block rounded-full border border-border-subtle px-5 py-2.5 text-sm font-semibold text-text-primary hover:bg-bg-secondary">
-              {t("commun.voirPlus")}
-            </button>
-          )}
+          <Pagination
+            page={page}
+            nbPages={Math.max(1, Math.ceil(total / PAR_PAGE))}
+            onChange={(p) => {
+              setPage(p);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
         </>
       ) : (
         <Vide icone={Users} titre={t("admin.aucunMembre")} />

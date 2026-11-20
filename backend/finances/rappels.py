@@ -33,13 +33,13 @@ def generer_mois(mois, annee, montant):
 def marquer_retards(aujourdhui):
     """Les mois passés encore « non payés » passent « en retard »."""
     passe = Q(annee__lt=aujourdhui.year) | Q(annee=aujourdhui.year, mois__lt=aujourdhui.month)
-    return Cotisation.objects.filter(passe, statut=Cotisation.Statut.NON_PAYE).update(statut=Cotisation.Statut.EN_RETARD)
+    return Cotisation.objects.filter(passe, statut=Cotisation.Statut.NON_PAYE, archive_le__isnull=True).update(statut=Cotisation.Statut.EN_RETARD)
 
 
 def impayees_par_membre():
     par_membre = defaultdict(list)
     qs = (
-        Cotisation.objects.filter(statut__in=IMPAYEES, membre__is_active=True)
+        Cotisation.objects.filter(statut__in=IMPAYEES, membre__is_active=True, archive_le__isnull=True)
         .select_related("membre")
         .order_by("annee", "mois")
     )

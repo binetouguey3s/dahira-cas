@@ -97,13 +97,14 @@
     "bonjour": "Bonjour {{nom}}",
     "bonApresMidi": "Bon après-midi {{nom}}",
     "bonsoir": "Bonsoir {{nom}}",
-    "bienvenueVisiteur": "Assalamou alaykoum, bienvenue",
+    "bienvenueVisiteur": "Assalamou Aleykoum Wa Rahmatoullah, Dalal ak Diam !",
     "conseilDuJour": "Conseil du jour",
     "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "Prochains événements",
     "derniersEnseignements": "Derniers enseignements",
     "nosCanaux": "Nos canaux",
-    "nosCanauxAide": "Suivez le Dahira sur les réseaux sociaux."
+    "nosCanauxAide": "Suivez le Dahira sur les réseaux sociaux.",
+    "salutationMembre": "Assalamou Aleykoum Wa Rahmatoullah, {{nom}}"
   },
   "biographie": {
     "titreGuide": "Guide religieux du Dahira",
@@ -214,7 +215,7 @@
     "aucuneQuestion": "Vous n'avez pas encore posé de question.",
     "aucuneQuestionAide": "L'Oustaz répond à toutes les questions sur la foi et la vie du Dahira.",
     "supprimerTitre": "Supprimer cette question ?",
-    "supprimerMessage": "La question sera définitivement supprimée."
+    "supprimerMessage": "La question sera retirée de votre liste."
   },
   "cotisations": {
     "sousTitre": "Suivez vos cotisations mensuelles au Dahira.",
@@ -412,8 +413,8 @@
     "aucunResultat": "Aucune cotisation ne correspond.",
     "aucuneCeMois": "Aucune cotisation pour ce mois.",
     "aucuneCeMoisAide": "Générez les cotisations du mois pour tous les membres en un clic.",
-    "supprimerTitre": "Supprimer cette cotisation ?",
-    "supprimerMessage": "La cotisation de {{nom}} sera supprimée.",
+    "supprimerTitre": "Archiver cette cotisation ?",
+    "supprimerMessage": "La cotisation de {{nom}} sera mise aux archives. Vous pourrez la restaurer depuis « Archives ».",
     "generees": "{{count}} cotisations créées"
   },
   "adminMedia": {
@@ -435,8 +436,8 @@
     "texte": "Texte de l'enseignement",
     "description": "Description",
     "traductionAuto": "Écrivez dans votre langue : le texte sera traduit automatiquement pour chaque visiteur.",
-    "supprimerTitre": "Supprimer cet enseignement ?",
-    "supprimerMessage": "« {{titre}} » sera définitivement supprimé.",
+    "supprimerTitre": "Archiver cet enseignement ?",
+    "supprimerMessage": "« {{titre}} » ne sera plus visible sur le site. Vous pourrez le restaurer depuis « Archives ».",
     "categorie": "Catégorie (occasion)",
     "categoriePrecision": "Précisez",
     "categoriePrecisionExemple": "Ex. Kazu Rajab, Tamkharit…"
@@ -458,8 +459,8 @@
     "listeTitre": "Réservations de bus",
     "exporter": "Exporter (Excel)",
     "aucuneReservation": "Aucune réservation pour le moment.",
-    "supprimerTitre": "Supprimer cet événement ?",
-    "supprimerMessage": "« {{titre}} » et ses réservations seront supprimés.",
+    "supprimerTitre": "Archiver cet événement ?",
+    "supprimerMessage": "« {{titre}} » ne sera plus visible sur le site. Vous pourrez le restaurer depuis « Archives ».",
     "reserves": "{{count}} réservés"
   },
   "oustaz": {
@@ -696,5 +697,28 @@
     "toutEstAJour": "Tout est à jour : rien à traiter.",
     "valider": "Valider",
     "annulerLaReservation": "Annuler la réservation"
+  },
+  "pagination": {
+    "titre": "Pages",
+    "precedente": "Page précédente",
+    "suivante": "Page suivante"
+  },
+  "archives": {
+    "titre": "Archives",
+    "aide": "Les éléments archivés ne sont plus visibles sur le site. Vous pouvez les restaurer ou les supprimer définitivement.",
+    "archiver": "Archiver",
+    "archive": "Mis aux archives. Vous pouvez le restaurer depuis « Archives ».",
+    "archiveLe": "Archivé le {{date}}",
+    "par": "par {{nom}}",
+    "restaurer": "Restaurer",
+    "restaure": "Restauré : il est de nouveau visible.",
+    "supprimer": "Supprimer définitivement",
+    "supprimeDefinitivement": "Supprimé définitivement.",
+    "supprimerTitre": "Supprimer définitivement ?",
+    "supprimerMessage": "Cette action est irréversible : l'élément ne pourra plus être restauré.",
+    "vide": "Aucun élément archivé.",
+    "archiverQuestionTitre": "Archiver cette question ?",
+    "archiverMessage": "Elle disparaîtra de la liste. Vous pourrez la restaurer depuis « Archives ».",
+    "questionVocale": "Question vocale"
   }
 }

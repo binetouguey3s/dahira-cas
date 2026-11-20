@@ -97,13 +97,14 @@
     "bonjour": "صباح الخير يا {{nom}}",
     "bonApresMidi": "طاب يومك يا {{nom}}",
     "bonsoir": "مساء الخير يا {{nom}}",
-    "bienvenueVisiteur": "السلام عليكم، أهلًا وسهلًا",
+    "bienvenueVisiteur": "السلام عليكم ورحمة الله، Dalal ak Diam !",
     "conseilDuJour": "نصيحة اليوم",
     "citationParDefaut": "Setaané, Gnétaané",
     "prochainsEvenements": "الفعاليات القادمة",
     "derniersEnseignements": "أحدث الدروس",
     "nosCanaux": "قنواتنا",
-    "nosCanauxAide": "تابعوا الدائرة على شبكات التواصل الاجتماعي."
+    "nosCanauxAide": "تابعوا الدائرة على شبكات التواصل الاجتماعي.",
+    "salutationMembre": "السلام عليكم ورحمة الله يا {{nom}}"
   },
   "biographie": {
     "titreGuide": "المرشد الديني للدائرة",
@@ -222,7 +223,7 @@
     "aucuneQuestion": "لم تطرح أي سؤال بعد.",
     "aucuneQuestionAide": "يجيب الأستاذ عن جميع الأسئلة المتعلقة بالإيمان وحياة الدائرة.",
     "supprimerTitre": "حذف هذا السؤال؟",
-    "supprimerMessage": "سيُحذف السؤال نهائيًا."
+    "supprimerMessage": "سيُزال السؤال من قائمتك."
   },
   "cotisations": {
     "sousTitre": "تابع اشتراكاتك الشهرية في الدائرة.",
@@ -436,8 +437,8 @@
     "aucunResultat": "لا توجد اشتراكات مطابقة.",
     "aucuneCeMois": "لا توجد اشتراكات لهذا الشهر.",
     "aucuneCeMoisAide": "أنشئ اشتراكات الشهر لجميع الأعضاء بنقرة واحدة.",
-    "supprimerTitre": "حذف هذا الاشتراك؟",
-    "supprimerMessage": "سيُحذف اشتراك {{nom}}.",
+    "supprimerTitre": "أرشفة هذا الاشتراك؟",
+    "supprimerMessage": "سيُؤرشف اشتراك {{nom}}. يمكنك استعادته من «الأرشيف».",
     "generees": "تم إنشاء {{count}} اشتراك"
   },
   "adminMedia": {
@@ -459,8 +460,8 @@
     "texte": "نص الدرس",
     "description": "الوصف",
     "traductionAuto": "اكتب بلغتك: سيُترجم النص تلقائيًا لكل زائر.",
-    "supprimerTitre": "حذف هذا الدرس؟",
-    "supprimerMessage": "سيُحذف «{{titre}}» نهائيًا.",
+    "supprimerTitre": "أرشفة هذا الدرس؟",
+    "supprimerMessage": "«{{titre}}» لن يظهر في الموقع بعد الآن. يمكنك استعادته من «الأرشيف».",
     "categorie": "الفئة (المناسبة)",
     "categoriePrecision": "حدّد",
     "categoriePrecisionExemple": "مثال: كازو رجب، تامخاريت…"
@@ -486,8 +487,8 @@
     "listeTitre": "حجوزات الحافلات",
     "exporter": "تصدير (Excel)",
     "aucuneReservation": "لا توجد حجوزات بعد.",
-    "supprimerTitre": "حذف هذه الفعالية؟",
-    "supprimerMessage": "ستُحذف «{{titre}}» وحجوزاتها.",
+    "supprimerTitre": "أرشفة هذه الفعالية؟",
+    "supprimerMessage": "«{{titre}}» لن تظهر في الموقع بعد الآن. يمكنك استعادتها من «الأرشيف».",
     "reserves": "{{count}} حجز"
   },
   "oustaz": {
@@ -764,5 +765,28 @@
     "toutEstAJour": "كل شيء محدَّث: لا شيء للمعالجة.",
     "valider": "تأكيد",
     "annulerLaReservation": "إلغاء الحجز"
+  },
+  "pagination": {
+    "titre": "الصفحات",
+    "precedente": "الصفحة السابقة",
+    "suivante": "الصفحة التالية"
+  },
+  "archives": {
+    "titre": "الأرشيف",
+    "aide": "العناصر المؤرشفة لم تعد ظاهرة في الموقع. يمكنك استعادتها أو حذفها نهائيًا.",
+    "archiver": "أرشفة",
+    "archive": "تمت الأرشفة. يمكنك استعادته من «الأرشيف».",
+    "archiveLe": "أُرشف في {{date}}",
+    "par": "بواسطة {{nom}}",
+    "restaurer": "استعادة",
+    "restaure": "تمت الاستعادة: أصبح ظاهرًا من جديد.",
+    "supprimer": "حذف نهائي",
+    "supprimeDefinitivement": "تم الحذف نهائيًا.",
+    "supprimerTitre": "حذف نهائي؟",
+    "supprimerMessage": "لا يمكن التراجع عن هذا الإجراء: لن يمكن استعادة العنصر.",
+    "vide": "لا توجد عناصر مؤرشفة.",
+    "archiverQuestionTitre": "أرشفة هذا السؤال؟",
+    "archiverMessage": "سيختفي من القائمة. يمكنك استعادته من «الأرشيف».",
+    "questionVocale": "سؤال صوتي"
   }
 }

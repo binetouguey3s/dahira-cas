@@ -1,9 +1,10 @@
-import { Bus, Calendar, ClipboardList, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, Bus, Calendar, ClipboardList, Pencil, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import { ChoixResponsables, type ResponsableChoisi } from "@/components/metier/bus/ChoixResponsables";
+import { Archives, BoutonArchives } from "@/components/metier/Archives";
 import { PaveDate } from "@/components/metier/Elements";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +12,7 @@ import { Badge, Card } from "@/components/ui/Card";
 import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { Champ, Input, Interrupteur, Select, Textarea } from "@/components/ui/Input";
 import { Confirmation, Modal } from "@/components/ui/Modal";
+import { Pagination, usePageLocale } from "@/components/ui/Pagination";
 import { useToast } from "@/context/ToastContext";
 import {
   api,
@@ -58,6 +60,8 @@ export default function AdminEvenements() {
   const [form, setForm] = useState<Formulaire>(VIDE);
   const [envoi, setEnvoi] = useState(false);
   const [aSupprimer, setASupprimer] = useState<Evenement | null>(null);
+  const [archives, setArchives] = useState(false);
+  const pages = usePageLocale(evenements, periode);
 
   const charger = () => {
     setEvenements(null);
@@ -123,7 +127,7 @@ export default function AdminEvenements() {
     setEnvoi(true);
     try {
       await api.delete(`/evenements/evenements/${aSupprimer.id}/`);
-      notifier(t("commun.supprime"));
+      notifier(t("archives.archive"));
       setASupprimer(null);
       charger();
     } catch (err) {
@@ -140,9 +144,12 @@ export default function AdminEvenements() {
         titre={t("admin.evenements")}
         sousTitre={t("adminEv.sousTitre")}
         action={
-          <Button onClick={() => setEdition("nouveau")}>
-            <Plus className="h-4 w-4" /> {t("adminEv.nouveau")}
-          </Button>
+          <>
+            <BoutonArchives onClick={() => setArchives(true)} />
+            <Button onClick={() => setEdition("nouveau")}>
+              <Plus className="h-4 w-4" /> {t("adminEv.nouveau")}
+            </Button>
+          </>
         }
       />
 
@@ -159,8 +166,9 @@ export default function AdminEvenements() {
       {evenements === null ? (
         <SqueletteListe />
       ) : evenements.length ? (
-        <ListeAnimee key={periode} className="flex flex-col gap-3">
-          {evenements.map((ev) => (
+        <div ref={pages.ref}>
+        <ListeAnimee key={`${periode}-${pages.page}`} className="flex flex-col gap-3">
+          {(pages.elements ?? []).map((ev) => (
             <ElementAnime key={ev.id}>
               <Card className="flex flex-wrap items-center gap-4">
                 <PaveDate date={ev.date} passe={periode === "passes"} />
@@ -190,14 +198,16 @@ export default function AdminEvenements() {
                   <Button variant="ghost" size="icon" onClick={() => setEdition(ev)} aria-label={t("commun.modifier")}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-status-error" onClick={() => setASupprimer(ev)} aria-label={t("commun.supprimer")}>
-                    <Trash2 className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" className="text-status-error" onClick={() => setASupprimer(ev)} aria-label={t("archives.archiver")}>
+                    <Archive className="h-4 w-4" />
                   </Button>
                 </div>
               </Card>
             </ElementAnime>
           ))}
         </ListeAnimee>
+        <Pagination page={pages.page} nbPages={pages.nbPages} onChange={pages.changer} />
+        </div>
       ) : (
         <Vide
           icone={Calendar}
@@ -291,8 +301,21 @@ export default function AdminEvenements() {
         onConfirmer={supprimer}
         titre={t("adminEv.supprimerTitre")}
         message={t("adminEv.supprimerMessage", { titre: aSupprimer?.titre })}
-        libelleConfirmer={t("commun.supprimer")}
+        libelleConfirmer={t("archives.archiver")}
         chargement={envoi}
+      />
+
+      <Archives<Evenement>
+        ouvert={archives}
+        onFermer={() => setArchives(false)}
+        base="/evenements/evenements/"
+        onChange={charger}
+        rendu={(ev) => (
+          <>
+            <p className="truncate font-semibold text-text-primary">{ev.titre}</p>
+            <p className="text-xs text-text-secondary first-letter:uppercase">{formatDateHeure(ev.date)}</p>
+          </>
+        )}
       />
     </AppShell>
   );

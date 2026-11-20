@@ -1,11 +1,13 @@
 from django.db import models
 
+from dahira_backend.archives import Archivable
+
 from dahira_backend.stockage import stockage_audio_video
 
 from evenements.models import Evenement
 
 
-class ContenuMedia(models.Model):
+class ContenuMedia(Archivable):
     class TypeContenu(models.TextChoices):
         AUDIO = "audio", "Audio"
         VIDEO = "video", "Vidéo"

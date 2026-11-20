@@ -8,6 +8,7 @@ import { ajouterVocal, EnregistreurVocal, type Vocal } from "@/components/metier
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
+import { Pagination, usePageLocale } from "@/components/ui/Pagination";
 import { Champ, Select, Textarea } from "@/components/ui/Input";
 import { Confirmation, Modal } from "@/components/ui/Modal";
 import { useToast } from "@/context/ToastContext";
@@ -90,6 +91,7 @@ export default function QuestionsReponses() {
 
   const visibles = (questions ?? []).filter((q) => filtre === "toutes" || q.statut === filtre);
   const nbAttente = (questions ?? []).filter((q) => q.statut === "en_attente").length;
+  const pages = usePageLocale(questions ? visibles : null, filtre);
 
   return (
     <AppShell>
@@ -122,8 +124,9 @@ export default function QuestionsReponses() {
       {questions === null ? (
         <SqueletteListe />
       ) : visibles.length ? (
-        <ListeAnimee key={filtre} className="flex flex-col gap-4">
-          {visibles.map((q) => (
+        <div ref={pages.ref}>
+        <ListeAnimee key={`${filtre}-${pages.page}`} className="flex flex-col gap-4">
+          {(pages.elements ?? []).map((q) => (
             <ElementAnime key={q.id}>
               <Card className="p-5">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -168,6 +171,8 @@ export default function QuestionsReponses() {
             </ElementAnime>
           ))}
         </ListeAnimee>
+        <Pagination page={pages.page} nbPages={pages.nbPages} onChange={pages.changer} />
+        </div>
       ) : (
         <Vide
           icone={MessageCircleQuestion}

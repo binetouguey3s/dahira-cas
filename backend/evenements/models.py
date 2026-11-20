@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.db import models
 
+from dahira_backend.archives import Archivable
 
-class Evenement(models.Model):
+
+class Evenement(Archivable):
     class Categorie(models.TextChoices):
         MAGAL = "magal", "Magal"
         GAMOU = "gamou", "Gamou"

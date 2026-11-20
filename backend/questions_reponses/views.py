@@ -7,11 +7,13 @@ from rest_framework.response import Response
 
 from comptes.permissions import ROLES_OUSTAZ, a_un_role
 
+from dahira_backend.archives import ArchivesMixin
+
 from .models import Question
 from .serializers import QuestionSerializer, ReponseSerializer
 
 
-class QuestionViewSet(viewsets.ModelViewSet):
+class QuestionViewSet(ArchivesMixin, viewsets.ModelViewSet):
     """Chaque membre ne voit et ne gère que SES questions.
 
     L'Oustaz et l'Administrateur général voient toutes les questions et y répondent.
@@ -24,9 +26,10 @@ class QuestionViewSet(viewsets.ModelViewSet):
     filterset_fields = ["statut", "theme"]
     search_fields = ["texte", "membre__nom_complet"]
     ordering_fields = ["date_creation", "statut"]
+    roles_archives = ROLES_OUSTAZ
 
     def get_queryset(self):
-        qs = Question.objects.select_related("reponse", "membre")
+        qs = self.filtrer_archives(Question.objects.select_related("reponse", "membre"))
         # ?miennes=1 : l'espace personnel n'affiche que ses propres questions, même pour l'Oustaz.
         if self.request.query_params.get("miennes") == "1" or not a_un_role(self.request.user, ROLES_OUSTAZ):
             return qs.filter(membre=self.request.user)
@@ -47,7 +50,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         self._verifier_modifiable(instance)
-        instance.delete()
+        super().perform_destroy(instance)  # mise aux archives
 
     @action(detail=True, methods=["post"])
     def repondre(self, request, pk=None):

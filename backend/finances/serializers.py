@@ -4,12 +4,15 @@ from .models import Cotisation, ReglagesRappels
 
 
 class CotisationSerializer(serializers.ModelSerializer):
+    archive_par_nom = serializers.CharField(source="archive_par.nom_complet", read_only=True, default="")
     membre_nom = serializers.CharField(source="membre.nom_complet", read_only=True)
     membre_telephone = serializers.CharField(source="membre.telephone", read_only=True)
 
     class Meta:
         model = Cotisation
         fields = [
+            "archive_le",
+            "archive_par_nom",
             "id",
             "membre",
             "membre_nom",
@@ -23,7 +26,7 @@ class CotisationSerializer(serializers.ModelSerializer):
             "date_paiement",
             "cree_le",
         ]
-        read_only_fields = ["id", "cree_le"]
+        read_only_fields = ["archive_le", "id", "cree_le"]
 
     def validate_mois(self, mois):
         if not 1 <= mois <= 12:

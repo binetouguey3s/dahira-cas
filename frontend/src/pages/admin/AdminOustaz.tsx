@@ -1,14 +1,17 @@
 import { AnimatePresence, motion } from "motion/react";
-import { CheckCircle2, MessageCircleQuestion, Pencil, Search, Send } from "lucide-react";
+import { Archive, CheckCircle2, MessageCircleQuestion, Pencil, Search, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { Archives, BoutonArchives } from "@/components/metier/Archives";
 import { ajouterVocal, EnregistreurVocal, type Vocal } from "@/components/metier/EnregistreurVocal";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { Avatar, ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { Input, Textarea } from "@/components/ui/Input";
+import { Confirmation } from "@/components/ui/Modal";
+import { Pagination, usePageLocale } from "@/components/ui/Pagination";
 import { useToast } from "@/context/ToastContext";
 import { Traduit } from "@/context/TraductionContext";
 import { api, messageErreur, toutesLesPages, type Question } from "@/lib/api";
@@ -24,6 +27,9 @@ export default function AdminOustaz() {
   const [enEdition, setEnEdition] = useState<number | null>(null);
   const [envoiId, setEnvoiId] = useState<number | null>(null);
   const [vocaux, setVocaux] = useState<Record<number, Vocal | null>>({});
+  const [aArchiver, setAArchiver] = useState<Question | null>(null);
+  const [archives, setArchives] = useState(false);
+  const [archivage, setArchivage] = useState(false);
 
   const charger = () =>
     toutesLesPages<Question>("/questions-reponses/questions/?ordering=date_creation")
@@ -56,16 +62,37 @@ export default function AdminOustaz() {
     }
   };
 
+  const archiver = async () => {
+    if (!aArchiver) return;
+    setArchivage(true);
+    try {
+      await api.delete(`/questions-reponses/questions/${aArchiver.id}/`);
+      notifier(t("archives.archive"));
+      setAArchiver(null);
+      await charger();
+    } catch (err) {
+      notifier(messageErreur(err, t("commun.erreur")), "erreur");
+    } finally {
+      setArchivage(false);
+    }
+  };
+
   const liste = questions ?? [];
   const nbAttente = liste.filter((q) => q.statut === "en_attente").length;
   const visibles = liste
     .filter((q) => q.statut === onglet)
     .filter((q) => !recherche.trim() || `${q.texte} ${q.membre_nom}`.toLowerCase().includes(recherche.toLowerCase()));
   if (onglet === "repondu") visibles.reverse();
+  const pages = usePageLocale(questions ? visibles : null, `${onglet}|${recherche}|${liste.length}`);
 
   return (
     <AppShell large>
-      <EnTete surTitre={t("nav.administration")} titre={t("admin.questions")} sousTitre={t("oustaz.sousTitre")} />
+      <EnTete
+        surTitre={t("nav.administration")}
+        titre={t("admin.questions")}
+        sousTitre={t("oustaz.sousTitre")}
+        action={<BoutonArchives onClick={() => setArchives(true)} />}
+      />
 
       <div className="mb-6 flex flex-col gap-3 md:flex-row">
         <Onglets
@@ -86,8 +113,9 @@ export default function AdminOustaz() {
       {questions === null ? (
         <SqueletteListe />
       ) : visibles.length ? (
-        <ListeAnimee key={onglet} className="flex flex-col gap-4">
-          {visibles.map((q) => {
+        <div ref={pages.ref}>
+        <ListeAnimee key={`${onglet}-${pages.page}`} className="flex flex-col gap-4">
+          {(pages.elements ?? []).map((q) => {
             const edite = q.statut === "en_attente" || enEdition === q.id;
             return (
               <ElementAnime key={q.id}>
@@ -99,6 +127,16 @@ export default function AdminOustaz() {
                       <p className="text-xs text-text-secondary">{formatDate(q.date_creation)}</p>
                     </div>
                     <Badge tone="or">{t(`questionsReponses.themes.${q.theme}`)}</Badge>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9 text-status-error"
+                      onClick={() => setAArchiver(q)}
+                      aria-label={t("archives.archiver")}
+                      title={t("archives.archiver")}
+                    >
+                      <Archive className="h-4 w-4" />
+                    </Button>
                   </div>
                   {q.texte && (
                     <p className="whitespace-pre-line text-text-primary">
@@ -162,9 +200,33 @@ export default function AdminOustaz() {
             );
           })}
         </ListeAnimee>
+        <Pagination page={pages.page} nbPages={pages.nbPages} onChange={pages.changer} />
+        </div>
       ) : (
         <Vide icone={MessageCircleQuestion} titre={onglet === "en_attente" ? t("admin.aucuneQuestionEnAttente") : t("oustaz.aucuneRepondue")} />
       )}
+
+      <Confirmation
+        ouvert={!!aArchiver}
+        onFermer={() => setAArchiver(null)}
+        onConfirmer={archiver}
+        titre={t("archives.archiverQuestionTitre")}
+        message={t("archives.archiverMessage")}
+        libelleConfirmer={t("archives.archiver")}
+        chargement={archivage}
+      />
+      <Archives<Question>
+        ouvert={archives}
+        onFermer={() => setArchives(false)}
+        base="/questions-reponses/questions/"
+        onChange={charger}
+        rendu={(q) => (
+          <>
+            <p className="text-sm font-semibold text-text-primary">{q.membre_nom}</p>
+            <p className="line-clamp-2 text-xs text-text-secondary">{q.texte || t("archives.questionVocale")}</p>
+          </>
+        )}
+      />
     </AppShell>
   );
 }

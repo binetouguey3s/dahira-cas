@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.db import models
 
+from dahira_backend.archives import Archivable
 
-class Cotisation(models.Model):
+
+class Cotisation(Archivable):
     class Statut(models.TextChoices):
         PAYE = "paye", "Payé"
         EN_RETARD = "en_retard", "En retard"

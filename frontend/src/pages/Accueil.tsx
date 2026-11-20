@@ -15,10 +15,39 @@ import { PHOTO_GUIDE_PAR_DEFAUT, useParametres } from "@/context/ParametresConte
 import { Traduit } from "@/context/TraductionContext";
 import { api, type ContenuMedia, type Evenement, type Paginated } from "@/lib/api";
 
-function salutation(heure: number) {
-  if (heure < 12) return "accueil.bonjour";
-  if (heure < 18) return "accueil.bonApresMidi";
-  return "accueil.bonsoir";
+/** Nombre maximum d'événements et d'enseignements affichés sur l'accueil (le reste : « Tout voir »). */
+const MAX_ACCUEIL = 4;
+
+/** Prénom(s) bien écrits : « awa NDIAYE » → « Awa », « mame diarra bousso » → « Mame Diarra ».
+ * Le dernier mot est le nom de famille ; on garde tous les prénoms composés. */
+function prenomsDe(nomComplet: string) {
+  const mots = nomComplet.trim().split(/\s+/).filter(Boolean);
+  const prenoms = mots.length > 1 ? mots.slice(0, -1) : mots;
+  return prenoms
+    .map((mot) => mot.split("-").map((p) => p.charAt(0).toLocaleUpperCase() + p.slice(1).toLocaleLowerCase()).join("-"))
+    .join(" ");
+}
+
+/** « Tout voir » : petit bouton animé (la flèche avance doucement). */
+function BoutonToutVoir({ to }: { to: string }) {
+  const { t } = useTranslation();
+  return (
+    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+      <Link
+        to={to}
+        className="group inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3.5 py-1.5 text-sm font-semibold text-accent-primary shadow-sm transition-colors hover:bg-accent-primary hover:text-text-inverse"
+      >
+        {t("commun.voirTout")}
+        <motion.span
+          className="inline-flex"
+          animate={{ x: [0, 4, 0] }}
+          transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+        </motion.span>
+      </Link>
+    </motion.div>
+  );
 }
 
 export default function Accueil() {
@@ -30,16 +59,16 @@ export default function Accueil() {
 
   useEffect(() => {
     api
-      .get<Paginated<ContenuMedia>>("/mediatheque/contenus/?ordering=-date_publication&page_size=4")
-      .then((res) => setContenus(res.data.results.slice(0, 4)))
+      .get<Paginated<ContenuMedia>>(`/mediatheque/contenus/?ordering=-date_publication&page_size=${MAX_ACCUEIL}`)
+      .then((res) => setContenus(res.data.results.slice(0, MAX_ACCUEIL)))
       .catch(() => setContenus([]));
     api
-      .get<Paginated<Evenement>>("/evenements/evenements/?periode=a_venir&ordering=date")
-      .then((res) => setEvenements(res.data.results.slice(0, 3)))
+      .get<Paginated<Evenement>>(`/evenements/evenements/?periode=a_venir&ordering=date&page_size=${MAX_ACCUEIL}`)
+      .then((res) => setEvenements(res.data.results.slice(0, MAX_ACCUEIL)))
       .catch(() => setEvenements([]));
   }, []);
 
-  const prenom = membre?.nom_complet?.split(" ")[0];
+  const prenom = membre ? prenomsDe(membre.nom_complet) : "";
 
   const raccourcis = [
     { to: "/biographie", icone: BookOpen, label: t("nav.biographie") },
@@ -72,7 +101,7 @@ export default function Accueil() {
         <div className="relative flex flex-col gap-6 md:flex-row md:items-center">
           <div className="flex-1">
             <p className="mb-2 text-sm font-medium text-[#D9C89A]">
-              {membre ? t(salutation(new Date().getHours()), { nom: prenom }) : t("accueil.bienvenueVisiteur")}
+              {membre && prenom ? t("accueil.salutationMembre", { nom: prenom }) : t("accueil.bienvenueVisiteur")}
             </p>
             <h1 className="max-w-xl text-2xl font-bold leading-tight md:text-4xl">{parametres.nom_dahira}</h1>
             <blockquote className="mt-5 max-w-xl">
@@ -133,9 +162,7 @@ export default function Accueil() {
         <section className="min-w-0">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-text-primary">{t("accueil.prochainsEvenements")}</h2>
-            <Link to="/evenements" className="text-sm font-semibold text-accent-primary hover:underline">
-              {t("commun.voirTout")}
-            </Link>
+            <BoutonToutVoir to="/evenements" />
           </div>
           {evenements === null ? (
             <SqueletteListe lignes={2} />
@@ -155,9 +182,7 @@ export default function Accueil() {
         <section className="min-w-0">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-text-primary">{t("accueil.derniersEnseignements")}</h2>
-            <Link to="/mediatheque" className="text-sm font-semibold text-accent-primary hover:underline">
-              {t("commun.voirTout")}
-            </Link>
+            <BoutonToutVoir to="/mediatheque" />
           </div>
           {contenus === null ? (
             <SqueletteListe lignes={3} />

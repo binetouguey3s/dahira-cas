@@ -24,6 +24,7 @@ class ResponsableBusSerializer(serializers.ModelSerializer):
 
 
 class EvenementSerializer(serializers.ModelSerializer):
+    archive_par_nom = serializers.CharField(source="archive_par.nom_complet", read_only=True, default="")
     bus = serializers.SerializerMethodField()
     ma_reservation = serializers.SerializerMethodField()
     nb_reservations = serializers.SerializerMethodField()
@@ -38,6 +39,8 @@ class EvenementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evenement
         fields = [
+            "archive_le",
+            "archive_par_nom",
             "id",
             "titre",
             "description",
@@ -59,7 +62,7 @@ class EvenementSerializer(serializers.ModelSerializer):
             "cree_par",
             "cree_le",
         ]
-        read_only_fields = ["id", "cree_par", "cree_le"]
+        read_only_fields = ["archive_le", "id", "cree_par", "cree_le"]
 
     def get_bus(self, obj):
         """Places de chaque bus : [{numero, places_total, places_restantes}]."""

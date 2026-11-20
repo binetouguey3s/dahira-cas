@@ -160,7 +160,9 @@ class MembreAdminViewSet(
 
     def get_queryset(self):
         return Membre.objects.annotate(
-            nb_cotisations_payees=Count("cotisations", filter=Q(cotisations__statut="paye"))
+            nb_cotisations_payees=Count(
+                "cotisations", filter=Q(cotisations__statut="paye", cotisations__archive_le__isnull=True)
+            )
         )
 
     def create(self, request, *args, **kwargs):
@@ -217,19 +219,20 @@ class StatistiquesView(APIView):
                 date_inscription__year=maintenant.year, date_inscription__month=maintenant.month
             ).count()
         if a_un_role(user, ROLES_FINANCE):
-            du_mois = Cotisation.objects.filter(annee=maintenant.year, mois=maintenant.month)
+            cotisations = Cotisation.objects.filter(archive_le__isnull=True)
+            du_mois = cotisations.filter(annee=maintenant.year, mois=maintenant.month)
             stats["cotisations_mois_payees"] = du_mois.filter(statut="paye").count()
             stats["cotisations_mois_total"] = du_mois.count()
             stats["montant_encaisse_annee"] = (
-                Cotisation.objects.filter(annee=maintenant.year, statut="paye").aggregate(t=Sum("montant"))["t"] or 0
+                cotisations.filter(annee=maintenant.year, statut="paye").aggregate(t=Sum("montant"))["t"] or 0
             )
-            stats["cotisations_en_retard"] = Cotisation.objects.exclude(statut="paye").count()
+            stats["cotisations_en_retard"] = cotisations.exclude(statut="paye").count()
         if a_un_role(user, ("oustaz", "admin_general")):
-            stats["questions_en_attente"] = Question.objects.filter(statut="en_attente").count()
+            stats["questions_en_attente"] = Question.objects.filter(statut="en_attente", archive_le__isnull=True).count()
         if a_un_role(user, ("oustaz", "admin_contenus", "admin_general")):
-            stats["contenus"] = ContenuMedia.objects.count()
+            stats["contenus"] = ContenuMedia.objects.filter(archive_le__isnull=True).count()
         if a_un_role(user, ("admin_contenus", "admin_general")):
-            stats["evenements_a_venir"] = Evenement.objects.filter(date__gte=maintenant).count()
+            stats["evenements_a_venir"] = Evenement.objects.filter(date__gte=maintenant, archive_le__isnull=True).count()
         return Response(stats)
 
 

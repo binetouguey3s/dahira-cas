@@ -6,12 +6,15 @@ TAILLE_MAX_FICHIER = 100 * 1024 * 1024  # 100 Mo
 
 
 class ContenuMediaSerializer(serializers.ModelSerializer):
+    archive_par_nom = serializers.CharField(source="archive_par.nom_complet", read_only=True, default="")
     aime = serializers.SerializerMethodField()
     evenement_titre = serializers.CharField(source="evenement.titre", read_only=True, default=None)
 
     class Meta:
         model = ContenuMedia
         fields = [
+            "archive_le",
+            "archive_par_nom",
             "id",
             "titre",
             "description",
@@ -28,7 +31,7 @@ class ContenuMediaSerializer(serializers.ModelSerializer):
             "aime",
             "date_publication",
         ]
-        read_only_fields = ["id", "nb_likes", "nb_telechargements", "date_publication"]
+        read_only_fields = ["archive_le", "id", "nb_likes", "nb_telechargements", "date_publication"]
 
     def get_aime(self, obj) -> bool:
         request = self.context.get("request")

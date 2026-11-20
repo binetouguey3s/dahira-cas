@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/layout/AppShell";
 import { Badge, Card } from "@/components/ui/Card";
 import { ElementAnime, EnTete, ListeAnimee, SqueletteListe, Stat, Vide } from "@/components/ui/Divers";
+import { Pagination, usePageLocale } from "@/components/ui/Pagination";
 import { useParametres } from "@/context/ParametresContext";
 import { useToast } from "@/context/ToastContext";
 import { toutesLesPages, type Cotisation } from "@/lib/api";
@@ -27,6 +28,7 @@ export default function Cotisations() {
   }, []);
 
   const liste = cotisations ?? [];
+  const pages = usePageLocale(cotisations);
   const payeesAnnee = liste.filter((c) => c.annee === annee && c.statut === "paye");
   const totalAnnee = payeesAnnee.reduce((s, c) => s + Number(c.montant), 0);
   const aRegler = liste.filter((c) => c.statut !== "paye");
@@ -155,8 +157,9 @@ export default function Cotisations() {
       {cotisations === null ? (
         <SqueletteListe />
       ) : liste.length ? (
-        <ListeAnimee className="flex flex-col gap-2">
-          {liste.map((c) => (
+        <div ref={pages.ref}>
+        <ListeAnimee key={pages.page} className="flex flex-col gap-2">
+          {(pages.elements ?? []).map((c) => (
             <ElementAnime key={c.id}>
               <Card className="flex items-center justify-between gap-3">
                 <div>
@@ -172,6 +175,8 @@ export default function Cotisations() {
             </ElementAnime>
           ))}
         </ListeAnimee>
+        <Pagination page={pages.page} nbPages={pages.nbPages} onChange={pages.changer} />
+        </div>
       ) : (
         <Vide icone={Wallet} titre={t("cotisations.aucuneCotisation")} message={t("cotisations.aucuneCotisationAide")} />
       )}

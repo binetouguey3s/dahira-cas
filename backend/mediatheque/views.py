@@ -7,12 +7,13 @@ from rest_framework.response import Response
 
 from comptes.permissions import ROLES_CONTENUS, role_ou_lecture_seule
 
+from dahira_backend.archives import ArchivesMixin
 from dahira_backend.stockage import supprimer_fichier
 from .models import ContenuMedia, Like
 from .serializers import ContenuMediaSerializer
 
 
-class ContenuMediaViewSet(viewsets.ModelViewSet):
+class ContenuMediaViewSet(ArchivesMixin, viewsets.ModelViewSet):
     """Lecture ouverte à tous ; publication réservée à l'Oustaz et aux admins contenus."""
 
     queryset = ContenuMedia.objects.select_related("evenement").all()
@@ -22,8 +23,12 @@ class ContenuMediaViewSet(viewsets.ModelViewSet):
     filterset_fields = ["type", "evenement", "auteur", "categorie"]
     search_fields = ["titre", "description", "auteur", "categorie_autre"]
     ordering_fields = ["date_publication", "nb_likes", "nb_telechargements", "titre"]
+    roles_archives = ROLES_CONTENUS
 
-    def perform_destroy(self, instance):
+    def get_queryset(self):
+        return self.filtrer_archives(super().get_queryset())
+
+    def supprimer_definitivement(self, instance):
         supprimer_fichier(instance.fichier)
         instance.delete()
 
