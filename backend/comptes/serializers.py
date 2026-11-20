@@ -25,6 +25,9 @@ def valider_telephone_unique(valeur, instance=None):
 class MembreSerializer(serializers.ModelSerializer):
     """Profil du membre connecté (GET/PATCH /api/comptes/moi/)."""
 
+    # Vrai si le membre gère les bus d'un événement à venir (affiche son « Espace bus »).
+    est_responsable_bus = serializers.SerializerMethodField()
+
     class Meta:
         model = Membre
         fields = [
@@ -42,8 +45,18 @@ class MembreSerializer(serializers.ModelSerializer):
             "langue_preferee",
             "carte_numero",
             "date_inscription",
+            "est_responsable_bus",
         ]
         read_only_fields = ["id", "username", "role", "is_staff", "carte_numero", "date_inscription"]
+
+    def get_est_responsable_bus(self, obj):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        return obj.responsabilites_bus.filter(
+            evenement__reservation_bus_active=True, evenement__date__gte=timezone.now() - timedelta(days=7)
+        ).exists()
 
     def validate_photo(self, photo):
         return valider_photo(photo)

@@ -21,7 +21,7 @@ from dahira_backend.stockage import supprimer_fichier
 
 from .models import Membre
 from .emails import envoyer_bienvenue, envoyer_reinitialisation
-from .permissions import ROLES_ADMIN_GENERAL, ROLES_FINANCE, a_un_role, role_requis
+from .permissions import ROLES_ADMIN_GENERAL, ROLES_EVENEMENTS, ROLES_FINANCE, a_un_role, role_requis
 from .telephone import identifiants_possibles, normaliser_telephone
 from .serializers import (
     CarteVerificationSerializer,
@@ -185,10 +185,11 @@ class MembreAdminViewSet(
 
 
 class MembreAnnuaireView(generics.ListAPIView):
-    """/api/comptes/annuaire/ — liste légère des membres pour la Finance et l'Admin général."""
+    """/api/comptes/annuaire/ — liste légère des membres (Finance, Admin contenus pour choisir les
+    responsables de bus, Admin général)."""
 
     serializer_class = MembreResumeSerializer
-    permission_classes = [role_requis(*ROLES_FINANCE)]
+    permission_classes = [role_requis(*ROLES_FINANCE, *ROLES_EVENEMENTS)]
     search_fields = ["nom_complet", "telephone", "carte_numero"]
     pagination_class = None
 

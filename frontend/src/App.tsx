@@ -25,6 +25,8 @@ const QuestionsReponses = lazyPage(() => import("@/pages/QuestionsReponses"));
 const Cotisations = lazyPage(() => import("@/pages/Cotisations"));
 const Profil = lazyPage(() => import("@/pages/Profil"));
 const Carte = lazyPage(() => import("@/pages/Carte"));
+const EspaceBus = lazyPage(() => import("@/pages/EspaceBus"));
+const GestionBus = lazyPage(() => import("@/pages/GestionBus"));
 const Reinitialiser = lazyPage(() => import("@/pages/Reinitialiser"));
 const VerifierCarte = lazyPage(() => import("@/pages/VerifierCarte"));
 const Introuvable = lazyPage(() => import("@/pages/Introuvable"));
@@ -67,6 +69,8 @@ function Routage() {
         <Route path="/cotisations" element={<ProtectedRoute><Cotisations /></ProtectedRoute>} />
         <Route path="/profil" element={<ProtectedRoute><Profil /></ProtectedRoute>} />
         <Route path="/carte" element={<ProtectedRoute><Carte /></ProtectedRoute>} />
+        <Route path="/espace-bus" element={<ProtectedRoute><EspaceBus /></ProtectedRoute>} />
+        <Route path="/espace-bus/:id" element={<ProtectedRoute><GestionBus /></ProtectedRoute>} />
 
         <Route path="/admin" element={<ProtectedRoute roles={ROLES_ADMIN}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/membres" element={<ProtectedRoute roles={["admin_general"]}><AdminMembres /></ProtectedRoute>} />

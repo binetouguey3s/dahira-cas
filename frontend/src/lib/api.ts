@@ -110,6 +110,8 @@ export interface Membre {
   langue_preferee: CodeLangue;
   carte_numero: string;
   date_inscription: string;
+  /** Gère les bus d'un événement à venir (affiche son « Espace bus »). */
+  est_responsable_bus?: boolean;
 }
 
 export interface MembreAdmin extends Omit<Membre, "username"> {
@@ -154,16 +156,101 @@ export interface Bus {
   places_restantes: number | null;
 }
 
+export interface ResponsableBus {
+  id: number;
+  membre: number;
+  nom: string;
+  telephone: string;
+  numero_wave: string;
+  numero_orange_money: string;
+  accepte_especes: boolean;
+}
+
+export interface PassagerBus {
+  id?: number;
+  nom: string;
+  est_titulaire?: boolean;
+  bus_numero?: number;
+}
+
+export type MoyenPaiementBus = "wave" | "orange_money" | "especes";
+export type StatutPaiementBus = "a_verifier" | "valide" | "refuse";
+export type StatutReservationBus = "en_attente" | "acceptee" | "acompte" | "payee" | "annulee";
+
+export interface PaiementBus {
+  id: number;
+  montant: string;
+  moyen: MoyenPaiementBus;
+  reference: string;
+  note: string;
+  responsable: number | null;
+  responsable_nom: string;
+  statut: StatutPaiementBus;
+  declare_par_nom: string;
+  declare_le: string;
+  traite_par_nom: string;
+  traite_le: string | null;
+}
+
 export interface ReservationBus {
   id: number;
   evenement: number;
   evenement_titre: string;
-  membre: number;
-  membre_nom: string;
-  membre_telephone: string;
-  bus_numero: number;
+  membre: number | null;
+  titulaire_nom: string;
+  titulaire_telephone: string;
+  nom_contact: string;
+  telephone_contact: string;
+  passagers: PassagerBus[];
+  paiements: PaiementBus[];
   nb_places: number;
+  montant_du: string;
+  montant_paye: string;
+  montant_a_verifier: string;
+  statut: StatutReservationBus;
+  acceptee: boolean;
+  acceptee_par_nom: string;
+  annulee: boolean;
+  modifiable: boolean;
   date_reservation: string;
+  creee_par_nom?: string;
+}
+
+export interface EvenementEspaceBus {
+  id: number;
+  titre: string;
+  date: string;
+  lieu: string;
+  categorie: CategorieEvenement;
+  capacite: number;
+  places_occupees: number;
+  nb_reservations: number;
+  paiements_a_verifier: number;
+  en_attente: number;
+}
+
+export interface PassagerGestion {
+  id: number;
+  nom: string;
+  est_titulaire: boolean;
+  reservation: number;
+  titulaire_nom: string;
+  titulaire_telephone: string;
+  statut: StatutReservationBus;
+}
+
+export interface GestionBus {
+  evenement: Evenement;
+  bus: { numero: number; places_total: number; passagers: PassagerGestion[] }[];
+  reservations: ReservationBus[];
+  totaux: {
+    capacite: number;
+    places_occupees: number;
+    montant_du: string;
+    montant_paye: string;
+    montant_a_verifier: string;
+    reste_a_payer: string;
+  };
 }
 
 export type CategorieEvenement = "magal" | "gamou" | "dahira" | "causerie" | "nisfou_shabaan" | "leylatul_khadr" | "autre";
@@ -178,9 +265,13 @@ export interface Evenement {
   reservation_bus_active: boolean;
   nb_bus: number | null;
   places_par_bus: number | null;
+  prix_place: string | null;
   bus: Bus[];
+  places_restantes: number;
   ma_reservation: ReservationBus | null;
   nb_reservations: number;
+  responsables: ResponsableBus[];
+  est_responsable: boolean;
 }
 
 export type TypeContenu = "audio" | "video" | "texte";

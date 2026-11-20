@@ -18,4 +18,4 @@ class EvenementAdmin(admin.ModelAdmin):
 
 @admin.register(ReservationBus)
 class ReservationBusAdmin(admin.ModelAdmin):
-    list_display = ("evenement", "membre", "bus_numero", "nb_places")
+    list_display = ("evenement", "membre", "nom_contact", "acceptee", "annulee")

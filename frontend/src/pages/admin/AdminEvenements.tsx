@@ -1,7 +1,9 @@
-import { Bus, Calendar, Download, Pencil, Plus, Trash2, Users } from "lucide-react";
+import { Bus, Calendar, ClipboardList, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
+import { ChoixResponsables, type ResponsableChoisi } from "@/components/metier/bus/ChoixResponsables";
 import { PaveDate } from "@/components/metier/Elements";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/Button";
@@ -16,7 +18,6 @@ import {
   toutesLesPages,
   type CategorieEvenement,
   type Evenement,
-  type ReservationBus,
 } from "@/lib/api";
 import { CATEGORIES } from "@/lib/categories";
 import { formatDateHeure, versDatetimeLocal } from "@/lib/utils";
@@ -31,6 +32,8 @@ interface Formulaire {
   reservation_bus_active: boolean;
   nb_bus: string;
   places_par_bus: string;
+  prix_place: string;
+  responsables: ResponsableChoisi[];
 }
 
 const VIDE: Formulaire = {
@@ -42,19 +45,9 @@ const VIDE: Formulaire = {
   reservation_bus_active: false,
   nb_bus: "1",
   places_par_bus: "60",
+  prix_place: "",
+  responsables: [],
 };
-
-function exporterCSV(evenement: Evenement, reservations: ReservationBus[]) {
-  const lignes = [
-    ["Bus", "Nom", "Téléphone", "Places", "Réservé le"],
-    ...reservations.map((r) => [r.bus_numero, r.membre_nom, r.membre_telephone, r.nb_places, new Date(r.date_reservation).toLocaleString()]),
-  ];
-  const csv = "﻿" + lignes.map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";")).join("\n");
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-  a.download = `reservations-${evenement.titre.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.csv`;
-  a.click();
-}
 
 export default function AdminEvenements() {
   const { t } = useTranslation();
@@ -65,7 +58,6 @@ export default function AdminEvenements() {
   const [form, setForm] = useState<Formulaire>(VIDE);
   const [envoi, setEnvoi] = useState(false);
   const [aSupprimer, setASupprimer] = useState<Evenement | null>(null);
-  const [listeResa, setListeResa] = useState<{ ev: Evenement; resas: ReservationBus[] | null } | null>(null);
 
   const charger = () => {
     setEvenements(null);
@@ -91,6 +83,8 @@ export default function AdminEvenements() {
         reservation_bus_active: edition.reservation_bus_active,
         nb_bus: String(edition.nb_bus ?? 1),
         places_par_bus: String(edition.places_par_bus ?? ""),
+        prix_place: edition.prix_place ? String(Number(edition.prix_place)) : "",
+        responsables: edition.responsables.map((r) => ({ id: r.membre, nom_complet: r.nom, telephone: r.telephone })),
       });
   }, [edition]);
 
@@ -108,6 +102,8 @@ export default function AdminEvenements() {
       reservation_bus_active: form.reservation_bus_active,
       nb_bus: form.reservation_bus_active ? Number(form.nb_bus) || 1 : null,
       places_par_bus: form.reservation_bus_active && form.places_par_bus ? Number(form.places_par_bus) : null,
+      prix_place: form.reservation_bus_active && form.prix_place ? Number(form.prix_place) : null,
+      responsables_ids: form.reservation_bus_active ? form.responsables.map((r) => r.id) : [],
     };
     try {
       if (edition === "nouveau") await api.post("/evenements/evenements/", donnees);
@@ -136,21 +132,6 @@ export default function AdminEvenements() {
       setEnvoi(false);
     }
   };
-
-  const ouvrirReservations = async (ev: Evenement) => {
-    setListeResa({ ev, resas: null });
-    try {
-      const { data } = await api.get<ReservationBus[]>(`/evenements/evenements/${ev.id}/reservations/`);
-      setListeResa({ ev, resas: data });
-    } catch {
-      setListeResa({ ev, resas: [] });
-    }
-  };
-
-  const parBus = (listeResa?.resas ?? []).reduce<Record<number, ReservationBus[]>>((acc, r) => {
-    (acc[r.bus_numero] ??= []).push(r);
-    return acc;
-  }, {});
 
   return (
     <AppShell large>
@@ -200,8 +181,10 @@ export default function AdminEvenements() {
                 </div>
                 <div className="flex gap-1">
                   {ev.reservation_bus_active && (
-                    <Button variant="secondary" size="sm" onClick={() => ouvrirReservations(ev)}>
-                      <Users className="h-4 w-4" /> {t("adminEv.liste")}
+                    <Button asChild variant="secondary" size="sm">
+                      <Link to={`/espace-bus/${ev.id}`}>
+                        <ClipboardList className="h-4 w-4" /> {t("bus.gererLesBus")}
+                      </Link>
                     </Button>
                   )}
                   <Button variant="ghost" size="icon" onClick={() => setEdition(ev)} aria-label={t("commun.modifier")}>
@@ -285,51 +268,21 @@ export default function AdminEvenements() {
               <Champ label={t("adminEv.placesParBus")} aide={t("adminEv.placesAide")}>
                 {(id) => <Input id={id} type="number" min={1} value={form.places_par_bus} onChange={maj("places_par_bus")} />}
               </Champ>
+              <Champ label={t("bus.prixPlace")} aide={t("bus.prixPlaceAide")}>
+                {(id) => <Input id={id} type="number" min={0} inputMode="numeric" value={form.prix_place} onChange={maj("prix_place")} placeholder="0" />}
+              </Champ>
+              <div />
+              <div className="sm:col-span-2">
+                <p className="mb-1 text-sm font-semibold text-text-primary">{t("bus.responsablesTitre")}</p>
+                <p className="mb-2 text-xs text-text-secondary">{t("bus.responsablesAide")}</p>
+                <ChoixResponsables
+                  valeur={form.responsables}
+                  onChange={(responsables) => setForm((f) => ({ ...f, responsables }))}
+                />
+              </div>
             </>
           )}
         </div>
-      </Modal>
-
-      <Modal
-        ouvert={!!listeResa}
-        onFermer={() => setListeResa(null)}
-        large
-        titre={t("adminEv.listeTitre")}
-        description={listeResa?.ev.titre}
-        pied={
-          listeResa?.resas?.length ? (
-            <Button variant="outline" onClick={() => listeResa.resas && exporterCSV(listeResa.ev, listeResa.resas)}>
-              <Download className="h-4 w-4" /> {t("adminEv.exporter")}
-            </Button>
-          ) : undefined
-        }
-      >
-        {listeResa?.resas === null ? (
-          <SqueletteListe />
-        ) : Object.keys(parBus).length ? (
-          <div className="flex flex-col gap-5">
-            {Object.entries(parBus).map(([numero, resas]) => (
-              <div key={numero}>
-                <p className="mb-2 flex items-center gap-2 text-sm font-bold text-text-primary">
-                  <Bus className="h-4 w-4 text-accent-primary" /> {t("evenements.busNumero", { numero })} ·{" "}
-                  {t("evenements.nbPlaces", { count: resas.reduce((s, r) => s + r.nb_places, 0) })}
-                </p>
-                <div className="overflow-hidden rounded-2xl border border-border-subtle">
-                  {resas.map((r, i) => (
-                    <div key={r.id} className={`flex items-center justify-between gap-3 px-4 py-2.5 text-sm ${i ? "border-t border-border-subtle" : ""}`}>
-                      <span className="font-medium text-text-primary">{r.membre_nom}</span>
-                      <span className="text-text-secondary">
-                        {r.membre_telephone} · {r.nb_places}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <Vide icone={Bus} titre={t("adminEv.aucuneReservation")} />
-        )}
       </Modal>
 
       <Confirmation

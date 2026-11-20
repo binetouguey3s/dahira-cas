@@ -1,20 +1,19 @@
-import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, Bus, CalendarPlus, CheckCircle2, Clock, MapPin, Minus, Plus, Share2 } from "lucide-react";
+import { motion } from "motion/react";
+import { ArrowLeft, CalendarPlus, Clock, MapPin, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { ReservationBusCarte } from "@/components/metier/bus/ReservationBusCarte";
 import { PaveDate } from "@/components/metier/Elements";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { Squelette, Vide } from "@/components/ui/Divers";
-import { Confirmation } from "@/components/ui/Modal";
-import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import { Traduit, useTraduit } from "@/context/TraductionContext";
-import { api, messageErreur, type Evenement } from "@/lib/api";
-import { cn, formatDateHeure } from "@/lib/utils";
+import { api, type Evenement } from "@/lib/api";
+import { formatDateHeure } from "@/lib/utils";
 
 function useCompteARebours(date: string | undefined) {
   const [maintenant, setMaintenant] = useState(() => Date.now());
@@ -51,14 +50,9 @@ export default function EvenementDetail() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const { membre } = useAuth();
   const { notifier } = useToast();
   const [evenement, setEvenement] = useState<Evenement | null>(null);
   const [introuvable, setIntrouvable] = useState(false);
-  const [bus, setBus] = useState<number | null>(null);
-  const [places, setPlaces] = useState(1);
-  const [envoi, setEnvoi] = useState(false);
-  const [annulation, setAnnulation] = useState(false);
   const titreTraduit = useTraduit(evenement?.titre);
 
   const charger = () =>
@@ -73,37 +67,6 @@ export default function EvenementDetail() {
   }, [id]);
 
   const compte = useCompteARebours(evenement?.date);
-
-  const reserver = async () => {
-    if (!evenement || !bus) return;
-    setEnvoi(true);
-    try {
-      await api.post("/evenements/reservations-bus/", { evenement: evenement.id, bus_numero: bus, nb_places: places });
-      notifier(t("evenements.reservationConfirmee"));
-      await charger();
-    } catch (err) {
-      notifier(messageErreur(err, t("evenements.reservationImpossible")), "erreur");
-      await charger();
-    } finally {
-      setEnvoi(false);
-    }
-  };
-
-  const annuler = async () => {
-    if (!evenement?.ma_reservation) return;
-    setEnvoi(true);
-    try {
-      await api.delete(`/evenements/reservations-bus/${evenement.ma_reservation.id}/`);
-      notifier(t("evenements.reservationAnnulee"));
-      setAnnulation(false);
-      setBus(null);
-      await charger();
-    } catch (err) {
-      notifier(messageErreur(err, t("commun.erreur")), "erreur");
-    } finally {
-      setEnvoi(false);
-    }
-  };
 
   const partager = async () => {
     try {
@@ -133,8 +96,6 @@ export default function EvenementDetail() {
     );
 
   const passe = new Date(evenement.date) < new Date();
-  const busChoisi = evenement.bus.find((b) => b.numero === bus);
-  const maxPlaces = Math.min(10, busChoisi?.places_restantes ?? 10);
 
   return (
     <AppShell>
@@ -179,7 +140,7 @@ export default function EvenementDetail() {
         )}
       </motion.section>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex flex-col gap-4">
           <Card className="flex flex-col gap-3 p-5">
             <p className="flex items-start gap-3 text-sm text-text-primary">
@@ -221,121 +182,8 @@ export default function EvenementDetail() {
           )}
         </div>
 
-        {evenement.reservation_bus_active && !passe && (
-          <Card className="h-fit p-5">
-            <h2 className="mb-1 flex items-center gap-2 font-bold text-text-primary">
-              <Bus className="h-5 w-5 text-accent-primary" /> {t("evenements.busTitre")}
-            </h2>
-            <p className="mb-4 text-sm text-text-secondary">{t("evenements.busAide")}</p>
-
-            <AnimatePresence mode="wait">
-              {!membre ? (
-                <Button asChild className="w-full">
-                  <Link to="/connexion" state={{ depuis: `/evenements/${evenement.id}` }}>
-                    {t("evenements.connectezVous")}
-                  </Link>
-                </Button>
-              ) : evenement.ma_reservation ? (
-                <motion.div key="resa" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}>
-                  <div className="mb-3 rounded-2xl bg-accent-soft p-4 text-center">
-                    <CheckCircle2 className="mx-auto mb-2 h-8 w-8 text-status-success" />
-                    <p className="font-semibold text-text-primary">{t("evenements.reservationConfirmee")}</p>
-                    <p className="mt-1 text-sm text-text-secondary">
-                      {t("evenements.busNumero", { numero: evenement.ma_reservation.bus_numero })} ·{" "}
-                      {t("evenements.nbPlaces", { count: evenement.ma_reservation.nb_places })}
-                    </p>
-                  </div>
-                  <Button variant="outline" className="w-full text-status-error" onClick={() => setAnnulation(true)}>
-                    {t("evenements.annulerReservation")}
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div key="choix" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <div className="mb-4 grid grid-cols-2 gap-2">
-                    {evenement.bus.map((b) => {
-                      const complet = b.places_restantes === 0;
-                      const ratio = b.places_total ? 1 - (b.places_restantes ?? 0) / b.places_total : 0;
-                      return (
-                        <button
-                          key={b.numero}
-                          disabled={complet}
-                          onClick={() => {
-                            setBus(b.numero);
-                            setPlaces(1);
-                          }}
-                          className={cn(
-                            "rounded-2xl border-2 p-3 text-start transition-all",
-                            bus === b.numero
-                              ? "border-accent-primary bg-accent-soft"
-                              : "border-border-subtle hover:border-accent-primary/40",
-                            complet && "cursor-not-allowed opacity-50",
-                          )}
-                        >
-                          <p className="flex items-center gap-1.5 text-sm font-bold text-text-primary">
-                            <Bus className="h-4 w-4" /> {t("evenements.busNumero", { numero: b.numero })}
-                          </p>
-                          <p className={cn("mt-0.5 text-xs", complet ? "text-status-error" : "text-text-secondary")}>
-                            {complet
-                              ? t("evenements.complet")
-                              : b.places_restantes === null
-                                ? t("evenements.placesLibres")
-                                : t("evenements.placesRestantes", { count: b.places_restantes })}
-                          </p>
-                          {b.places_total > 0 && (
-                            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-border-subtle">
-                              <motion.div
-                                className={cn("h-full rounded-full", ratio > 0.85 ? "bg-status-warning" : "bg-accent-primary")}
-                                initial={{ width: 0 }}
-                                animate={{ width: `${Math.round(ratio * 100)}%` }}
-                                transition={{ duration: 0.6 }}
-                              />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {bus && (
-                    <div className="mb-4 flex items-center justify-between rounded-2xl border border-border-subtle p-3">
-                      <span className="text-sm font-semibold text-text-primary">{t("evenements.combienDePlaces")}</span>
-                      <div className="flex items-center gap-3">
-                        <Button variant="secondary" size="icon" className="h-9 w-9" onClick={() => setPlaces((p) => Math.max(1, p - 1))} aria-label="-">
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <span className="w-6 text-center font-bold tabular-nums">{places}</span>
-                        <Button
-                          variant="secondary"
-                          size="icon"
-                          className="h-9 w-9"
-                          onClick={() => setPlaces((p) => Math.min(maxPlaces, p + 1))}
-                          aria-label="+"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  <Button className="w-full" disabled={!bus} chargement={envoi} onClick={reserver}>
-                    {t("evenements.reserverPlace")}
-                  </Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </Card>
-        )}
+        {evenement.reservation_bus_active && !passe && <ReservationBusCarte evenement={evenement} onChange={charger} />}
       </div>
-
-      <Confirmation
-        ouvert={annulation}
-        onFermer={() => setAnnulation(false)}
-        onConfirmer={annuler}
-        titre={t("evenements.annulerReservation")}
-        message={t("evenements.annulerConfirmation")}
-        libelleConfirmer={t("evenements.annulerReservation")}
-        chargement={envoi}
-      />
     </AppShell>
   );
 }

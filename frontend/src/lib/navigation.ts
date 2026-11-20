@@ -1,6 +1,7 @@
 import {
   Banknote,
   BookOpen,
+  Bus,
   Calendar,
   CreditCard,
   HelpCircle,
@@ -24,6 +25,8 @@ export interface LienNav {
   connecte?: boolean;
   /** Réservé à ces rôles (l'Admin général et les super-admins ont toujours accès). */
   roles?: Role[];
+  /** Condition supplémentaire (ex. responsable des bus d'un événement). */
+  visible?: (membre: Membre) => boolean;
 }
 
 export const ROLES_ADMIN: Role[] = ["responsable_finance", "oustaz", "admin_contenus", "admin_general"];
@@ -39,6 +42,13 @@ export const LIENS_PRINCIPAUX: LienNav[] = [
 export const LIENS_ESPACE: LienNav[] = [
   { to: "/cotisations", icone: Wallet, labelKey: "nav.cotisations", connecte: true },
   { to: "/carte", icone: CreditCard, labelKey: "nav.carte", connecte: true },
+  {
+    to: "/espace-bus",
+    icone: Bus,
+    labelKey: "nav.espaceBus",
+    connecte: true,
+    visible: (m) => !!m.est_responsable_bus || aAcces(m, ["admin_contenus"]),
+  },
   { to: "/profil", icone: User, labelKey: "nav.profil", connecte: true },
 ];
 
@@ -63,5 +73,7 @@ export function aAcces(membre: Membre | null, roles?: Role[]) {
 }
 
 export function liensVisibles(liens: LienNav[], membre: Membre | null) {
-  return liens.filter((l) => (!l.connecte || !!membre) && aAcces(membre, l.roles));
+  return liens.filter(
+    (l) => (!l.connecte || !!membre) && aAcces(membre, l.roles) && (!l.visible || (!!membre && l.visible(membre))),
+  );
 }
