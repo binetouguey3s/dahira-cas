@@ -134,7 +134,8 @@
     "poserQuestionAide": "Se enviará al Oustaz, que te responderá en tu espacio de Preguntas y respuestas.",
     "connectezVousPourQuestion": "Inicia sesión para hacer una pregunta",
     "placeholderQuestion": "Escribe tu pregunta aquí…",
-    "questionEnvoyee": "Tu pregunta se ha enviado. Encontrarás la respuesta en"
+    "questionEnvoyee": "Tu pregunta se ha enviado. Encontrarás la respuesta en",
+    "toutesCategories": "Todas las ocasiones"
   },
   "evenements": {
     "surTitre": "Agenda",
@@ -430,7 +431,10 @@
     "description": "Descripción",
     "traductionAuto": "Escribe en tu idioma: el texto se traducirá automáticamente para cada visitante.",
     "supprimerTitre": "¿Eliminar esta enseñanza?",
-    "supprimerMessage": "«{{titre}}» se eliminará definitivamente."
+    "supprimerMessage": "«{{titre}}» se eliminará definitivamente.",
+    "categorie": "Categoría (ocasión)",
+    "categoriePrecision": "Especifica",
+    "categoriePrecisionExemple": "P. ej. Kazu Rajab, Tamkharit…"
   },
   "adminEv": {
     "sousTitre": "Crea eventos y sigue las reservas de autobús.",

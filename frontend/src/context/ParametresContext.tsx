@@ -48,8 +48,9 @@ export function ParametresProvider({ children }: { children: ReactNode }) {
 
   const recharger = useCallback(async () => {
     try {
-      const { data } = await api.get<Parametres>("/site/parametres/");
-      setParametres(data);
+      const { data } = await api.get<Partial<Parametres>>("/site/parametres/");
+      // Valeurs par défaut pour tout champ absent (serveur pas encore à jour, par exemple).
+      setParametres({ ...PAR_DEFAUT, ...data });
     } catch {
       /* hors ligne : on garde les valeurs par défaut */
     }

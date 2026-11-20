@@ -19,6 +19,8 @@ class ContenuMediaSerializer(serializers.ModelSerializer):
             "fichier",
             "url_externe",
             "auteur",
+            "categorie",
+            "categorie_autre",
             "evenement",
             "evenement_titre",
             "nb_likes",
@@ -48,4 +50,13 @@ class ContenuMediaSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Ajoutez un fichier ou un lien (YouTube, SoundCloud…).")
         if type_ == "texte" and not description:
             raise serializers.ValidationError({"description": "Le texte de l'enseignement est obligatoire."})
+        # Catégorie : reprise de l'événement lié si elle n'est pas choisie ; précision seulement pour « Autre ».
+        evenement = attrs.get("evenement", getattr(self.instance, "evenement", None))
+        categorie = attrs.get("categorie", getattr(self.instance, "categorie", ""))
+        if not categorie and evenement and "categorie" not in attrs:
+            attrs["categorie"] = categorie = evenement.categorie
+        if categorie != "autre":
+            attrs["categorie_autre"] = ""
+        else:
+            attrs["categorie_autre"] = attrs.get("categorie_autre", getattr(self.instance, "categorie_autre", "")).strip()
         return attrs

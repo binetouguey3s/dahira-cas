@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Badge, CardInteractive } from "@/components/ui/Card";
 import { Traduit } from "@/context/TraductionContext";
 import type { ContenuMedia, Evenement, TypeContenu } from "@/lib/api";
+import { libelleCategorie } from "@/lib/categories";
 import { formatDate, locale } from "@/lib/utils";
 
 export const ICONES_CONTENU: Record<TypeContenu, typeof Headphones> = {
@@ -76,6 +77,11 @@ export function CarteContenu({ contenu }: { contenu: ContenuMedia }) {
           <p className="truncate text-sm text-text-secondary">
             {contenu.auteur} · {formatDate(contenu.date_publication, { day: "numeric", month: "short" })}
           </p>
+          {contenu.categorie && (
+            <p className="mt-1 truncate text-xs font-semibold text-[#8a6d2a] [[data-theme=dark]_&]:text-[#D9C89A]">
+              {libelleCategorie(t, contenu.categorie, contenu.categorie_autre)}
+            </p>
+          )}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
           <Badge tone="neutral">{t(`mediatheque.types.${contenu.type}`)}</Badge>

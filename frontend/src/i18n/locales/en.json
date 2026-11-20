@@ -134,7 +134,8 @@
     "poserQuestionAide": "It will be sent to the Oustaz, who will answer in your Questions & Answers space.",
     "connectezVousPourQuestion": "Sign in to ask a question",
     "placeholderQuestion": "Write your question here…",
-    "questionEnvoyee": "Your question has been sent. Find the answer in"
+    "questionEnvoyee": "Your question has been sent. Find the answer in",
+    "toutesCategories": "All occasions"
   },
   "evenements": {
     "surTitre": "Calendar",
@@ -430,7 +431,10 @@
     "description": "Description",
     "traductionAuto": "Write in your own language: the text will be translated automatically for each visitor.",
     "supprimerTitre": "Delete this teaching?",
-    "supprimerMessage": "“{{titre}}” will be permanently deleted."
+    "supprimerMessage": "“{{titre}}” will be permanently deleted.",
+    "categorie": "Category (occasion)",
+    "categoriePrecision": "Specify",
+    "categoriePrecisionExemple": "E.g. Kazu Rajab, Tamkharit…"
   },
   "adminEv": {
     "sousTitre": "Create events and follow bus bookings.",

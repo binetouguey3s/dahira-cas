@@ -5,10 +5,11 @@ import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/layout/AppShell";
 import { CarteEvenement } from "@/components/metier/Elements";
 import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
+import { CATEGORIES } from "@/lib/categories";
 import { api, type CategorieEvenement, type Evenement, type Paginated } from "@/lib/api";
 import { locale } from "@/lib/utils";
 
-const CATEGORIES: (CategorieEvenement | "toutes")[] = ["toutes", "magal", "gamou", "dahira", "causerie", "nisfou_shabaan", "leylatul_khadr", "autre"];
+const CATEGORIES_FILTRE: (CategorieEvenement | "toutes")[] = ["toutes", ...CATEGORIES];
 
 export default function Evenements() {
   const { t } = useTranslation();
@@ -49,7 +50,7 @@ export default function Evenements() {
       />
 
       <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4">
-        {CATEGORIES.map((c) => (
+        {CATEGORIES_FILTRE.map((c) => (
           <button
             key={c}
             onClick={() => setCategorie(c)}

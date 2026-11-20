@@ -1,12 +1,15 @@
 import { Play, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { CarteContenu } from "@/components/metier/Elements";
 import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
 import { Input } from "@/components/ui/Input";
-import { api, type ContenuMedia, type Paginated } from "@/lib/api";
+import { api, type CategorieEvenement, type ContenuMedia, type Paginated } from "@/lib/api";
+import { CATEGORIES } from "@/lib/categories";
+import { cn } from "@/lib/utils";
 
 type Filtre = "tous" | "audio" | "video" | "texte";
 
@@ -17,15 +20,20 @@ export default function Mediatheque() {
   const [recherche, setRecherche] = useState("");
   const [tri, setTri] = useState("-date_publication");
   const [suivante, setSuivante] = useState<string | null>(null);
+  const [params, setParams] = useSearchParams();
+  const categorie = (params.get("categorie") ?? "") as CategorieEvenement | "";
+  const choisirCategorie = (c: CategorieEvenement | "") =>
+    setParams(c ? { categorie: c } : {}, { replace: true });
 
   useEffect(() => {
-    const params = new URLSearchParams({ ordering: tri });
-    if (filtre !== "tous") params.set("type", filtre);
-    if (recherche.trim()) params.set("search", recherche.trim());
+    const requete = new URLSearchParams({ ordering: tri });
+    if (filtre !== "tous") requete.set("type", filtre);
+    if (categorie) requete.set("categorie", categorie);
+    if (recherche.trim()) requete.set("search", recherche.trim());
     setContenus(null);
     const minuterie = window.setTimeout(() => {
       api
-        .get<Paginated<ContenuMedia>>(`/mediatheque/contenus/?${params}`)
+        .get<Paginated<ContenuMedia>>(`/mediatheque/contenus/?${requete}`)
         .then((res) => {
           setContenus(res.data.results);
           setSuivante(res.data.next);
@@ -33,7 +41,7 @@ export default function Mediatheque() {
         .catch(() => setContenus([]));
     }, recherche ? 300 : 0);
     return () => window.clearTimeout(minuterie);
-  }, [filtre, recherche, tri]);
+  }, [filtre, recherche, tri, categorie]);
 
   const chargerPlus = async () => {
     if (!suivante) return;
@@ -80,6 +88,26 @@ export default function Mediatheque() {
           { id: "texte", label: t("mediatheque.types.texte") },
         ]}
       />
+
+      {/* Catégories (Magal, Gamou, Nisfou Shabaan…) : bande qui défile sur mobile */}
+      <div className="-mx-4 mb-6 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:px-0">
+        {(["", ...CATEGORIES] as (CategorieEvenement | "")[]).map((c) => (
+          <button
+            key={c || "toutes"}
+            type="button"
+            onClick={() => choisirCategorie(c)}
+            aria-pressed={categorie === c}
+            className={cn(
+              "shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+              categorie === c
+                ? "border-accent-primary bg-accent-primary text-white"
+                : "border-border-subtle bg-bg-elevated text-text-primary hover:border-accent-primary/40",
+            )}
+          >
+            {c ? t(`evenements.categories.${c}`) : t("mediatheque.toutesCategories")}
+          </button>
+        ))}
+      </div>
 
       {contenus === null ? (
         <SqueletteListe lignes={4} />

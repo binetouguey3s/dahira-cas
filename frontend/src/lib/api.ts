@@ -193,6 +193,8 @@ export interface ContenuMedia {
   fichier: string | null;
   url_externe: string;
   auteur: string;
+  categorie: CategorieEvenement | "";
+  categorie_autre: string;
   evenement: number | null;
   evenement_titre: string | null;
   nb_likes: number;

@@ -134,7 +134,8 @@
     "poserQuestionAide": "Elle sera transmise à l'Oustaz, qui vous répondra dans votre espace Questions & Réponses.",
     "connectezVousPourQuestion": "Se connecter pour poser une question",
     "placeholderQuestion": "Écrivez votre question ici…",
-    "questionEnvoyee": "Votre question a bien été envoyée. Retrouvez la réponse dans"
+    "questionEnvoyee": "Votre question a bien été envoyée. Retrouvez la réponse dans",
+    "toutesCategories": "Toutes les occasions"
   },
   "evenements": {
     "surTitre": "Agenda",
@@ -430,7 +431,10 @@
     "description": "Description",
     "traductionAuto": "Écrivez dans votre langue : le texte sera traduit automatiquement pour chaque visiteur.",
     "supprimerTitre": "Supprimer cet enseignement ?",
-    "supprimerMessage": "« {{titre}} » sera définitivement supprimé."
+    "supprimerMessage": "« {{titre}} » sera définitivement supprimé.",
+    "categorie": "Catégorie (occasion)",
+    "categoriePrecision": "Précisez",
+    "categoriePrecisionExemple": "Ex. Kazu Rajab, Tamkharit…"
   },
   "adminEv": {
     "sousTitre": "Créez les événements et suivez les réservations de bus.",

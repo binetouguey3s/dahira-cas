@@ -1,5 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useDragControls } from "motion/react";
 import { Calendar, Grid2x2, HelpCircle, Home, LogIn, LogOut, Play, UserPlus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -55,6 +55,7 @@ export function BottomNav() {
   const { t } = useTranslation();
   const { membre, deconnecter } = useAuth();
   const [ouvert, setOuvert] = useState(false);
+  const glisser = useDragControls();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -130,13 +131,24 @@ export function BottomNav() {
                   animate={{ y: 0 }}
                   exit={{ y: "100%" }}
                   transition={{ type: "spring", stiffness: 380, damping: 36 }}
+                  // Glisser vers le bas pour fermer : seulement depuis la poignée du haut.
+                  // (Sur toute la fenêtre, le geste empêchait de faire défiler la liste jusqu'en bas.)
                   drag="y"
+                  dragListener={false}
+                  dragControls={glisser}
                   dragConstraints={{ top: 0, bottom: 0 }}
                   dragElastic={{ top: 0, bottom: 0.4 }}
                   onDragEnd={(_, info) => info.offset.y > 100 && fermer()}
-                  className="fixed inset-x-0 bottom-0 z-50 max-h-[88dvh] overflow-y-auto rounded-t-[28px] bg-bg-elevated px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3 shadow-2xl md:hidden"
+                  className="fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-[28px] bg-bg-elevated shadow-2xl md:hidden"
                 >
-                  <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-border-default/40" />
+                  <div
+                    onPointerDown={(e) => glisser.start(e)}
+                    className="flex shrink-0 cursor-grab touch-none justify-center pb-3 pt-3 active:cursor-grabbing"
+                    aria-hidden
+                  >
+                    <div className="h-1.5 w-10 rounded-full bg-border-default/40" />
+                  </div>
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
                   <div className="mb-5 flex items-center justify-between gap-3">
                     <Dialog.Title className="text-lg font-bold text-text-primary">{t("nav.menu")}</Dialog.Title>
                     <Dialog.Description className="sr-only">{t("nav.menu")}</Dialog.Description>
@@ -200,6 +212,7 @@ export function BottomNav() {
                       <LogOut className="h-4 w-4" /> {t("profil.deconnexion")}
                     </button>
                   )}
+                  </div>
                 </motion.div>
               </Dialog.Content>
             </Dialog.Portal>

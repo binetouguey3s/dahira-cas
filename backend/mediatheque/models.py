@@ -17,6 +17,9 @@ class ContenuMedia(models.Model):
     fichier = models.FileField(upload_to="mediatheque/", storage=stockage_audio_video, blank=True, null=True)
     url_externe = models.URLField(blank=True, help_text="Lien YouTube ou autre, si pas d'upload direct")
     auteur = models.CharField(max_length=150, help_text="Ex. Cheikh Abdoulahi Seye, Oustaz Modou Diagne")
+    # Même liste que les événements (Magal, Gamou, Nisfou Shabaan…) ; « autre » + précision libre.
+    categorie = models.CharField(max_length=20, choices=Evenement.Categorie.choices, blank=True)
+    categorie_autre = models.CharField(max_length=80, blank=True)
     evenement = models.ForeignKey(
         Evenement, on_delete=models.SET_NULL, null=True, blank=True, related_name="contenus"
     )

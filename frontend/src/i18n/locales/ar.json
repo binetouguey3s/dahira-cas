@@ -134,7 +134,8 @@
     "poserQuestionAide": "سيُرسل إلى الأستاذ الذي سيجيبك في مساحة الأسئلة والأجوبة.",
     "connectezVousPourQuestion": "سجّل الدخول لطرح سؤال",
     "placeholderQuestion": "اكتب سؤالك هنا…",
-    "questionEnvoyee": "تم إرسال سؤالك. ستجد الإجابة في"
+    "questionEnvoyee": "تم إرسال سؤالك. ستجد الإجابة في",
+    "toutesCategories": "كل المناسبات"
   },
   "evenements": {
     "surTitre": "المواعيد",
@@ -454,7 +455,10 @@
     "description": "الوصف",
     "traductionAuto": "اكتب بلغتك: سيُترجم النص تلقائيًا لكل زائر.",
     "supprimerTitre": "حذف هذا الدرس؟",
-    "supprimerMessage": "سيُحذف «{{titre}}» نهائيًا."
+    "supprimerMessage": "سيُحذف «{{titre}}» نهائيًا.",
+    "categorie": "الفئة (المناسبة)",
+    "categoriePrecision": "حدّد",
+    "categoriePrecisionExemple": "مثال: كازو رجب، تامخاريت…"
   },
   "adminEv": {
     "sousTitre": "أنشئ الفعاليات وتابع حجوزات الحافلات.",

@@ -13,7 +13,8 @@ import { Champ, Input, Select, Textarea } from "@/components/ui/Input";
 import { Confirmation, Modal } from "@/components/ui/Modal";
 import { useParametres } from "@/context/ParametresContext";
 import { useToast } from "@/context/ToastContext";
-import { api, messageErreur, toutesLesPages, type ContenuMedia, type Evenement, type TypeContenu } from "@/lib/api";
+import { CATEGORIES } from "@/lib/categories";
+import { api, messageErreur, toutesLesPages, type CategorieEvenement, type ContenuMedia, type Evenement, type TypeContenu } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 
 interface Formulaire {
@@ -23,6 +24,8 @@ interface Formulaire {
   description: string;
   url_externe: string;
   evenement: string;
+  categorie: CategorieEvenement | "";
+  categorie_autre: string;
   source: "fichier" | "lien";
 }
 
@@ -37,7 +40,7 @@ export default function AdminMediatheque() {
   const [filtre, setFiltre] = useState<"tous" | TypeContenu>("tous");
   const [recherche, setRecherche] = useState("");
   const [edition, setEdition] = useState<ContenuMedia | "nouveau" | null>(null);
-  const [form, setForm] = useState<Formulaire>({ titre: "", type: "audio", auteur: "", description: "", url_externe: "", evenement: "", source: "fichier" });
+  const [form, setForm] = useState<Formulaire>({ titre: "", type: "audio", auteur: "", description: "", url_externe: "", evenement: "", categorie: "", categorie_autre: "", source: "fichier" });
   const [fichier, setFichier] = useState<File | null>(null);
   const [progression, setProgression] = useState<number | null>(null);
   const [aSupprimer, setASupprimer] = useState<ContenuMedia | null>(null);
@@ -58,7 +61,7 @@ export default function AdminMediatheque() {
     setFichier(null);
     setProgression(null);
     if (edition === "nouveau")
-      setForm({ titre: "", type: "audio", auteur: parametres.nom_guide, description: "", url_externe: "", evenement: "", source: "fichier" });
+      setForm({ titre: "", type: "audio", auteur: parametres.nom_guide, description: "", url_externe: "", evenement: "", categorie: "", categorie_autre: "", source: "fichier" });
     else if (edition)
       setForm({
         titre: edition.titre,
@@ -67,6 +70,8 @@ export default function AdminMediatheque() {
         description: edition.description,
         url_externe: edition.url_externe,
         evenement: edition.evenement ? String(edition.evenement) : "",
+        categorie: edition.categorie ?? "",
+        categorie_autre: edition.categorie_autre ?? "",
         source: edition.url_externe && !edition.fichier ? "lien" : "fichier",
       });
   }, [edition, parametres.nom_guide]);
@@ -82,6 +87,8 @@ export default function AdminMediatheque() {
     donnees.append("auteur", form.auteur.trim());
     donnees.append("description", form.description.trim());
     donnees.append("evenement", form.evenement);
+    donnees.append("categorie", form.categorie);
+    donnees.append("categorie_autre", form.categorie === "autre" ? form.categorie_autre.trim() : "");
     donnees.append("url_externe", form.type !== "texte" && form.source === "lien" ? form.url_externe.trim() : "");
     if (form.type !== "texte" && form.source === "fichier" && fichier) donnees.append("fichier", fichier);
     try {
@@ -252,7 +259,15 @@ export default function AdminMediatheque() {
             <Champ label={t("adminMedia.auteur")}>{(id) => <Input id={id} value={form.auteur} onChange={maj("auteur")} />}</Champ>
             <Champ label={t("adminMedia.evenementLie")} optionnel={t("commun.optionnel")}>
               {(id) => (
-                <Select id={id} value={form.evenement} onChange={maj("evenement")}>
+                <Select
+                  id={id}
+                  value={form.evenement}
+                  onChange={(e) => {
+                    const choisi = evenements.find((ev) => String(ev.id) === e.target.value);
+                    // Un média lié à un événement reprend sa catégorie (modifiable ensuite).
+                    setForm((f) => ({ ...f, evenement: e.target.value, categorie: choisi && !f.categorie ? choisi.categorie : f.categorie }));
+                  }}
+                >
                   <option value="">—</option>
                   {evenements.map((ev) => (
                     <option key={ev.id} value={ev.id}>
@@ -262,6 +277,28 @@ export default function AdminMediatheque() {
                 </Select>
               )}
             </Champ>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Champ label={t("adminMedia.categorie")} optionnel={t("commun.optionnel")}>
+              {(id) => (
+                <Select id={id} value={form.categorie} onChange={maj("categorie")}>
+                  <option value="">—</option>
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {t(`evenements.categories.${c}`)}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </Champ>
+            {form.categorie === "autre" && (
+              <Champ label={t("adminMedia.categoriePrecision")}>
+                {(id) => (
+                  <Input id={id} value={form.categorie_autre} onChange={maj("categorie_autre")} maxLength={80} placeholder={t("adminMedia.categoriePrecisionExemple")} autoFocus />
+                )}
+              </Champ>
+            )}
           </div>
 
           {form.type !== "texte" && (

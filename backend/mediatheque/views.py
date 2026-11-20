@@ -19,8 +19,8 @@ class ContenuMediaViewSet(viewsets.ModelViewSet):
     serializer_class = ContenuMediaSerializer
     permission_classes = [role_ou_lecture_seule(*ROLES_CONTENUS)]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
-    filterset_fields = ["type", "evenement", "auteur"]
-    search_fields = ["titre", "description", "auteur"]
+    filterset_fields = ["type", "evenement", "auteur", "categorie"]
+    search_fields = ["titre", "description", "auteur", "categorie_autre"]
     ordering_fields = ["date_publication", "nb_likes", "nb_telechargements", "titre"]
 
     def perform_destroy(self, instance):

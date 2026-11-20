@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, Calendar, CheckCircle2, Download, Heart, Share2, User } from "lucide-react";
+import { ArrowLeft, Calendar, CheckCircle2, Download, Heart, Share2, Tag, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -14,6 +14,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import { Traduit } from "@/context/TraductionContext";
 import { api, messageErreur, type ContenuMedia } from "@/lib/api";
+import { libelleCategorie } from "@/lib/categories";
 import { formatDate, lienIntegrable } from "@/lib/utils";
 
 export default function MediaDetail() {
@@ -121,6 +122,13 @@ export default function MediaDetail() {
         <Badge tone="success">
           <Icone className="h-3.5 w-3.5" /> {t(`mediatheque.types.${contenu.type}`)}
         </Badge>
+        {contenu.categorie && (
+          <Link to={`/mediatheque?categorie=${contenu.categorie}`}>
+            <Badge tone="or">
+              <Tag className="h-3.5 w-3.5" /> {libelleCategorie(t, contenu.categorie, contenu.categorie_autre)}
+            </Badge>
+          </Link>
+        )}
         {contenu.evenement_titre && (
           <Link to={`/evenements/${contenu.evenement}`}>
             <Badge tone="or">
