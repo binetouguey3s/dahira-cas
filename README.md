@@ -14,7 +14,7 @@ carte de membre avec QR code et espace d'administration par rôles.
 
 | Document | Pour qui | Contenu |
 |---|---|---|
-| [Guide utilisateur](docs/GUIDE_UTILISATEUR.md) | Membres | S'inscrire, se connecter, carte de membre, cotisations, bus, questions |
+| [Guide utilisateur](docs/GUIDE_UTILISATEUR.md) | Membres | Version imprimable : [PDF](docs/Guide-utilisateur-Dahira.pdf). S'inscrire, se connecter, carte de membre, cotisations, bus, questions |
 | [Guide d'administration](docs/GUIDE_ADMINISTRATION.md) | Responsables du Dahira | Rôles, membres, finance, médiathèque, événements, bus, archives, paramètres |
 | [Documentation technique](docs/DOCUMENTATION_TECHNIQUE.md) | Développeurs | Architecture, modèles, API, sécurité, traduction, tâches automatiques, tests |
 | [Guide de démarrage et de déploiement](GUIDE_DEMARRAGE.md) | Développeurs | Installation locale, variables d'environnement, hébergement, maintenance |
