@@ -78,7 +78,7 @@ export const RectoCarte = forwardRef<HTMLDivElement, { membre: Membre }>(({ memb
         {/* Corps */}
         <div className="absolute inset-x-[5cqw] bottom-[6cqw] top-[18.5cqw] flex gap-[4cqw]">
           <div className="relative h-full shrink-0">
-            <div className="h-full aspect-[3/3.7] overflow-hidden rounded-[2.4cqw] bg-[#0B3D2E] ring-[0.5cqw] ring-[#D9C89A]">
+            <div className="h-full aspect-[3/3.7] overflow-hidden rounded-[2.4cqw] border-[0.5cqw] border-[#D9C89A] bg-[#0B3D2E]">
               {membre.photo && !photoEchec ? (
                 <img src={membre.photo} alt="" crossOrigin="anonymous" onError={() => setPhotoEchec(true)} className="h-full w-full object-cover" />
               ) : (
@@ -136,7 +136,7 @@ export const VersoCarte = forwardRef<HTMLDivElement, { membre: Membre }>(({ memb
 
         <div className="absolute inset-x-[5cqw] bottom-[4.5cqw] top-[16cqw] flex gap-[4.5cqw]">
           <div className="flex shrink-0 flex-col items-center gap-[1cqw]">
-            <div className="rounded-[2cqw] bg-white p-[1cqw] shadow-sm ring-1 ring-[#0B3D2E]/10">
+            <div className="rounded-[2cqw] border border-[#0B3D2E]/10 bg-white p-[1cqw]">
               {qr && <img src={qr} alt="QR" className="h-[23cqw] w-[23cqw]" />}
             </div>
             <p className="text-[1.9cqw] font-semibold uppercase tracking-[0.1em] text-[#0B3D2E]/70">{t("carte.scannerVerifier")}</p>

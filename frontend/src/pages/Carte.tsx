@@ -1,4 +1,25 @@
 import { toPng } from "html-to-image";
+
+/**
+ * Transforme une face de la carte en image PNG.
+ * Sur iPhone (Safari) et certains Android, les images (QR code, photo) ne sont pas encore « peintes »
+ * au premier passage : elles sortaient en carré blanc. On attend qu'elles soient prêtes, puis on fait
+ * plusieurs passages et on garde le dernier, qui est complet.
+ */
+async function capturer(noeud: HTMLElement) {
+  await Promise.all(
+    Array.from(noeud.querySelectorAll("img")).map((img) =>
+      img.complete && img.naturalWidth ? img.decode?.().catch(() => undefined) : new Promise((r) => {
+        img.addEventListener("load", r, { once: true });
+        img.addEventListener("error", r, { once: true });
+      }),
+    ),
+  );
+  const options = { pixelRatio: 3, cacheBust: true, skipFonts: false };
+  let url = "";
+  for (let passage = 0; passage < 3; passage++) url = await toPng(noeud, options);
+  return url;
+}
 import { AnimatePresence, motion } from "motion/react";
 import { CheckCircle2, Circle, Download, Printer, RotateCw, ShieldCheck } from "lucide-react";
 import { useRef, useState } from "react";
@@ -102,16 +123,35 @@ export default function Carte() {
   const telecharger = async () => {
     setExport(true);
     try {
+      const fichiers: File[] = [];
       for (const [noeud, cote] of [
         [rectoExport.current, "recto"],
         [versoExport.current, "verso"],
       ] as const) {
         if (!noeud) continue;
-        const url = await toPng(noeud, { pixelRatio: 3, cacheBust: true, skipFonts: false });
+        const url = await capturer(noeud);
+        const blob = await (await fetch(url)).blob();
+        fichiers.push(new File([blob], `carte-${membre.carte_numero}-${cote}.png`, { type: "image/png" }));
+      }
+      // Téléphone : le menu de partage permet « Enregistrer l'image » dans Photos / Galerie (les deux faces d'un coup).
+      // Ordinateur (ou si le partage n'est pas possible) : téléchargement classique des deux fichiers.
+      const mobile = window.matchMedia("(pointer: coarse)").matches;
+      if (mobile && navigator.canShare?.({ files: fichiers })) {
+        try {
+          await navigator.share({ files: fichiers, title: t("carte.maCarte") });
+          notifier(t("carte.telechargee"));
+          return;
+        } catch (err) {
+          if ((err as Error).name === "AbortError") return; // partage fermé par le membre
+        }
+      }
+      for (const fichier of fichiers) {
         const a = document.createElement("a");
-        a.href = url;
-        a.download = `carte-${membre.carte_numero}-${cote}.png`;
+        a.href = URL.createObjectURL(fichier);
+        a.download = fichier.name;
         a.click();
+        await new Promise((r) => setTimeout(r, 400)); // iPhone bloque deux téléchargements trop rapprochés
+        URL.revokeObjectURL(a.href);
       }
       notifier(t("carte.telechargee"));
     } catch {
