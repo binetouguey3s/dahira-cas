@@ -1,335 +1,229 @@
-# Guide de démarrage — Plateforme Dahira Cheikh Abdoulahi Seye
+# Guide de démarrage, de déploiement et de maintenance
 
-Ce guide contient **toutes les commandes** nécessaires pour faire tourner le
-projet en local, le mettre sur GitHub, puis le déployer gratuitement
-(Vercel + Render), et brancher les automatisations (n8n, email, WhatsApp).
-Copiez-collez les commandes dans l'ordre, dans un terminal, depuis le dossier
-où vous avez dézippé le projet.
+Ce guide décrit comment faire tourner la plateforme en local, comment elle est hébergée en
+production, et comment l'entretenir. Pour l'architecture et l'API, voir la
+[documentation technique](docs/DOCUMENTATION_TECHNIQUE.md).
 
-Sommaire :
+## Sommaire
 
-1. [Prérequis à installer](#1-prérequis-à-installer)
+1. [Prérequis](#1-prérequis)
 2. [Lancer le projet en local](#2-lancer-le-projet-en-local)
-3. [Créer un compte administrateur](#3-créer-un-compte-administrateur)
-4. [Mettre le projet sur GitHub](#4-mettre-le-projet-sur-github)
-5. [Déployer le backend sur Render](#5-déployer-le-backend-sur-render-gratuit)
-6. [Déployer le frontend sur Vercel](#6-déployer-le-frontend-sur-vercel-gratuit)
-7. [Brancher les automatisations n8n](#7-brancher-les-automatisations-n8n-gratuit)
-8. [Envoi d'emails avec Brevo](#8-envoi-demails-avec-brevo-gratuit)
-9. [Notifications WhatsApp](#9-notifications-whatsapp)
-10. [Stockage des fichiers médias avec Cloudinary](#10-stockage-des-fichiers-médias-avec-cloudinary-optionnel)
-11. [Migration future vers LWS](#11-migration-future-vers-lws)
-12. [Dépannage courant](#12-dépannage-courant)
+3. [Variables d'environnement](#3-variables-denvironnement)
+4. [Comptes administrateurs et rôles](#4-comptes-administrateurs-et-rôles)
+5. [Hébergement en production](#5-hébergement-en-production)
+6. [Services externes](#6-services-externes)
+7. [Déployer une modification](#7-déployer-une-modification)
+8. [Maintenance courante](#8-maintenance-courante)
+9. [Nom de domaine (à venir)](#9-nom-de-domaine-à-venir)
+10. [Dépannage](#10-dépannage)
 
 ---
 
-## 1. Prérequis à installer
+## 1. Prérequis
 
-Sur votre ordinateur (une seule fois) :
-
-- **Python 3.11+** → [python.org/downloads](https://www.python.org/downloads/)
-- **Node.js 20+** (inclut npm) → [nodejs.org](https://nodejs.org/)
-- **Git** → [git-scm.com/downloads](https://git-scm.com/downloads)
-- **VSCode** → [code.visualstudio.com](https://code.visualstudio.com/)
-- Un compte **GitHub** (gratuit) → [github.com](https://github.com)
-- Un compte **Vercel** (gratuit, connectez-vous avec GitHub) → [vercel.com](https://vercel.com)
-- Un compte **Render** (gratuit, connectez-vous avec GitHub) → [render.com](https://render.com)
-
-Vérifiez les installations :
+- **Python 3.12+** et **Node.js 20+** (avec npm)
+- **Git**, un éditeur (VS Code)
+- Accès aux comptes du projet : GitHub, Vercel, Render, Neon, Cloudinary, Brevo, DeepL, UptimeRobot
 
 ```bash
-python --version
-node --version
-npm --version
-git --version
+python --version && node --version && git --version
 ```
-
----
 
 ## 2. Lancer le projet en local
 
-### 2.1 Backend (Django)
+### Backend (Django)
 
 ```bash
 cd backend
-
-# Créer et activer un environnement virtuel Python
 python -m venv venv
-
-# Sur Windows :
-venv\Scripts\activate
-# Sur Mac / Linux :
-source venv/bin/activate
-
-# Installer les dépendances
+source venv/bin/activate            # Windows : venv\Scripts\activate
 pip install -r requirements.txt
-
-# Créer le fichier d'environnement local
-cp .env.example .env
-# (Sur Windows sans "cp" : copy .env.example .env)
-
-# Appliquer les migrations de base de données
+cp .env.example .env                # Windows : copy .env.example .env
 python manage.py migrate
-
-# Créer un super-administrateur Django (accès à /admin/)
 python manage.py createsuperuser
-
-# Lancer le serveur
 python manage.py runserver
 ```
 
-Le backend tourne maintenant sur **http://127.0.0.1:8000**.
-Admin Django : http://127.0.0.1:8000/admin/
+- API : http://127.0.0.1:8000/api/
+- Admin Django : http://127.0.0.1:8000/admin/
 
-### 2.2 Frontend (React)
+En local, sans autre réglage : base SQLite, fichiers dans `backend/media/`, e-mails affichés dans
+le terminal, pas de traduction automatique.
 
-Dans un **second terminal**, en gardant le backend lancé :
+### Frontend (React)
+
+Dans un second terminal :
 
 ```bash
 cd frontend
-
 npm install
-
-cp .env.example .env
-# (Sur Windows : copy .env.example .env)
-
-npm run dev
+cp .env.example .env                # VITE_API_URL=http://127.0.0.1:8000/api
+npm run dev                         # http://localhost:5173
 ```
 
-L'application tourne maintenant sur **http://localhost:5173**.
-
----
-
-## 3. Créer un compte administrateur
-
-Deux façons de donner un rôle (Finance, Oustaz, Admin Contenus, Admin Général)
-à un membre :
-
-**Option A — via l'admin Django (recommandé) :**
-
-1. Allez sur http://127.0.0.1:8000/admin/ et connectez-vous avec le
-   super-administrateur créé à l'étape 2.1.
-2. Cliquez sur **Membres**, choisissez le membre (il doit déjà s'être
-   inscrit depuis l'application), puis changez son champ **Role**.
-
-**Option B — en ligne de commande :**
+### Vérifications avant d'envoyer du code
 
 ```bash
-cd backend
-python manage.py shell
+cd backend && python manage.py test && python manage.py makemigrations --check --dry-run
+cd frontend && npx tsc -b && npm run build
 ```
 
-Puis dans le shell Python qui s'ouvre :
+## 3. Variables d'environnement
 
-```python
-from comptes.models import Membre
-m = Membre.objects.get(telephone="+221771234567")
-m.role = "admin_general"   # ou "responsable_finance", "oustaz", "admin_contenus"
-m.save()
-exit()
+### Backend (`backend/.env` en local, onglet **Environment** du service Render en production)
+
+| Variable | Obligatoire en production | Rôle |
+|---|---|---|
+| `SECRET_KEY` | Oui | Clé secrète Django, longue et aléatoire |
+| `DEBUG` | Oui (`False`) | Mode débogage (laisser `True` en local) |
+| `ALLOWED_HOSTS` | Oui | Ex. `dahira-cas.onrender.com` |
+| `DATABASE_URL` | Oui | URL PostgreSQL Neon (connexion **directe**, sans « -pooler ») ; vide en local = SQLite |
+| `CORS_ALLOWED_ORIGINS` | Oui | URL du site, ex. `https://dahira-cas.vercel.app` (sans `/` final) |
+| `FRONTEND_URL` | Non | URL utilisée dans les e-mails ; par défaut la première origine https de `CORS_ALLOWED_ORIGINS` |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Oui | Stockage des photos, audios et vidéos |
+| `BREVO_API_KEY` | Oui | Envoi des e-mails (clé API, pas une clé SMTP « xsmtpsib- ») |
+| `DEFAULT_FROM_EMAIL` | Oui | Adresse expéditrice, validée dans Brevo |
+| `EMAIL_NOM_EXPEDITEUR` | Non | Nom affiché de l'expéditeur |
+| `DEEPL_API_KEY` | Non | Traduction automatique (sans clé : textes affichés dans leur langue d'origine) |
+| `TACHES_CLE` | Oui | Clé partagée avec le robot GitHub (même valeur que le secret GitHub) |
+
+Ne mettez jamais ces valeurs dans le dépôt : `backend/.env` est ignoré par git.
+
+### Frontend (`frontend/.env` en local, **Settings → Environment Variables** sur Vercel)
+
+| Variable | Rôle |
+|---|---|
+| `VITE_API_URL` | Adresse de l'API, se terminant par `/api` (ex. `https://dahira-cas.onrender.com/api`) |
+
+### GitHub (**Settings → Secrets and variables → Actions**)
+
+| Secret | Rôle |
+|---|---|
+| `TACHES_CLE` | Même valeur que la variable Render, utilisée par le robot quotidien |
+
+## 4. Comptes administrateurs et rôles
+
+- **Super-administrateur Django** : `python manage.py createsuperuser` (en production : onglet
+  **Shell** du service Render). Il accède à `/admin/` et a tous les droits dans l'application.
+- **Rôles des membres** : la personne s'inscrit dans l'application, puis l'administrateur général
+  lui donne son rôle dans **Administration → Membres** (voir le
+  [guide d'administration](docs/GUIDE_ADMINISTRATION.md)).
+- En ligne de commande, si besoin :
+
+  ```bash
+  python manage.py shell
+  ```
+  ```python
+  from comptes.models import Membre
+  m = Membre.objects.get(telephone="+221770000000")
+  m.role = "admin_general"   # responsable_finance, oustaz, admin_contenus, membre
+  m.save()
+  ```
+
+## 5. Hébergement en production
+
+| Élément | Service | Réglages |
+|---|---|---|
+| Site (frontend) | **Vercel** | Root Directory `frontend`, framework Vite, variable `VITE_API_URL` ; en-têtes de sécurité dans `frontend/vercel.json` |
+| API (backend) | **Render** (Web Service gratuit) | Root Directory `backend` ; voir commandes ci-dessous |
+| Base de données | **Neon** (PostgreSQL 17, région Europe) | Base `dahira`, rôle dédié ; URL directe dans `DATABASE_URL` |
+| Fichiers | **Cloudinary** | Clés dans les variables Render |
+| E-mails | **Brevo** (API HTTP) | Clé restreinte « e-mails transactionnels » ; le SMTP est bloqué sur Render gratuit |
+| Traduction | **DeepL** (offre gratuite) | Clé dans `DEEPL_API_KEY` |
+| Robot quotidien | **GitHub Actions** | `.github/workflows/taches-quotidiennes.yml`, 8 h UTC |
+| Réveil du serveur | **UptimeRobot** | Moniteur HTTP sur `https://dahira-cas.onrender.com/api/sante/`, toutes les 5 min |
+
+Commandes du service Render :
+
+```
+Build Command : pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+Start Command : gunicorn dahira_backend.wsgi
 ```
 
----
+Render est relié au dépôt par l'**application GitHub Render** : sans elle, les `git push` ne
+déclenchent aucun déploiement.
 
-## 4. Mettre le projet sur GitHub
+## 6. Services externes
 
-Dans le dossier racine du projet (celui qui contient `backend/` et `frontend/`) :
+### Cloudinary
+Dashboard → **Clés API** : copier le **Cloud name** (celui affiché en haut du tableau de bord, pas
+le nom de la clé), l'API Key et l'API Secret dans les variables Render.
+
+### Brevo
+1. **Paramètres → Clés API** : créer une clé API restreinte aux **e-mails transactionnels**.
+2. Vérifier l'adresse ou le domaine expéditeur (`DEFAULT_FROM_EMAIL`).
+3. La clé expire au bout d'un an, ou après 90 jours sans envoi : la renouveler à temps.
+4. En cas d'erreur 401 dans les journaux Render (« Key not found »), la clé est fausse ou expirée.
+
+### DeepL
+Compte API gratuit (500 000 caractères par mois). La clé se termine par `:fx`. Les traductions
+sont mémorisées en base : un même texte n'est traduit qu'une fois.
+
+### Robot quotidien (GitHub Actions)
+- Onglet **Actions → Tâches quotidiennes** : historique des passages ; **Run workflow** pour le
+  lancer à la main.
+- Une croix rouge avec « Clé invalide » signifie que `TACHES_CLE` diffère entre GitHub et Render.
+
+### UptimeRobot
+Moniteur de type HTTP(s) toutes les 5 minutes sur `/api/sante/`. Il évite les 30 à 60 secondes
+d'attente du réveil de Render et prévient par e-mail en cas de panne.
+
+## 7. Déployer une modification
 
 ```bash
-git init
-git add .
-git commit -m "Premier commit — Plateforme Dahira Cheikh Abdoulahi Seye"
-```
-
-Créez ensuite un nouveau dépôt **vide** sur GitHub (sans README, sans
-.gitignore — vous en avez déjà) : https://github.com/new
-
-Puis reliez-le et poussez :
-
-```bash
-git branch -M main
-git remote add origin https://github.com/VOTRE-UTILISATEUR/dahira-platform.git
-git push -u origin main
-```
-
----
-
-## 5. Déployer le backend sur Render (gratuit)
-
-1. Sur [render.com](https://render.com), cliquez **New +** → **Web Service**.
-2. Connectez votre dépôt GitHub `dahira-platform`.
-3. Réglages :
-   - **Root Directory** : `backend`
-   - **Runtime** : Python 3
-   - **Build Command** :
-     ```
-     pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
-     ```
-   - **Start Command** :
-     ```
-     gunicorn dahira_backend.wsgi
-     ```
-4. Ajoutez une base de données : **New +** → **PostgreSQL** (plan gratuit),
-   puis copiez son **Internal Database URL**.
-5. Dans les **Environment Variables** du Web Service, ajoutez :
-   - `SECRET_KEY` → générez une valeur aléatoire longue (ex. avec
-     `python -c "import secrets; print(secrets.token_urlsafe(50))"`)
-   - `DEBUG` → `False`
-   - `ALLOWED_HOSTS` → `votre-backend.onrender.com`
-   - `DATABASE_URL` → l'URL PostgreSQL copiée à l'étape 4
-   - `CORS_ALLOWED_ORIGINS` → `https://votre-frontend.vercel.app` (vous la
-     connaîtrez après l'étape 6 — vous pourrez revenir la modifier)
-6. Cliquez **Create Web Service**. Render construit et déploie automatiquement
-   à chaque `git push` sur `main`.
-7. Une fois en ligne, créez le super-administrateur en production via le
-   **Shell** de Render (onglet "Shell" du service) :
-   ```
-   python manage.py createsuperuser
-   ```
-
----
-
-## 6. Déployer le frontend sur Vercel (gratuit)
-
-1. Sur [vercel.com](https://vercel.com), cliquez **Add New…** → **Project**.
-2. Importez le dépôt GitHub `dahira-platform`.
-3. Réglages :
-   - **Root Directory** : `frontend`
-   - Framework détecté automatiquement : **Vite**
-4. **Environment Variables** :
-   - `VITE_API_URL` → `https://votre-backend.onrender.com/api`
-5. Cliquez **Deploy**.
-6. Une fois déployé, copiez l'URL Vercel (ex. `https://dahira.vercel.app`) et
-   retournez sur Render pour mettre à jour `CORS_ALLOWED_ORIGINS` avec cette
-   URL exacte (étape 5.5), puis redéployez le backend.
-
-À partir de maintenant, chaque `git push` met à jour automatiquement les deux
-sites (Vercel et Render sont tous deux branchés sur GitHub).
-
-```bash
-git add .
-git commit -m "Mise à jour"
+git checkout main
+git pull
+# … modifications, tests (section 2) …
+git add -A
+git commit -m "Description de la modification"
 git push
 ```
 
----
+Vercel et Render redéploient automatiquement (2 à 5 minutes). Les migrations de base de données
+s'appliquent pendant le build Render. Les visiteurs dont la page est ouverte sont rechargés
+automatiquement sur la nouvelle version.
 
-## 7. Brancher les automatisations n8n (gratuit)
+## 8. Maintenance courante
 
-n8n sert à automatiser les rappels de cotisation, les notifications de
-nouveaux événements, etc. Le plus simple et gratuit : l'héberger sur Render
-également (ou en local pour commencer).
+| Quand | Quoi |
+|---|---|
+| Après chaque déploiement | Vérifier le statut sur Render et Vercel, ouvrir le site |
+| Chaque mois | Regarder l'onglet Actions (robot vert) et les journaux Render (erreurs) |
+| Avant expiration | Renouveler la clé Brevo (une fois par an) |
+| Régulièrement | Sauvegarder la base (ci-dessous) ; Neon garde aussi un historique de restauration |
 
-**Essai rapide en local :**
+**Sauvegarde manuelle de la base** (depuis `backend/`, avec `DATABASE_URL` pointant vers Neon) :
 
 ```bash
-npx n8n
+python manage.py dumpdata --natural-foreign --natural-primary \
+  --exclude contenttypes --exclude auth.permission --exclude sessions \
+  --indent 2 > sauvegarde-$(date +%F).json
 ```
 
-Ouvre l'interface sur http://localhost:5678. Créez un workflow déclenché par
-un **Webhook**, puis copiez son URL dans la variable `N8N_WEBHOOK_URL` du
-fichier `.env` du backend (et dans les variables d'environnement Render en
-production).
+Conservez ce fichier **hors du dépôt** (il contient des données personnelles).
 
-**Hébergement gratuit permanent (optionnel, plus avancé) :** déployer n8n sur
-Render via son image Docker officielle (`n8nio/n8n`), en suivant le guide
-officiel : https://docs.n8n.io/hosting/
+## 9. Nom de domaine (à venir)
 
-Exemples de workflows à créer dans n8n :
+Avec un domaine (par exemple chez LWS) :
+1. Vercel → **Settings → Domains** : ajouter le domaine, puis créer chez le registraire les
+   enregistrements DNS indiqués.
+2. Optionnel : un sous-domaine `api.` pointé vers Render (**Settings → Custom Domains**).
+3. Mettre à jour `CORS_ALLOWED_ORIGINS`, `FRONTEND_URL` et `ALLOWED_HOSTS` sur Render,
+   `VITE_API_URL` sur Vercel, et la CSP `connect-src` de `frontend/vercel.json` si l'adresse de
+   l'API change.
+4. Mettre à jour le moniteur UptimeRobot et l'URL du robot GitHub si l'API change d'adresse.
 
-- **Rappel de cotisation** : déclencheur programmé (Cron) une fois par mois →
-  requête HTTP vers `GET /api/finances/cotisations/?statut=non_paye` sur le
-  backend → envoi d'un email (Brevo) ou message WhatsApp à chaque membre
-  concerné.
-- **Nouvel événement** : webhook appelé par Django quand un événement est créé
-  → envoi d'une notification à tous les membres.
-
----
-
-## 8. Envoi d'emails avec Brevo (gratuit)
-
-1. Créez un compte gratuit sur [brevo.com](https://www.brevo.com/) (300
-   emails/jour gratuits).
-2. Dans **Paramètres → SMTP & API → SMTP**, récupérez vos identifiants SMTP.
-3. Dans le `.env` du backend (local) et dans les variables Render (production) :
-   ```
-   EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-   EMAIL_HOST=smtp-relay.brevo.com
-   EMAIL_PORT=587
-   EMAIL_USE_TLS=True
-   EMAIL_HOST_USER=votre-identifiant-smtp-brevo
-   EMAIL_HOST_PASSWORD=votre-cle-smtp-brevo
-   ```
-   *(Ajoutez `EMAIL_HOST` et `EMAIL_PORT` à `dahira_backend/settings.py` si
-   vous voulez les piloter par variables d'environnement — actuellement
-   `EMAIL_HOST_USER`/`EMAIL_HOST_PASSWORD` sont déjà prévus dans
-   `.env.example`.)*
-
----
-
-## 9. Notifications WhatsApp
-
-Deux options gratuites pour démarrer :
-
-- **Twilio Sandbox WhatsApp** (gratuit en mode test) :
-  [twilio.com/whatsapp](https://www.twilio.com/whatsapp) — récupérez votre
-  `Account SID`, `Auth Token` et le numéro sandbox, puis utilisez-les dans un
-  nœud HTTP Request de n8n pour envoyer des messages.
-- **Meta Cloud API** (gratuit, officiel WhatsApp Business) :
-  [developers.facebook.com/docs/whatsapp/cloud-api](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started) —
-  demande une vérification d'entreprise mais pas de frais mensuels pour un
-  faible volume.
-
-Dans les deux cas, le plus simple est de déclencher l'envoi **depuis n8n**
-(nœud HTTP ou nœud WhatsApp dédié) plutôt que depuis Django directement,
-pour pouvoir changer de fournisseur sans toucher au code.
-
----
-
-## 10. Stockage des fichiers médias avec Cloudinary (optionnel)
-
-Par défaut, les fichiers audio/vidéo uploadés sont stockés sur le disque du
-serveur Render — ce qui **n'est pas persistant** sur le plan gratuit (les
-fichiers peuvent être perdus au redémarrage). Pour un stockage fiable et
-gratuit (jusqu'à 25 Go) :
-
-1. Créez un compte sur [cloudinary.com](https://cloudinary.com/).
-2. Récupérez `Cloud name`, `API Key`, `API Secret` depuis le tableau de bord.
-3. Dans le `.env` / variables Render :
-   ```
-   CLOUDINARY_CLOUD_NAME=votre-cloud-name
-   CLOUDINARY_API_KEY=votre-api-key
-   CLOUDINARY_API_SECRET=votre-api-secret
-   ```
-4. Décommentez les deux lignes Cloudinary dans `backend/requirements.txt` et
-   relancez `pip install -r requirements.txt`. Le code de `settings.py` active
-   déjà automatiquement le stockage Cloudinary dès que ces variables sont
-   renseignées.
-
----
-
-## 11. Migration future vers LWS
-
-Quand le budget le permettra, pour héberger sur LWS au lieu de
-Vercel/Render :
-
-- **Frontend** : `npm run build` dans `frontend/`, puis uploadez le contenu du
-  dossier `frontend/dist/` par FTP dans le répertoire web de votre
-  hébergement LWS (hébergement mutualisé classique, le frontend est 100%
-  statique).
-- **Backend** : LWS propose des hébergements avec Python/WSGI selon la
-  formule choisie ; sinon, gardez le backend sur Render (gratuit) et
-  n'utilisez LWS que pour le nom de domaine, en le pointant vers Vercel
-  (frontend) et Render (backend) via des enregistrements DNS CNAME.
-
----
-
-## 12. Dépannage courant
+## 10. Dépannage
 
 | Problème | Solution |
 |---|---|
-| `CORS` bloqué dans la console du navigateur | Vérifiez que `CORS_ALLOWED_ORIGINS` sur Render contient exactement l'URL Vercel (avec `https://`, sans `/` final). |
-| Le frontend affiche des erreurs 404 sur l'API | Vérifiez `VITE_API_URL` dans les variables Vercel — elle doit se terminer par `/api`. |
-| `relation does not exist` sur Render | Les migrations n'ont pas tourné — relancez un déploiement ou exécutez `python manage.py migrate` depuis le Shell Render. |
-| Fichiers médias disparus après un redéploiement Render | Normal sur le plan gratuit (disque non persistant) — passez à Cloudinary (section 10). |
-| `ModuleNotFoundError` au démarrage local | Vérifiez que l'environnement virtuel est activé (`source venv/bin/activate`) avant `pip install`. |
+| Erreur CORS dans le navigateur | `CORS_ALLOWED_ORIGINS` doit contenir exactement l'URL du site (avec `https://`, sans `/` final) |
+| Le site affiche des erreurs de connexion à l'API | Vérifier `VITE_API_URL` sur Vercel (doit finir par `/api`) et que Render est en ligne |
+| `git push` ne redéploie pas Render | Vérifier que l'application GitHub Render a bien accès au dépôt |
+| Première ouverture très lente | Render s'était endormi : vérifier le moniteur UptimeRobot |
+| Envoi de photo : « service de stockage indisponible » | Vérifier les variables Cloudinary (le **Cloud name** surtout) |
+| E-mails non reçus | Journaux Render ; clé Brevo valide ; regarder les courriers indésirables |
+| Traductions absentes | `DEEPL_API_KEY` manquante ou quota mensuel atteint |
+| Robot quotidien en rouge | Même valeur de `TACHES_CLE` sur GitHub et Render, puis **Run workflow** |
+| `relation does not exist` | Migrations non appliquées : redéployer ou lancer `python manage.py migrate` dans le Shell Render |
+| Une fonction marche en local mais pas en ligne | Penser à la CSP de `frontend/vercel.json`, absente en local |

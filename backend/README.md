@@ -1,53 +1,28 @@
-# Dahira — Backend (Django + DRF)
+# Backend — API Django
 
-API REST pour la plateforme du Dahira Cheikh Abdoulahi Seye.
-
-## Démarrage local
+API REST de la plateforme du Dahira Cheikh Abdoulahi Seye (Django 6 + Django REST Framework).
 
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate        # Windows : venv\Scripts\activate
+python -m venv venv && source venv/bin/activate   # Windows : venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env            # puis éditer .env si besoin
+cp .env.example .env
 python manage.py migrate
 python manage.py createsuperuser
-python manage.py runserver
+python manage.py runserver                          # http://127.0.0.1:8000/api/
+python manage.py test                               # tests
 ```
 
-L'API est servie sur `http://127.0.0.1:8000/api/...` et l'admin Django sur
-`http://127.0.0.1:8000/admin/`.
+| Application | Contenu |
+|---|---|
+| `dahira_backend` | Réglages, URLs, stockage, e-mails Brevo, archives, pagination, erreurs |
+| `comptes` | Membres, connexion JWT, mot de passe oublié, carte, statistiques, e-mails |
+| `finances` | Cotisations, rappels par e-mail, tâches quotidiennes |
+| `evenements` | Événements, réservations de bus (passagers, paiements, responsables) |
+| `mediatheque` | Enseignements audio / vidéo / texte |
+| `questions_reponses` | Questions des membres et réponses de l'Oustaz |
+| `site_web` | Paramètres du site, traduction automatique (DeepL) |
+| `notifications` | Journal des notifications |
 
-## Apps et endpoints principaux
-
-| App | Endpoints |
-| --- | --- |
-| `comptes` | `POST /api/comptes/inscription/`, `POST /api/comptes/connexion/` (JWT), `POST /api/comptes/connexion/rafraichir/`, `GET/PATCH /api/comptes/moi/` |
-| `finances` | `/api/finances/cotisations/` (CRUD) |
-| `evenements` | `/api/evenements/evenements/`, `/api/evenements/reservations-bus/` |
-| `mediatheque` | `/api/mediatheque/contenus/` (+ actions `aimer/`, `telecharger/`) |
-| `questions_reponses` | `/api/questions-reponses/questions/` (+ action `repondre/`, réservée Oustaz/Admin) |
-| `notifications` | `/api/notifications/notifications/` (journal, lecture admin) |
-
-Authentification : JWT (`djangorestframework-simplejwt`). Envoyer le jeton dans
-l'en-tête `Authorization: Bearer <access_token>`.
-
-## Rôles (`Membre.role`)
-
-`membre`, `responsable_finance`, `oustaz`, `admin_contenus`, `admin_general`.
-Attribuer un rôle autre que `membre` se fait depuis l'admin Django (`/admin/`)
-pour l'instant.
-
-## Déploiement (Render)
-
-1. Pousser ce dossier `backend/` sur GitHub.
-2. Sur [render.com](https://render.com) : New → Web Service → connecter le dépôt.
-3. Build command : `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`
-4. Start command : `gunicorn dahira_backend.wsgi`
-5. Ajouter une base PostgreSQL gratuite (New → PostgreSQL) et copier son
-   `DATABASE_URL` dans les variables d'environnement du Web Service.
-6. Renseigner les autres variables de `.env.example` dans l'onglet
-   "Environment" de Render.
-
-Voir le guide complet (toutes les commandes, Vercel, n8n, etc.) à la racine du
-projet : `GUIDE_DEMARRAGE.md`.
+Documentation complète :
+- endpoints, modèles, permissions et règles métier : [`../docs/DOCUMENTATION_TECHNIQUE.md`](../docs/DOCUMENTATION_TECHNIQUE.md) ;
+- variables d'environnement, déploiement Render / Neon et maintenance : [`../GUIDE_DEMARRAGE.md`](../GUIDE_DEMARRAGE.md).
