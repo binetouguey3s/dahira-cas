@@ -7,6 +7,7 @@ from datetime import date
 
 from django.conf import settings
 from django.db.models import Q
+from django.db import close_old_connections
 from django.utils import timezone
 
 from comptes.emails import envoyer_rappel_cotisation
@@ -97,6 +98,21 @@ def taches_quotidiennes(aujourdhui=None):
         reglages.save(update_fields=["dernier_envoi_auto"])
     else:
         resultat["rappels_envoyes"] = 0
+
+    # Annonces d'événements restées en attente (quota du jour atteint la veille).
+    from evenements.annonces import continuer_annonces
+
+    if settings.EMAIL_EN_ARRIERE_PLAN:  # en production : la réponse au robot part tout de suite
+        def tache():
+            try:
+                continuer_annonces()
+            finally:
+                close_old_connections()
+
+        threading.Thread(target=tache, daemon=True).start()
+        resultat["annonces"] = "en_cours"
+    else:
+        resultat["annonces_envoyees"] = continuer_annonces()
     return resultat
 
 

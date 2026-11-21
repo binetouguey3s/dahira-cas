@@ -158,3 +158,71 @@ class ReservationBusTests(APITestCase):
         self.client.force_authenticate(self.a)
         res = self.client.post(EVS, {"titre": "x", "date": "2030-01-01T10:00:00Z"})
         self.assertEqual(res.status_code, 403)
+
+
+class AnnonceEvenementTests(APITestCase):
+    def setUp(self):
+        from django.core.cache import cache
+
+        cache.clear()
+        self.admin = creer_membre("+221770000061", role="admin_contenus", email="admin@exemple.sn")
+        self.awa = creer_membre("+221770000062", email="awa@exemple.sn")
+        self.modou = creer_membre("+221770000063", email="modou@exemple.sn", langue_preferee="en")
+        creer_membre("+221770000064")  # sans e-mail
+        creer_membre("+221770000065", email="non@exemple.sn", recevoir_annonces=False)
+        self.ev = Evenement.objects.create(
+            titre="Grand Magal de Touba", lieu="Keur Ndiaye Lo", date=timezone.now() + timedelta(days=5),
+            reservation_bus_active=True, nb_bus=1, places_par_bus=10,
+        )
+
+    def test_annonce_envoyee_une_seule_fois(self):
+        from django.core import mail
+
+        url = f"{EVS}{self.ev.id}/annoncer/"
+        self.client.force_authenticate(self.awa)
+        self.assertEqual(self.client.post(url).status_code, 403)
+        self.client.force_authenticate(self.admin)
+        res = self.client.post(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data["destinataires"], 3)  # admin, Awa, Modou (pas sans e-mail, pas refus)
+        self.assertEqual(len(mail.outbox), 3)
+        sujets = {m.to[0]: m.subject for m in mail.outbox}
+        self.assertIn("Grand Magal de Touba", sujets["awa@exemple.sn"])
+        self.assertTrue(sujets["modou@exemple.sn"].startswith("New event"))
+        self.assertIn("Keur Ndiaye Lo", mail.outbox[0].body)
+        self.assertIn(f"/evenements/{self.ev.id}", mail.outbox[0].body)
+        # Deuxième clic : personne ne la reçoit deux fois.
+        self.assertEqual(self.client.post(url).data["destinataires"], 0)
+        self.assertEqual(len(mail.outbox), 3)
+        etat = self.client.get(f"{EVS}{self.ev.id}/?avec_annonce=1").data["annonce"]
+        self.assertEqual((etat["envoyes"], etat["restants"]), (3, 0))
+
+    def test_quota_puis_suite_le_lendemain(self):
+        from django.core import mail
+
+        from evenements import annonces
+        from finances.rappels import taches_quotidiennes
+
+        ancien = annonces.QUOTA_JOUR
+        annonces.QUOTA_JOUR = 2
+        try:
+            self.client.force_authenticate(self.admin)
+            res = self.client.post(f"{EVS}{self.ev.id}/annoncer/").data
+            self.assertEqual((res["envoi_immediat"], res["reportes"]), (2, 1))
+            self.assertEqual(len(mail.outbox), 2)
+            annonces.QUOTA_JOUR = 10
+            taches_quotidiennes()
+            self.assertEqual(len([m for m in mail.outbox if m.subject.startswith(("Nouvel", "New"))]), 3)
+        finally:
+            annonces.QUOTA_JOUR = ancien
+
+    def test_evenement_passe_refuse(self):
+        self.ev.date = timezone.now() - timedelta(days=1)
+        self.ev.save()
+        self.client.force_authenticate(self.admin)
+        self.assertEqual(self.client.post(f"{EVS}{self.ev.id}/annoncer/").status_code, 400)
+
+    def test_membre_peut_couper_les_annonces(self):
+        self.client.force_authenticate(self.awa)
+        res = self.client.patch("/api/comptes/moi/", {"recevoir_annonces": False}, format="json")
+        self.assertFalse(res.data["recevoir_annonces"])

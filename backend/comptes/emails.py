@@ -31,6 +31,14 @@ TEXTES = {
         "bienvenue_intro": "Votre compte membre est créé. Vous pouvez désormais suivre les enseignements, vos cotisations et générer votre carte de membre.",
         "bienvenue_bouton": "Ouvrir mon espace",
         "bienvenue_identifiant": "Pour vous connecter, utilisez votre numéro de téléphone : {telephone}.",
+        "annonce_sujet": "Nouvel événement : {titre}",
+        "annonce_intro": "Le Dahira vous invite :",
+        "annonce_date": "Date : {date}",
+        "annonce_lieu": "Lieu : {lieu}",
+        "annonce_bus": "La réservation des places de bus est ouverte sur le site.",
+        "annonce_bouton": "Voir l'événement",
+        "annonce_note": "Vous recevez cet e-mail en tant que membre du Dahira. Pour ne plus recevoir les annonces d'événements, désactivez l'option dans votre profil : {lien}",
+        "a": "à",
         "signature": "Dalal ak Diam !",
     },
     "en": {
@@ -51,6 +59,14 @@ TEXTES = {
         "bienvenue_intro": "Your member account has been created. You can now follow the teachings, your contributions and generate your membership card.",
         "bienvenue_bouton": "Open my space",
         "bienvenue_identifiant": "To sign in, use your phone number: {telephone}.",
+        "annonce_sujet": "New event: {titre}",
+        "annonce_intro": "The Dahira invites you:",
+        "annonce_date": "Date: {date}",
+        "annonce_lieu": "Place: {lieu}",
+        "annonce_bus": "Bus seat booking is open on the website.",
+        "annonce_bouton": "See the event",
+        "annonce_note": "You receive this email as a member of the Dahira. To stop receiving event announcements, turn the option off in your profile: {lien}",
+        "a": "at",
         "signature": "Dalal ak Diam!",
     },
     "es": {
@@ -71,6 +87,14 @@ TEXTES = {
         "bienvenue_intro": "Tu cuenta de miembro ha sido creada. Ya puedes seguir las enseñanzas, tus cuotas y generar tu carné de miembro.",
         "bienvenue_bouton": "Abrir mi espacio",
         "bienvenue_identifiant": "Para iniciar sesión, usa tu número de teléfono: {telephone}.",
+        "annonce_sujet": "Nuevo evento: {titre}",
+        "annonce_intro": "La Dahira te invita:",
+        "annonce_date": "Fecha: {date}",
+        "annonce_lieu": "Lugar: {lieu}",
+        "annonce_bus": "La reserva de plazas de autobús está abierta en el sitio.",
+        "annonce_bouton": "Ver el evento",
+        "annonce_note": "Recibes este correo como miembro de la Dahira. Para dejar de recibir los anuncios de eventos, desactiva la opción en tu perfil: {lien}",
+        "a": "a las",
         "signature": "¡Dalal ak Diam!",
     },
     "ar": {
@@ -91,6 +115,14 @@ TEXTES = {
         "bienvenue_intro": "تم إنشاء حسابك. يمكنك الآن متابعة الدروس واشتراكاتك وإنشاء بطاقة العضوية.",
         "bienvenue_bouton": "فتح مساحتي",
         "bienvenue_identifiant": "لتسجيل الدخول استخدم رقم هاتفك: {telephone}.",
+        "annonce_sujet": "فعالية جديدة: {titre}",
+        "annonce_intro": "تدعوكم الدائرة إلى:",
+        "annonce_date": "التاريخ: {date}",
+        "annonce_lieu": "المكان: {lieu}",
+        "annonce_bus": "حجز مقاعد الحافلات مفتوح على الموقع.",
+        "annonce_bouton": "عرض الفعالية",
+        "annonce_note": "تصلك هذه الرسالة بصفتك عضوًا في الدائرة. لإيقاف إعلانات الفعاليات، عطّل الخيار في ملفك الشخصي: {lien}",
+        "a": "الساعة",
         "signature": "Dalal ak Diam!",
     },
 }
@@ -102,6 +134,23 @@ MOIS = {
     "es": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
     "ar": ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
 }
+
+
+JOURS = {
+    "fr": ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"],
+    "en": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    "es": ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"],
+    "ar": ["الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"],
+}
+
+
+def _date_longue(date, langue):
+    """« jeudi 26 novembre 2026 à 07:47 » à l'heure de Dakar."""
+    from django.utils import timezone
+
+    d = timezone.localtime(date)
+    t = TEXTES.get(langue, TEXTES["fr"])
+    return f"{JOURS[langue][d.weekday()]} {d.day} {MOIS[langue][d.month - 1]} {d.year} {t['a']} {d:%H:%M}"
 
 
 def _montant(valeur):
@@ -216,3 +265,24 @@ def envoyer_rappel_cotisation(membre, cotisations, parametres, en_arriere_plan=N
     texte = "\n\n".join([*paragraphes, lien, t["rappel_deja"], t["signature"]])
     html = _html(langue, t["rappel_sujet"], paragraphes, t["rappel_bouton"], lien, t["rappel_deja"])
     _envoyer(t["rappel_sujet"], texte, html, membre.email, en_arriere_plan=en_arriere_plan)
+
+
+def envoyer_annonce_evenement(membre, evenement, titre, description, en_arriere_plan=None):
+    """Annonce d'un événement : titre et description déjà traduits dans la langue du membre."""
+    t = _textes(membre)
+    langue = membre.langue_preferee if membre.langue_preferee in MOIS else "fr"
+    paragraphes = [t["salut"].format(nom=membre.nom_complet), t["annonce_intro"], titre]
+    paragraphes.append(t["annonce_date"].format(date=_date_longue(evenement.date, langue)))
+    if evenement.lieu:
+        paragraphes.append(t["annonce_lieu"].format(lieu=evenement.lieu))  # le lieu n'est jamais traduit
+    if description:
+        resume = description if len(description) <= 400 else description[:400].rsplit(" ", 1)[0] + "…"
+        paragraphes.append(resume)
+    if evenement.reservation_bus_active:
+        paragraphes.append(t["annonce_bus"])
+    lien = f"{settings.FRONTEND_URL}/evenements/{evenement.pk}"
+    note = t["annonce_note"].format(lien=f"{settings.FRONTEND_URL}/profil")
+    sujet = t["annonce_sujet"].format(titre=titre)
+    texte = "\n\n".join([*paragraphes, lien, t["signature"], note])
+    html = _html(langue, sujet, paragraphes, t["annonce_bouton"], lien, note)
+    _envoyer(sujet, texte, html, membre.email, en_arriere_plan=en_arriere_plan)

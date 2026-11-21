@@ -53,6 +53,18 @@ class EvenementViewSet(ArchivesMixin, viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(cree_par=self.request.user)
 
+    @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
+    def annoncer(self, request, pk=None):
+        """Envoie l'annonce de l'événement par e-mail aux membres (admin contenus / général)."""
+        from .annonces import lancer_annonce
+
+        if not a_un_role(request.user, ROLES_EVENEMENTS):
+            raise PermissionDenied("Réservé à l'administration des événements.")
+        evenement = self.get_object()
+        if evenement.date < timezone.now():
+            raise ValidationError("Cet événement est déjà passé.")
+        return Response(lancer_annonce(evenement, request.user))
+
     @action(detail=False, methods=["get"], url_path="espace-bus", permission_classes=[permissions.IsAuthenticated])
     def espace_bus(self, request):
         """Événements dont l'utilisateur gère les bus (tous pour les admins), à venir ou de la semaine passée."""

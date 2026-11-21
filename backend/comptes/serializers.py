@@ -46,6 +46,7 @@ class MembreSerializer(serializers.ModelSerializer):
             "carte_numero",
             "date_inscription",
             "est_responsable_bus",
+            "recevoir_annonces",
         ]
         read_only_fields = ["id", "username", "role", "is_staff", "carte_numero", "date_inscription"]
 

@@ -10,7 +10,7 @@ import { PhotoProfil } from "@/components/metier/PhotoProfil";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { EnTete } from "@/components/ui/Divers";
-import { Champ, MotDePasseInput } from "@/components/ui/Input";
+import { Champ, Interrupteur, MotDePasseInput } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
@@ -175,6 +175,22 @@ export default function Profil() {
               <ChevronRight className="h-5 w-5 transition group-hover:translate-x-1 rtl:rotate-180" />
             </Card>
           </Link>
+
+          {membre.email && (
+            <Interrupteur
+              coche={membre.recevoir_annonces !== false}
+              onChange={async (v) => {
+                try {
+                  await mettreAJour({ recevoir_annonces: v });
+                  notifier(v ? t("profil.annoncesActivees") : t("profil.annoncesDesactivees"));
+                } catch (err) {
+                  notifier(messageErreur(err, t("commun.erreur")), "erreur");
+                }
+              }}
+              label={t("profil.recevoirAnnonces")}
+              description={t("profil.recevoirAnnoncesAide")}
+            />
+          )}
 
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" onClick={() => setMdpOuvert(true)}>

@@ -24,6 +24,11 @@ class Evenement(Archivable):
     places_par_bus = models.PositiveSmallIntegerField(blank=True, null=True)
     # Prix d'une place (vide ou 0 : bus gratuit).
     prix_place = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    # Annonce par e-mail aux membres (envoyée par lots : la suite part le lendemain si le quota est atteint).
+    annonce_demandee_le = models.DateTimeField(blank=True, null=True)
+    annonce_demandee_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
     visibilite_inscription_a_partir_de = models.DateTimeField(blank=True, null=True)
     cree_par = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="evenements_crees"
@@ -144,3 +149,14 @@ class PaiementBus(models.Model):
 
     def __str__(self):
         return f"{self.montant} ({self.get_moyen_display()}) — {self.get_statut_display()}"
+
+
+class EnvoiAnnonce(models.Model):
+    """Un e-mail d'annonce envoyé à un membre (évite les doublons et permet de reprendre le lendemain)."""
+
+    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE, related_name="envois_annonce")
+    membre = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+")
+    envoye_le = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("evenement", "membre")

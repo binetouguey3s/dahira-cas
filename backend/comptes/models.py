@@ -30,6 +30,8 @@ class Membre(AbstractUser):
     langue_preferee = models.CharField(max_length=5, choices=Langue.choices, default=Langue.FR)
     carte_numero = models.CharField(max_length=30, unique=True, blank=True)
     date_inscription = models.DateTimeField(auto_now_add=True)
+    # Annonces des événements par e-mail (le membre peut les couper dans son profil).
+    recevoir_annonces = models.BooleanField(default=True)
 
     REQUIRED_FIELDS = ["email"]
 

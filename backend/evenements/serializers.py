@@ -6,6 +6,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from comptes.models import Membre
+from comptes.permissions import ROLES_EVENEMENTS, a_un_role
 
 from . import bus as regles
 from .models import Evenement, PaiementBus, PassagerBus, ReservationBus, ResponsableBus
@@ -34,6 +35,8 @@ class EvenementSerializer(serializers.ModelSerializer):
     places_restantes = serializers.SerializerMethodField()
     responsables = serializers.SerializerMethodField()
     est_responsable = serializers.SerializerMethodField()
+    # État de l'annonce par e-mail (administration seulement, avec ?avec_annonce=1).
+    annonce = serializers.SerializerMethodField()
     # Écriture : identifiants des membres désignés responsables des bus.
     responsables_ids = serializers.PrimaryKeyRelatedField(
         queryset=Membre.objects.filter(is_active=True), many=True, write_only=True, required=False
@@ -62,6 +65,7 @@ class EvenementSerializer(serializers.ModelSerializer):
             "responsables",
             "responsables_ids",
             "est_responsable",
+            "annonce",
             "cree_par",
             "cree_le",
         ]
@@ -133,6 +137,16 @@ class EvenementSerializer(serializers.ModelSerializer):
         if not _utilisateur(self):
             return []
         return ResponsableBusSerializer(obj.responsables_bus.all(), many=True).data
+
+    def get_annonce(self, obj):
+        request = self.context.get("request")
+        if not request or request.query_params.get("avec_annonce") != "1":
+            return None
+        if not a_un_role(request.user, ROLES_EVENEMENTS):
+            return None
+        from .annonces import etat
+
+        return etat(obj)
 
     def get_est_responsable(self, obj):
         user = _utilisateur(self)

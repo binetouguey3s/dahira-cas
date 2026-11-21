@@ -258,7 +258,11 @@
     "motsDePasseDifferents": "Les deux mots de passe ne correspondent pas.",
     "motDePasseModifie": "Mot de passe modifié",
     "deconnexion": "Déconnexion",
-    "aideEmail": "Utile pour recevoir un lien si vous oubliez votre mot de passe."
+    "aideEmail": "Utile pour recevoir un lien si vous oubliez votre mot de passe.",
+    "recevoirAnnonces": "Annonces des événements par e-mail",
+    "recevoirAnnoncesAide": "Recevoir un e-mail quand le Dahira annonce un événement (Magal, Gamou…).",
+    "annoncesActivees": "Vous recevrez les annonces des événements.",
+    "annoncesDesactivees": "Vous ne recevrez plus les annonces des événements."
   },
   "photo": {
     "photo": "Photo d'identité",
@@ -726,5 +730,20 @@
   "reseau": {
     "horsLigne": "Pas de connexion internet",
     "retabli": "Connexion rétablie"
+  },
+  "annonce": {
+    "bouton": "Annoncer par e-mail",
+    "titre": "Annoncer cet événement par e-mail ?",
+    "envoyer": "Envoyer l'annonce",
+    "message_one": "« {{titre}} » sera annoncé par e-mail à {{count}} membre (dans sa langue, avec le lien vers l'événement).",
+    "message_other": "« {{titre}} » sera annoncé par e-mail à {{count}} membres (chacun dans sa langue, avec le lien vers l'événement).",
+    "messageNouveaux_one": "L'annonce de « {{titre}} » est déjà partie. Elle sera envoyée à {{count}} membre qui ne l'a pas encore reçue.",
+    "messageNouveaux_other": "L'annonce de « {{titre}} » est déjà partie. Elle sera envoyée aux {{count}} membres qui ne l'ont pas encore reçue.",
+    "envoyee_one": "Annonce envoyée à {{count}} membre.",
+    "envoyee_other": "Annonce envoyée à {{count}} membres.",
+    "envoyeeEnPartie_one": "Annonce envoyée à {{count}} membre ; les {{reste}} autres la recevront demain (limite d'envoi du jour).",
+    "envoyeeEnPartie_other": "Annonce envoyée à {{count}} membres ; les {{reste}} autres la recevront demain (limite d'envoi du jour).",
+    "badge_one": "Annoncé à {{count}} membre",
+    "badge_other": "Annoncé à {{count}} membres"
   }
 }

@@ -258,7 +258,11 @@
     "motsDePasseDifferents": "The two passwords do not match.",
     "motDePasseModifie": "Password changed",
     "deconnexion": "Sign out",
-    "aideEmail": "Useful to receive a link if you forget your password."
+    "aideEmail": "Useful to receive a link if you forget your password.",
+    "recevoirAnnonces": "Event announcements by email",
+    "recevoirAnnoncesAide": "Receive an email when the Dahira announces an event (Magal, Gamou…).",
+    "annoncesActivees": "You will receive event announcements.",
+    "annoncesDesactivees": "You will no longer receive event announcements."
   },
   "photo": {
     "photo": "ID photo",
@@ -726,5 +730,20 @@
   "reseau": {
     "horsLigne": "No internet connection",
     "retabli": "Back online"
+  },
+  "annonce": {
+    "bouton": "Announce by email",
+    "titre": "Announce this event by email?",
+    "envoyer": "Send the announcement",
+    "message_one": "“{{titre}}” will be announced by email to {{count}} member (in their language, with a link to the event).",
+    "message_other": "“{{titre}}” will be announced by email to {{count}} members (each in their language, with a link to the event).",
+    "messageNouveaux_one": "The announcement of “{{titre}}” has already been sent. It will go to {{count}} member who has not received it yet.",
+    "messageNouveaux_other": "The announcement of “{{titre}}” has already been sent. It will go to the {{count}} members who have not received it yet.",
+    "envoyee_one": "Announcement sent to {{count}} member.",
+    "envoyee_other": "Announcement sent to {{count}} members.",
+    "envoyeeEnPartie_one": "Announcement sent to {{count}} member; the other {{reste}} will receive it tomorrow (daily sending limit).",
+    "envoyeeEnPartie_other": "Announcement sent to {{count}} members; the other {{reste}} will receive it tomorrow (daily sending limit).",
+    "badge_one": "Announced to {{count}} member",
+    "badge_other": "Announced to {{count}} members"
   }
 }

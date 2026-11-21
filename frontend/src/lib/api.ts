@@ -112,6 +112,8 @@ export interface Membre {
   date_inscription: string;
   /** Gère les bus d'un événement à venir (affiche son « Espace bus »). */
   est_responsable_bus?: boolean;
+  /** Reçoit les annonces des événements par e-mail. */
+  recevoir_annonces?: boolean;
 }
 
 export interface MembreAdmin extends Omit<Membre, "username"> {
@@ -276,6 +278,8 @@ export interface Evenement {
   nb_reservations: number;
   responsables: ResponsableBus[];
   est_responsable: boolean;
+  /** État de l'annonce par e-mail (administration, avec ?avec_annonce=1). */
+  annonce?: { demandee_le: string | null; envoyes: number; restants: number } | null;
 }
 
 export type TypeContenu = "audio" | "video" | "texte";

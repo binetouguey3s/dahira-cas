@@ -1,4 +1,4 @@
-import { Archive, Bus, Calendar, ClipboardList, Pencil, Plus } from "lucide-react";
+import { Archive, Bus, Calendar, ClipboardList, Megaphone, Pencil, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -61,11 +61,12 @@ export default function AdminEvenements() {
   const [envoi, setEnvoi] = useState(false);
   const [aSupprimer, setASupprimer] = useState<Evenement | null>(null);
   const [archives, setArchives] = useState(false);
+  const [aAnnoncer, setAAnnoncer] = useState<Evenement | null>(null);
   const pages = usePageLocale(evenements, periode);
 
   const charger = () => {
     setEvenements(null);
-    return toutesLesPages<Evenement>(`/evenements/evenements/?periode=${periode}${periode === "a_venir" ? "&ordering=date" : ""}`)
+    return toutesLesPages<Evenement>(`/evenements/evenements/?avec_annonce=1&periode=${periode}${periode === "a_venir" ? "&ordering=date" : ""}`)
       .then(setEvenements)
       .catch(() => setEvenements([]));
   };
@@ -115,6 +116,35 @@ export default function AdminEvenements() {
       notifier(edition === "nouveau" ? t("adminEv.cree") : t("commun.enregistre"));
       setEdition(null);
       charger();
+    } catch (err) {
+      notifier(messageErreur(err, t("commun.erreur")), "erreur");
+    } finally {
+      setEnvoi(false);
+    }
+  };
+
+  const annoncer = async () => {
+    if (!aAnnoncer) return;
+    setEnvoi(true);
+    try {
+      const { data } = await api.post<{ destinataires: number; envoi_immediat: number; reportes: number }>(
+        `/evenements/evenements/${aAnnoncer.id}/annoncer/`,
+      );
+      notifier(
+        data.reportes
+          ? t("annonce.envoyeeEnPartie", { count: data.envoi_immediat, reste: data.reportes })
+          : t("annonce.envoyee", { count: data.envoi_immediat }),
+      );
+      // Les e-mails partent en arrière-plan : on affiche tout de suite le résultat sans attendre.
+      const envoye = aAnnoncer;
+      setEvenements((liste) =>
+        liste?.map((ev) =>
+          ev.id === envoye.id
+            ? { ...ev, annonce: { demandee_le: new Date().toISOString(), envoyes: (ev.annonce?.envoyes ?? 0) + data.envoi_immediat, restants: data.reportes } }
+            : ev,
+        ) ?? null,
+      );
+      setAAnnoncer(null);
     } catch (err) {
       notifier(messageErreur(err, t("commun.erreur")), "erreur");
     } finally {
@@ -175,6 +205,11 @@ export default function AdminEvenements() {
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex flex-wrap gap-2">
                     <Badge tone="or">{t(`evenements.categories.${ev.categorie}`)}</Badge>
+                    {!!ev.annonce?.envoyes && (
+                      <Badge tone="neutral">
+                        <Megaphone className="h-3 w-3" /> {t("annonce.badge", { count: ev.annonce.envoyes })}
+                      </Badge>
+                    )}
                     {ev.reservation_bus_active && (
                       <Badge tone="success">
                         <Bus className="h-3 w-3" /> {t("adminEv.reserves", { count: ev.nb_reservations })}
@@ -193,6 +228,11 @@ export default function AdminEvenements() {
                       <Link to={`/espace-bus/${ev.id}`}>
                         <ClipboardList className="h-4 w-4" /> {t("bus.gererLesBus")}
                       </Link>
+                    </Button>
+                  )}
+                  {periode === "a_venir" && (!ev.annonce?.envoyes || !!ev.annonce?.restants) && (
+                    <Button variant="ghost" size="icon" onClick={() => setAAnnoncer(ev)} aria-label={t("annonce.bouton")} title={t("annonce.bouton")}>
+                      <Megaphone className="h-4 w-4" />
                     </Button>
                   )}
                   <Button variant="ghost" size="icon" onClick={() => setEdition(ev)} aria-label={t("commun.modifier")}>
@@ -302,6 +342,21 @@ export default function AdminEvenements() {
         titre={t("adminEv.supprimerTitre")}
         message={t("adminEv.supprimerMessage", { titre: aSupprimer?.titre })}
         libelleConfirmer={t("archives.archiver")}
+        chargement={envoi}
+      />
+
+      <Confirmation
+        ouvert={!!aAnnoncer}
+        onFermer={() => setAAnnoncer(null)}
+        onConfirmer={annoncer}
+        titre={t("annonce.titre")}
+        message={
+          aAnnoncer?.annonce?.envoyes
+            ? t("annonce.messageNouveaux", { count: aAnnoncer.annonce.restants, titre: aAnnoncer.titre })
+            : t("annonce.message", { count: aAnnoncer?.annonce?.restants ?? 0, titre: aAnnoncer?.titre })
+        }
+        libelleConfirmer={t("annonce.envoyer")}
+        danger={false}
         chargement={envoi}
       />
 
