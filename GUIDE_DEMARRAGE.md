@@ -152,7 +152,10 @@ le nom de la clé), l'API Key et l'API Secret dans les variables Render.
 
 ### Brevo
 1. **Paramètres → Clés API** : créer une clé API restreinte aux **e-mails transactionnels**.
-2. Vérifier l'adresse ou le domaine expéditeur (`DEFAULT_FROM_EMAIL`).
+2. Domaine **dahiracas.com authentifié** (lignes DNS chez Vercel : `brevo-code` en TXT, DKIM
+   `brevo1._domainkey` et `brevo2._domainkey` en CNAME, DMARC `_dmarc` en TXT). Expéditeur :
+   `DEFAULT_FROM_EMAIL=no-reply@dahiracas.com`. Les réponses des membres partent vers l'e-mail de
+   contact des Paramètres du site.
 3. La clé expire au bout d'un an, ou après 90 jours sans envoi : la renouveler à temps.
 4. En cas d'erreur 401 dans les journaux Render (« Key not found »), la clé est fausse ou expirée.
 
