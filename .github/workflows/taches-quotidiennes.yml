@@ -23,5 +23,5 @@ jobs:
         run: |
           curl --fail-with-body --silent --show-error \
             --retry 4 --retry-delay 30 --retry-all-errors --max-time 120 \
-            -X POST "https://dahira-cas.onrender.com/api/finances/taches/" \
+            -X POST "https://api.dahiracas.com/api/finances/taches/" \
             -H "X-Cle-Taches: ${TACHES_CLE}"

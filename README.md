@@ -4,8 +4,9 @@ Application web officielle du Dahira, pensée d'abord pour le téléphone : ense
 médiathèque, vie du Dahira (événements et réservation de bus), cotisations, questions à l'Oustaz,
 carte de membre avec QR code et espace d'administration par rôles.
 
-- **Site** : https://dahira-cas.vercel.app
-- **API** : https://dahira-cas.onrender.com/api/
+- **Site** : https://www.dahiracas.com (dahiracas.com y renvoie ; l'ancienne adresse dahira-cas.vercel.app fonctionne toujours)
+- **API** : https://api.dahiracas.com/api/ (service Render, aussi joignable sur dahira-cas.onrender.com)
+- **Application installable** sur téléphone (écran d'accueil) et ordinateur.
 - **Langues** : français, anglais, espagnol, arabe (affichage de droite à gauche), avec traduction
   automatique des textes saisis par l'administration.
 - **Thèmes** : clair et sombre.

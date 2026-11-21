@@ -1,7 +1,7 @@
 # Guide utilisateur
 
 Ce guide explique comment utiliser la plateforme du Dahira Cheikh Abdoulahi Seye sur téléphone
-ou sur ordinateur. Adresse du site : **https://dahira-cas.vercel.app**
+ou sur ordinateur. Adresse du site : **https://www.dahiracas.com**
 
 ## Sommaire
 
@@ -31,6 +31,18 @@ apparaît. Sans compte, vous pouvez déjà :
 
 Un compte est nécessaire pour la carte de membre, les cotisations, les questions à l'Oustaz et
 la réservation de bus.
+
+### Installer l'application sur son téléphone
+Le site s'installe comme une application : icône « DCAS » sur l'écran d'accueil, ouverture en
+plein écran, sans barre d'adresse.
+
+- **Android (Chrome)** : ouvrez www.dahiracas.com, touchez le menu **⋮** en haut à droite, puis
+  **Installer l'application** (ou **Ajouter à l'écran d'accueil**).
+- **iPhone (Safari)** : ouvrez www.dahiracas.com, touchez le bouton **Partager** (carré avec une
+  flèche vers le haut), puis **Sur l'écran d'accueil**, et **Ajouter**.
+- **Ordinateur (Chrome, Edge)** : cliquez sur l'icône d'installation à droite de la barre d'adresse.
+
+L'application installée est toujours à jour : elle affiche directement la dernière version du site.
 
 ## 2. Créer un compte
 

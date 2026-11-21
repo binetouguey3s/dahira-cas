@@ -14,7 +14,7 @@ production, et comment l'entretenir. Pour l'architecture et l'API, voir la
 6. [Services externes](#6-services-externes)
 7. [Déployer une modification](#7-déployer-une-modification)
 8. [Maintenance courante](#8-maintenance-courante)
-9. [Nom de domaine (à venir)](#9-nom-de-domaine-à-venir)
+9. [Nom de domaine](#9-nom-de-domaine)
 10. [Dépannage](#10-dépannage)
 
 ---
@@ -76,9 +76,10 @@ cd frontend && npx tsc -b && npm run build
 |---|---|---|
 | `SECRET_KEY` | Oui | Clé secrète Django, longue et aléatoire |
 | `DEBUG` | Oui (`False`) | Mode débogage (laisser `True` en local) |
-| `ALLOWED_HOSTS` | Oui | Ex. `dahira-cas.onrender.com` |
+| `ALLOWED_HOSTS` | Oui | Ex. `dahira-cas.onrender.com` (`api.<DOMAINE_DAHIRA>` est ajouté automatiquement) |
 | `DATABASE_URL` | Oui | URL PostgreSQL Neon (connexion **directe**, sans « -pooler ») ; vide en local = SQLite |
-| `CORS_ALLOWED_ORIGINS` | Oui | URL du site, ex. `https://dahira-cas.vercel.app` (sans `/` final) |
+| `CORS_ALLOWED_ORIGINS` | Oui | Autres URL du site, ex. `https://dahira-cas.vercel.app` (sans `/` final) ; `https://www.<DOMAINE_DAHIRA>` et `https://<DOMAINE_DAHIRA>` sont ajoutés automatiquement |
+| `DOMAINE_DAHIRA` | Non | Nom de domaine du Dahira (`dahiracas.com` par défaut) |
 | `FRONTEND_URL` | Non | URL utilisée dans les e-mails ; par défaut la première origine https de `CORS_ALLOWED_ORIGINS` |
 | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Oui | Stockage des photos, audios et vidéos |
 | `BREVO_API_KEY` | Oui | Envoi des e-mails (clé API, pas une clé SMTP « xsmtpsib- ») |
@@ -93,7 +94,7 @@ Ne mettez jamais ces valeurs dans le dépôt : `backend/.env` est ignoré par gi
 
 | Variable | Rôle |
 |---|---|
-| `VITE_API_URL` | Adresse de l'API, se terminant par `/api` (ex. `https://dahira-cas.onrender.com/api`) |
+| `VITE_API_URL` | Adresse de l'API, se terminant par `/api` (production : `https://api.dahiracas.com/api`) |
 
 ### GitHub (**Settings → Secrets and variables → Actions**)
 
@@ -131,7 +132,7 @@ Ne mettez jamais ces valeurs dans le dépôt : `backend/.env` est ignoré par gi
 | E-mails | **Brevo** (API HTTP) | Clé restreinte « e-mails transactionnels » ; le SMTP est bloqué sur Render gratuit |
 | Traduction | **DeepL** (offre gratuite) | Clé dans `DEEPL_API_KEY` |
 | Robot quotidien | **GitHub Actions** | `.github/workflows/taches-quotidiennes.yml`, 8 h UTC |
-| Réveil du serveur | **UptimeRobot** | Moniteur HTTP sur `https://dahira-cas.onrender.com/api/sante/`, toutes les 5 min |
+| Réveil du serveur | **UptimeRobot** | Moniteur HTTP sur `https://api.dahiracas.com/api/sante/`, toutes les 5 min |
 
 Commandes du service Render :
 
@@ -202,16 +203,24 @@ python manage.py dumpdata --natural-foreign --natural-primary \
 
 Conservez ce fichier **hors du dépôt** (il contient des données personnelles).
 
-## 9. Nom de domaine (à venir)
+## 9. Nom de domaine
 
-Avec un domaine (par exemple chez LWS) :
-1. Vercel → **Settings → Domains** : ajouter le domaine, puis créer chez le registraire les
-   enregistrements DNS indiqués.
-2. Optionnel : un sous-domaine `api.` pointé vers Render (**Settings → Custom Domains**).
-3. Mettre à jour `CORS_ALLOWED_ORIGINS`, `FRONTEND_URL` et `ALLOWED_HOSTS` sur Render,
-   `VITE_API_URL` sur Vercel, et la CSP `connect-src` de `frontend/vercel.json` si l'adresse de
-   l'API change.
-4. Mettre à jour le moniteur UptimeRobot et l'URL du robot GitHub si l'API change d'adresse.
+Le domaine **dahiracas.com** est géré par **Vercel** (serveurs de noms `ns1/ns2.vercel-dns.com`).
+
+| Adresse | Rôle | Réglage |
+|---|---|---|
+| `dahiracas.com` | Renvoie vers www | Domaine du projet Vercel |
+| `www.dahiracas.com` | Le site | Domaine principal du projet Vercel |
+| `api.dahiracas.com` | L'API | DNS : CNAME → `dahira-cas.onrender.com` ; Render → **Settings → Custom Domains** (certificat HTTPS automatique) |
+
+- `VITE_API_URL` (Vercel) = `https://api.dahiracas.com/api`.
+- Côté Django, `DOMAINE_DAHIRA` ajoute automatiquement `api.dahiracas.com` aux hôtes autorisés,
+  `https://www.dahiracas.com` et `https://dahiracas.com` aux origines CORS, et sert d'adresse aux
+  liens des e-mails.
+- Les anciennes adresses (`dahira-cas.vercel.app`, `dahira-cas.onrender.com`) restent valables.
+- **Changer d'hébergeur pour l'API** : seule la ligne CNAME `api` change ; le site, les applications
+  installées et les documents gardent la même adresse.
+- La CSP de `frontend/vercel.json` autorise déjà `api.dahiracas.com` et `dahira-cas.onrender.com`.
 
 ## 10. Dépannage
 
