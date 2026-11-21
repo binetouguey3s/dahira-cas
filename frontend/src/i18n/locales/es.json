@@ -299,7 +299,9 @@
     "erreurTelechargement": "No se pudo descargar. Prueba «Imprimir» y luego «Guardar como PDF».",
     "aideImpression": "Imprime en cartulina al 100 % (sin ajustar a la página), recorta por las líneas y pega anverso y reverso o plastifícalo.",
     "testerQr": "Probar el código QR",
-    "consigneImpression": "Imprimir al 100 % · Recortar por las líneas · Pegar anverso/reverso y plastificar"
+    "consigneImpression": "Imprimir al 100 % · Recortar por las líneas · Pegar anverso/reverso y plastificar",
+    "pretePourEnregistrer": "Tu carné está listo (anverso y reverso).",
+    "enregistrerPhotos": "Guardar en mis fotos"
   },
   "verification": {
     "valide": "Carné válido",

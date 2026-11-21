@@ -299,7 +299,9 @@
     "erreurTelechargement": "Téléchargement impossible. Essayez « Imprimer » puis « Enregistrer en PDF ».",
     "aideImpression": "Imprimez sur papier cartonné à 100 % (sans mise à l'échelle), découpez le long des traits, puis collez recto et verso ou plastifiez.",
     "testerQr": "Tester le QR code",
-    "consigneImpression": "Imprimer à 100 % · Découper le long des traits · Coller recto/verso puis plastifier"
+    "consigneImpression": "Imprimer à 100 % · Découper le long des traits · Coller recto/verso puis plastifier",
+    "pretePourEnregistrer": "Votre carte est prête (recto et verso).",
+    "enregistrerPhotos": "Enregistrer dans mes photos"
   },
   "verification": {
     "valide": "Carte valide",

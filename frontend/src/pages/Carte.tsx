@@ -20,6 +20,31 @@ async function capturer(noeud: HTMLElement) {
   for (let passage = 0; passage < 3; passage++) url = await toPng(noeud, options);
   return url;
 }
+
+/** Image « data:image/png;base64,… » → fichier, sans passer par fetch (bloqué par la sécurité du site). */
+function versFichier(dataUrl: string, nom: string) {
+  const binaire = atob(dataUrl.split(",")[1]);
+  const octets = new Uint8Array(binaire.length);
+  for (let i = 0; i < binaire.length; i++) octets[i] = binaire.charCodeAt(i);
+  return new File([octets], nom, { type: "image/png" });
+}
+
+function telechargerFichiers(fichiers: File[]) {
+  return fichiers.reduce(
+    (attente, fichier) =>
+      attente.then(async () => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(fichier);
+        a.download = fichier.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        await new Promise((r) => setTimeout(r, 500)); // iPhone bloque deux téléchargements trop rapprochés
+        setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+      }),
+    Promise.resolve(),
+  );
+}
 import { AnimatePresence, motion } from "motion/react";
 import { CheckCircle2, Circle, Download, Printer, RotateCw, ShieldCheck } from "lucide-react";
 import { useRef, useState } from "react";
@@ -112,6 +137,7 @@ export default function Carte() {
   const { notifier } = useToast();
   const [retournee, setRetournee] = useState(false);
   const [export_, setExport] = useState(false);
+  const [pretes, setPretes] = useState<File[] | null>(null);
   const recto = useRef<HTMLDivElement>(null);
   const verso = useRef<HTMLDivElement>(null);
   const rectoExport = useRef<HTMLDivElement>(null);
@@ -119,6 +145,30 @@ export default function Carte() {
 
   if (!membre) return null;
   const complete = champsManquants(membre).length === 0;
+
+  /** Enregistre les images prêtes : menu de partage sur téléphone (Photos / Galerie), sinon téléchargement. */
+  const enregistrer = async (fichiers: File[]) => {
+    const mobile = window.matchMedia("(pointer: coarse)").matches;
+    if (mobile && navigator.canShare?.({ files: fichiers })) {
+      try {
+        await navigator.share({ files: fichiers, title: t("carte.maCarte") });
+        setPretes(null);
+        notifier(t("carte.telechargee"));
+        return;
+      } catch (err) {
+        const nom = (err as Error).name;
+        if (nom === "AbortError") return; // menu fermé par le membre
+        // iPhone : la préparation a pris quelques secondes, il faut un nouveau toucher pour ouvrir le menu.
+        if (nom === "NotAllowedError") {
+          setPretes(fichiers);
+          return;
+        }
+      }
+    }
+    await telechargerFichiers(fichiers);
+    setPretes(null);
+    notifier(t("carte.telechargee"));
+  };
 
   const telecharger = async () => {
     setExport(true);
@@ -129,31 +179,9 @@ export default function Carte() {
         [versoExport.current, "verso"],
       ] as const) {
         if (!noeud) continue;
-        const url = await capturer(noeud);
-        const blob = await (await fetch(url)).blob();
-        fichiers.push(new File([blob], `carte-${membre.carte_numero}-${cote}.png`, { type: "image/png" }));
+        fichiers.push(versFichier(await capturer(noeud), `carte-${membre.carte_numero}-${cote}.png`));
       }
-      // Téléphone : le menu de partage permet « Enregistrer l'image » dans Photos / Galerie (les deux faces d'un coup).
-      // Ordinateur (ou si le partage n'est pas possible) : téléchargement classique des deux fichiers.
-      const mobile = window.matchMedia("(pointer: coarse)").matches;
-      if (mobile && navigator.canShare?.({ files: fichiers })) {
-        try {
-          await navigator.share({ files: fichiers, title: t("carte.maCarte") });
-          notifier(t("carte.telechargee"));
-          return;
-        } catch (err) {
-          if ((err as Error).name === "AbortError") return; // partage fermé par le membre
-        }
-      }
-      for (const fichier of fichiers) {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(fichier);
-        a.download = fichier.name;
-        a.click();
-        await new Promise((r) => setTimeout(r, 400)); // iPhone bloque deux téléchargements trop rapprochés
-        URL.revokeObjectURL(a.href);
-      }
-      notifier(t("carte.telechargee"));
+      await enregistrer(fichiers);
     } catch {
       notifier(t("carte.erreurTelechargement"), "erreur");
     } finally {
@@ -216,6 +244,23 @@ export default function Carte() {
                 <Download className="h-5 w-5" /> {t("carte.telecharger")}
               </Button>
             </div>
+
+            {/* iPhone : images prêtes, un dernier toucher ouvre le menu « Enregistrer ». */}
+            <AnimatePresence>
+              {pretes && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex w-full max-w-[520px] flex-col items-center gap-3 rounded-2xl bg-accent-soft p-4 text-center"
+                >
+                  <p className="text-sm font-semibold text-text-primary">{t("carte.pretePourEnregistrer")}</p>
+                  <Button size="lg" className="w-full" onClick={() => enregistrer(pretes)}>
+                    <Download className="h-5 w-5" /> {t("carte.enregistrerPhotos")}
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <Card className="flex w-full max-w-[520px] items-start gap-3 bg-bg-secondary/50 p-4 text-sm text-text-secondary">
               <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-accent-primary" />

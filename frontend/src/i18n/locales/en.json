@@ -299,7 +299,9 @@
     "erreurTelechargement": "Download failed. Try “Print” then “Save as PDF”.",
     "aideImpression": "Print on card stock at 100% (no scaling), cut along the lines, then glue front and back or laminate.",
     "testerQr": "Test the QR code",
-    "consigneImpression": "Print at 100% · Cut along the lines · Glue front/back then laminate"
+    "consigneImpression": "Print at 100% · Cut along the lines · Glue front/back then laminate",
+    "pretePourEnregistrer": "Your card is ready (front and back).",
+    "enregistrerPhotos": "Save to my photos"
   },
   "verification": {
     "valide": "Valid card",
