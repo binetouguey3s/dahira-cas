@@ -98,6 +98,7 @@ Dans **Profil**, vous pouvez :
   le visage soit bien visible ;
 - compléter votre **e-mail**, votre **profession**, votre **adresse** et votre **pays** ;
 - choisir votre **langue préférée** (elle sert aussi pour les e-mails que vous recevez) ;
+- activer ou couper les **annonces des événements par e-mail** (Magal, Gamou…) ;
 - changer votre **mot de passe** ;
 - vous **déconnecter**.
 

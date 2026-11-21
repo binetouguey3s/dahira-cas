@@ -126,6 +126,13 @@ La liste montre les « j'aime » et les téléchargements. **Modifier** (crayon)
 - **Nouvel événement** : titre, date et heure, catégorie, lieu, description.
   - Le **lieu** n'est jamais traduit (« Keur Ndiaye Lo » reste tel quel).
   - La **description** est traduite automatiquement.
+- **Annoncer par e-mail** (icône mégaphone, événements à venir) : chaque membre qui a une adresse
+  e-mail reçoit l'annonce dans sa langue, avec la date, le lieu, la description, la réservation de
+  bus si elle est ouverte et le lien vers l'événement. Personne ne la reçoit deux fois : un
+  nouveau clic ne l'envoie qu'aux membres qui ne l'ont pas encore reçue (nouveaux inscrits).
+  Au-delà de 200 envois dans la journée, la suite part automatiquement le lendemain matin.
+  La mention « Annoncé à N membres » s'affiche sur l'événement. Les membres peuvent couper ces
+  annonces dans leur profil.
 - **Activer la réservation de bus** : voir la section suivante.
 - **Archiver** un événement le retire du site (ses réservations sont conservées).
 
