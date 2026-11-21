@@ -745,5 +745,16 @@
     "envoyeeEnPartie_other": "Announcement sent to {{count}} members; the other {{reste}} will receive it tomorrow (daily sending limit).",
     "badge_one": "Announced to {{count}} member",
     "badge_other": "Announced to {{count}} members"
+  },
+  "installation": {
+    "bouton": "Install the app",
+    "titre": "Install the app on iPhone",
+    "iphoneIntro": "Three steps in Safari, and the Dahira icon appears on your home screen.",
+    "iphone1": "Tap the Share button (square with an arrow pointing up), at the bottom or top of the screen.",
+    "iphone2": "Scroll and tap “Add to Home Screen”.",
+    "iphone3": "Tap “Add”: the Dahira CAS app is installed.",
+    "carteTitre": "Install the Dahira CAS app",
+    "carteTexte": "An icon on your home screen, opens full screen: the Dahira at your fingertips.",
+    "plusTard": "Later"
   }
 }

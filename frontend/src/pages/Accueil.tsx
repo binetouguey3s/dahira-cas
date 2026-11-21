@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { CarteContenu, CarteEvenement } from "@/components/metier/Elements";
+import { CarteInstallation } from "@/components/metier/InstallerApplication";
 import { ReseauxSociaux } from "@/components/metier/ReseauxSociaux";
 import { VideoGuide } from "@/components/metier/VideoGuide";
 import { Button } from "@/components/ui/Button";
@@ -138,6 +139,9 @@ export default function Accueil() {
           )}
         </div>
       </motion.section>
+
+      {/* Invitation à installer l'application (téléphone, tant qu'elle n'est pas installée) */}
+      <CarteInstallation />
 
       {/* Raccourcis */}
       <ListeAnimee className="mb-10 grid grid-cols-3 gap-3 md:grid-cols-6">

@@ -745,5 +745,16 @@
     "envoyeeEnPartie_other": "Annonce envoyée à {{count}} membres ; les {{reste}} autres la recevront demain (limite d'envoi du jour).",
     "badge_one": "Annoncé à {{count}} membre",
     "badge_other": "Annoncé à {{count}} membres"
+  },
+  "installation": {
+    "bouton": "Installer l'application",
+    "titre": "Installer l'application sur l'iPhone",
+    "iphoneIntro": "Trois gestes dans Safari, et l'icône du Dahira apparaît sur votre écran d'accueil.",
+    "iphone1": "Touchez le bouton Partager (carré avec une flèche vers le haut), en bas ou en haut de l'écran.",
+    "iphone2": "Faites défiler et touchez « Sur l'écran d'accueil ».",
+    "iphone3": "Touchez « Ajouter » : l'application Dahira CAS est installée.",
+    "carteTitre": "Installez l'application Dahira CAS",
+    "carteTexte": "Une icône sur votre écran d'accueil, ouverture en plein écran : le Dahira à portée de main.",
+    "plusTard": "Plus tard"
   }
 }

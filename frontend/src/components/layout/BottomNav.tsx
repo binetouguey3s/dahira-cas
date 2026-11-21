@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
+import { BoutonInstaller } from "@/components/metier/InstallerApplication";
 import { Avatar } from "@/components/ui/Divers";
 import { useAuth } from "@/context/AuthContext";
 import { LIENS_ADMIN, LIENS_ESPACE, LIENS_PRINCIPAUX, liensVisibles, type LienNav } from "@/lib/navigation";
@@ -199,6 +200,8 @@ export function BottomNav() {
                   <GrilleLiens titre={t("nav.decouvrir")} liens={liensVisibles(LIENS_PRINCIPAUX, membre)} onChoisir={fermer} />
                   <GrilleLiens titre={t("nav.monEspace")} liens={liensVisibles(LIENS_ESPACE, membre)} onChoisir={fermer} />
                   <GrilleLiens titre={t("nav.administration")} liens={liensVisibles(LIENS_ADMIN, membre)} onChoisir={fermer} />
+
+                  <BoutonInstaller className="mb-3 w-full" onFait={fermer} />
 
                   {membre && (
                     <button

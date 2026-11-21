@@ -6,6 +6,14 @@ import "./index.css";
 import App from "./App.tsx";
 import { rechargerVersNouvelleVersion } from "./lib/chargement";
 
+// Installation de l'application (Android / Chrome) : le navigateur propose l'installation une seule fois,
+// parfois avant que React ne démarre. On garde sa proposition pour le bouton « Installer l'application ».
+window.addEventListener("beforeinstallprompt", (evenement) => {
+  evenement.preventDefault();
+  (window as unknown as { __invitationInstallation?: Event }).__invitationInstallation = evenement;
+  window.dispatchEvent(new Event("installation-disponible"));
+});
+
 // Fichier d'une ancienne version introuvable (site mis à jour entre-temps) : rechargement automatique.
 window.addEventListener("vite:preloadError", (evenement) => {
   if (rechargerVersNouvelleVersion()) evenement.preventDefault();
