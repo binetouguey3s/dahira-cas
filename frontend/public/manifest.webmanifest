@@ -1,0 +1,20 @@
+{
+  "name": "Dahira Cheikh Abdoulahi Seye",
+  "short_name": "DCAS",
+  "description": "Plateforme officielle du Dahira Cheikh Abdoulahi Seye : enseignements, médiathèque, événements et espace membres.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "fr",
+  "dir": "auto",
+  "background_color": "#FBF8EF",
+  "theme_color": "#0B3D2E",
+  "categories": ["education", "lifestyle", "social"],
+  "icons": [
+    { "src": "/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
