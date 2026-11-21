@@ -159,6 +159,12 @@ le nom de la clé), l'API Key et l'API Secret dans les variables Render.
 3. La clé expire au bout d'un an, ou après 90 jours sans envoi : la renouveler à temps.
 4. En cas d'erreur 401 dans les journaux Render (« Key not found »), la clé est fausse ou expirée.
 
+### Réception des e-mails @dahiracas.com (ImprovMX)
+Service gratuit qui fait suivre tout message reçu sur une adresse @dahiracas.com (alias `*`) vers la
+boîte Gmail du Dahira. DNS chez Vercel : `MX 10 mx1.improvmx.com`, `MX 20 mx2.improvmx.com` et
+`TXT v=spf1 include:spf.improvmx.com ~all`. L'e-mail de contact des Paramètres du site est
+`contact@dahiracas.com` : les réponses des membres aux e-mails du Dahira y arrivent.
+
 ### DeepL
 Compte API gratuit (500 000 caractères par mois). La clé se termine par `:fx`. Les traductions
 sont mémorisées en base : un même texte n'est traduit qu'une fois.
