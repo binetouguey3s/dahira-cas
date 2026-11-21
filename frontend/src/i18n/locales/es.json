@@ -722,5 +722,9 @@
     "archiverQuestionTitre": "¿Archivar esta pregunta?",
     "archiverMessage": "Desaparecerá de la lista. Podrás restaurarla desde «Archivo».",
     "questionVocale": "Pregunta de voz"
+  },
+  "reseau": {
+    "horsLigne": "Sin conexión a internet",
+    "retabli": "Conexión restablecida"
   }
 }

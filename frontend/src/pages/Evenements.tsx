@@ -52,7 +52,7 @@ export default function Evenements() {
           <button
             key={c}
             onClick={() => setCategorie(c)}
-            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors ${
+            className={`shrink-0 rounded-full border px-4 py-2.5 text-sm font-semibold transition-all active:scale-95 ${
               categorie === c
                 ? "border-accent-secondary bg-accent-secondary/15 text-accent-secondary-text"
                 : "border-border-subtle text-text-secondary hover:text-text-primary"

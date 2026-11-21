@@ -90,7 +90,7 @@ export default function Mediatheque() {
             onClick={() => choisirCategorie(c)}
             aria-pressed={categorie === c}
             className={cn(
-              "shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+              "shrink-0 rounded-full border px-4 py-2.5 text-sm font-semibold transition-all active:scale-95",
               categorie === c
                 ? "border-accent-primary bg-accent-primary text-white"
                 : "border-border-subtle bg-bg-elevated text-text-primary hover:border-accent-primary/40",

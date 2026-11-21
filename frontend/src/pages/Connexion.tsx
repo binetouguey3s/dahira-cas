@@ -65,7 +65,7 @@ export default function Connexion() {
         <button
           type="button"
           onClick={() => setAideOuverte(true)}
-          className="-mt-1 self-end text-xs font-semibold text-accent-primary hover:underline"
+          className="-my-2 inline-flex min-h-11 items-center self-end px-1 text-sm font-semibold text-accent-primary hover:underline"
         >
           {t("connexion.oublie")}
         </button>
@@ -94,7 +94,7 @@ export default function Connexion() {
             {t("connexion.sInscrire")}
           </Link>
         </p>
-        <Link to="/" className="text-center text-xs font-semibold text-text-secondary hover:text-text-primary">
+        <Link to="/" className="mx-auto inline-flex min-h-11 items-center px-3 text-sm font-semibold text-text-secondary hover:text-text-primary">
           {t("connexion.continuerSansCompte")}
         </Link>
       </form>

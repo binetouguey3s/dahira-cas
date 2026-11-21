@@ -8,6 +8,7 @@ import { ParametresProvider } from "@/context/ParametresContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { TraductionProvider } from "@/context/TraductionContext";
+import { BandeauHorsLigne } from "@/components/layout/BandeauHorsLigne";
 import { lazyPage } from "@/lib/chargement";
 import { ROLES_ADMIN } from "@/lib/navigation";
 
@@ -96,6 +97,7 @@ export default function App() {
               <AuthProvider>
                 <BrowserRouter>
                   <RemonterEnHaut />
+                  <BandeauHorsLigne />
                   <Routage />
                 </BrowserRouter>
               </AuthProvider>

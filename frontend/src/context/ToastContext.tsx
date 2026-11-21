@@ -27,6 +27,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const notifier = useCallback((message: string, ton: Ton = "succes") => {
+    // Petite vibration de confirmation (Android ; l'iPhone ne le permet pas aux sites web).
+    try {
+      navigator.vibrate?.(ton === "erreur" ? [40, 60, 40] : 18);
+    } catch {
+      /* non pris en charge */
+    }
     const id = Date.now() + Math.random();
     setToasts((t) => [...t, { id, message, ton }]);
     window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), ton === "erreur" ? 6000 : 3500);

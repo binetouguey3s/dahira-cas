@@ -722,5 +722,9 @@
     "archiverQuestionTitre": "Archive this question?",
     "archiverMessage": "It will disappear from the list. You can restore it from “Archives”.",
     "questionVocale": "Voice question"
+  },
+  "reseau": {
+    "horsLigne": "No internet connection",
+    "retabli": "Back online"
   }
 }

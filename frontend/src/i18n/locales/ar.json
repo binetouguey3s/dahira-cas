@@ -790,5 +790,9 @@
     "archiverQuestionTitre": "أرشفة هذا السؤال؟",
     "archiverMessage": "سيختفي من القائمة. يمكنك استعادته من «الأرشيف».",
     "questionVocale": "سؤال صوتي"
+  },
+  "reseau": {
+    "horsLigne": "لا يوجد اتصال بالإنترنت",
+    "retabli": "عاد الاتصال"
   }
 }
