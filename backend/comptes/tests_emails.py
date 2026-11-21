@@ -108,3 +108,18 @@ class BrevoBackendTests(APITestCase):
         self.assertEqual(corps["sender"], {"email": "dahira@exemple.sn", "name": "Dahira"})
         self.assertEqual(corps["to"], [{"email": "awa@exemple.sn"}])
         self.assertEqual(corps["htmlContent"], "<p>HTML</p>")
+
+
+class ReponseVersContactTests(APITestCase):
+    def test_reponse_vers_email_de_contact(self):
+        from django.core import mail
+
+        from comptes.emails import envoyer_bienvenue
+        from site_web.models import Parametres
+
+        p = Parametres.charger()
+        p.email_contact = "contact@exemple.sn"
+        p.save()
+        membre = creer_membre("+221770000092", email="awa@exemple.sn")
+        envoyer_bienvenue(membre)
+        self.assertEqual(mail.outbox[-1].reply_to, ["contact@exemple.sn"])

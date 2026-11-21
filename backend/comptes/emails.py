@@ -131,12 +131,24 @@ def _html(langue, titre, paragraphes, bouton=None, lien=None, note=None):
 </td></tr></table></td></tr></table></body></html>"""
 
 
+def _email_contact():
+    from site_web.models import Parametres
+
+    try:
+        return Parametres.charger().email_contact or ""
+    except Exception:  # noqa: BLE001 — jamais bloquant pour un envoi
+        return ""
+
+
 def _envoyer(sujet, texte, html, destinataire, en_arriere_plan=None):
     message = EmailMultiAlternatives(
         subject=sujet,
         body=texte,
         from_email=f"{settings.EMAIL_NOM_EXPEDITEUR} <{settings.DEFAULT_FROM_EMAIL}>",
         to=[destinataire],
+        # L'adresse d'envoi (no-reply@…) ne reçoit pas de courrier : une réponse du membre part vers
+        # l'e-mail de contact du Dahira (Paramètres du site), s'il est renseigné.
+        reply_to=[contact] if (contact := _email_contact()) else None,
     )
     message.attach_alternative(html, "text/html")
 
