@@ -33,14 +33,18 @@ Un compte est nécessaire pour la carte de membre, les cotisations, les question
 la réservation de bus.
 
 ### Installer l'application sur son téléphone
-Le site s'installe comme une application : icône « DCAS » sur l'écran d'accueil, ouverture en
-plein écran, sans barre d'adresse.
+Le site s'installe comme une application : icône du Dahira nommée **« Dahira CAS »** sur l'écran
+d'accueil, ouverture en plein écran, sans barre d'adresse.
 
-- **Android (Chrome)** : ouvrez www.dahiracas.com, touchez le menu **⋮** en haut à droite, puis
-  **Installer l'application** (ou **Ajouter à l'écran d'accueil**).
-- **iPhone (Safari)** : ouvrez www.dahiracas.com, touchez le bouton **Partager** (carré avec une
-  flèche vers le haut), puis **Sur l'écran d'accueil**, et **Ajouter**.
+Le plus simple : touchez **Installer l'application**, sur la carte de la page d'accueil ou dans le
+menu **Plus**.
+- **Android** : la fenêtre d'installation s'ouvre, touchez **Installer**.
+- **iPhone** : le site affiche les 3 gestes à faire dans Safari : bouton **Partager** (carré avec
+  une flèche vers le haut), puis **Sur l'écran d'accueil**, puis **Ajouter**.
 - **Ordinateur (Chrome, Edge)** : cliquez sur l'icône d'installation à droite de la barre d'adresse.
+
+Sans le bouton : sur Android, menu **⋮** de Chrome puis **Installer l'application** ; sur iPhone,
+les 3 gestes ci-dessus dans Safari.
 
 L'application installée est toujours à jour : elle affiche directement la dernière version du site.
 
