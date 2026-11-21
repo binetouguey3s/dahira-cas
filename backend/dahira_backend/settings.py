@@ -15,6 +15,13 @@ SECRET_KEY = config("SECRET_KEY", default="django-insecure-change-me-in-producti
 DEBUG = config("DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
+# Nom de domaine du Dahira : le site sur www.<domaine> (et <domaine>), l'API sur api.<domaine>.
+# Ajoutés automatiquement à ceux des variables d'environnement (les adresses Render / Vercel
+# continuent de fonctionner).
+DOMAINE_DAHIRA = config("DOMAINE_DAHIRA", default="dahiracas.com")
+if DOMAINE_DAHIRA and f"api.{DOMAINE_DAHIRA}" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(f"api.{DOMAINE_DAHIRA}")
+
 # --- Sécurité HTTPS en production (Render) -------------------------------
 # Render termine le HTTPS puis transmet la requête en HTTP à Django :
 # cet en-tête permet à Django de savoir que la requête d'origine était sécurisée
@@ -212,6 +219,9 @@ CORS_ALLOWED_ORIGINS = config(
     default="http://localhost:5173",
     cast=Csv(),
 )
+for _origine in (f"https://www.{DOMAINE_DAHIRA}", f"https://{DOMAINE_DAHIRA}") if DOMAINE_DAHIRA else ():
+    if _origine not in CORS_ALLOWED_ORIGINS:
+        CORS_ALLOWED_ORIGINS.append(_origine)
 CORS_ALLOW_CREDENTIALS = True
 
 # --- E-mails (Brevo) -----------------------------------------------------
@@ -230,10 +240,12 @@ EMAIL_NOM_EXPEDITEUR = config("EMAIL_NOM_EXPEDITEUR", default="Dahira Cheikh Abd
 # Les e-mails partent en arrière-plan (la page répond tout de suite) ; synchrone pendant les tests.
 EMAIL_EN_ARRIERE_PLAN = "test" not in sys.argv
 
-# Adresse du site (liens dans les e-mails). Par défaut : la première origine HTTPS autorisée.
+# Adresse du site (liens dans les e-mails). Par défaut : www.<domaine du Dahira>.
 FRONTEND_URL = config(
     "FRONTEND_URL",
-    default=next((o for o in CORS_ALLOWED_ORIGINS if o.startswith("https://")), "http://localhost:5173"),
+    default=f"https://www.{DOMAINE_DAHIRA}"
+    if DOMAINE_DAHIRA
+    else next((o for o in CORS_ALLOWED_ORIGINS if o.startswith("https://")), "http://localhost:5173"),
 ).rstrip("/")
 # Clé secrète du robot qui lance les tâches quotidiennes (cotisations du mois, rappels).
 TACHES_CLE = config("TACHES_CLE", default="")
