@@ -17,6 +17,7 @@ carte de membre avec QR code et espace d'administration par rôles.
 |---|---|---|
 | [Guide utilisateur](docs/GUIDE_UTILISATEUR.md) | Membres | Version imprimable : [PDF](docs/Guide-utilisateur-Dahira.pdf). S'inscrire, se connecter, carte de membre, cotisations, bus, questions |
 | [Guide d'administration](docs/GUIDE_ADMINISTRATION.md) | Responsables du Dahira | Version imprimable : [PDF](docs/Guide-administration-Dahira.pdf). Rôles, membres, finance, médiathèque, événements, bus, archives, paramètres |
+| [Guide des adresses e-mail](docs/GUIDE_EMAILS.md) | Administratrice | Version imprimable : [PDF](docs/Guide-adresses-email-Dahira.pdf). Qui reçoit contact@dahiracas.com, ajouter / retirer une personne, adresses par rôle (finance@, bus@…) |
 | [Documentation technique](docs/DOCUMENTATION_TECHNIQUE.md) | Développeurs | Architecture, modèles, API, sécurité, traduction, tâches automatiques, tests |
 | [Guide de démarrage et de déploiement](GUIDE_DEMARRAGE.md) | Développeurs | Installation locale, variables d'environnement, hébergement, maintenance |
 

@@ -239,6 +239,11 @@ Pour protéger d'autres mots (un nom de famille rare, un quartier, un kourel), a
 **Paramètres du site → Traduction automatique**, un par ligne. Les traductions concernées sont
 refaites automatiquement.
 
+## Adresses e-mail @dahiracas.com
+
+Pour faire recevoir les messages de contact@dahiracas.com par d'autres personnes, ou créer des
+adresses par rôle (finance@, bus@…), voir le [guide des adresses e-mail](GUIDE_EMAILS.md).
+
 ## 12. Bonnes pratiques
 
 - **Désactivez** un compte plutôt que de le supprimer : l'historique des cotisations reste.
