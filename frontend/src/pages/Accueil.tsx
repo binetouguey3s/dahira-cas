@@ -90,7 +90,7 @@ export default function Accueil() {
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="relative mb-8 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B3D2E] via-[#145c45] to-[#1E7A5D] p-6 text-white shadow-[0_24px_60px_-24px_rgba(11,61,46,0.6)] md:p-10"
+        className="bandeau-vert relative mb-8 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B3D2E] via-[#145c45] to-[#1E7A5D] p-6 text-white shadow-[0_24px_60px_-24px_rgba(11,61,46,0.6)] md:p-10"
       >
         <div className="motif-etoiles pointer-events-none absolute inset-0" />
         <motion.div

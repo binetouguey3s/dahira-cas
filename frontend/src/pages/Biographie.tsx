@@ -28,7 +28,7 @@ export default function Biographie() {
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative mb-10 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B3D2E] to-[#1E7A5D] px-6 py-10 text-center text-white md:py-14"
+        className="bandeau-vert relative mb-10 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B3D2E] to-[#1E7A5D] px-6 py-10 text-center text-white md:py-14"
       >
         <div className="motif-etoiles pointer-events-none absolute inset-0" />
         <motion.div

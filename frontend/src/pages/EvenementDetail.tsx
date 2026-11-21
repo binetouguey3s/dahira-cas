@@ -109,7 +109,7 @@ export default function EvenementDetail() {
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative mb-6 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B3D2E] to-[#1E7A5D] p-6 text-white md:p-8"
+        className="bandeau-vert relative mb-6 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B3D2E] to-[#1E7A5D] p-6 text-white md:p-8"
       >
         <div className="motif-etoiles pointer-events-none absolute inset-0" />
         <div className="relative flex items-start gap-5">

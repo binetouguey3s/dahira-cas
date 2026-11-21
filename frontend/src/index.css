@@ -40,9 +40,9 @@
   --text-inverse: #082019;
   --text-inverse-muted: rgba(8, 32, 25, 0.75);
   --border-default: #6b7570;
-  --accent-primary: #61b795;
+  --accent-primary: #7acbaa;
   --accent-secondary: #d9c89a;
-  --status-success: #61b795;
+  --status-success: #7acbaa;
   --status-error: #e07a6d;
   --status-error-bg: rgba(224, 122, 109, 0.16);
   --status-warning: #f0d8a8;
@@ -50,8 +50,8 @@
   --glass-bg-strong: rgba(16, 50, 38, 0.85);
   --glass-border: rgba(170, 179, 174, 0.25);
   --glass-shadow: rgba(0, 0, 0, 0.35);
-  --border-subtle: #1d4a3a;
-  --accent-soft: rgba(97, 183, 149, 0.14);
+  --border-subtle: #275c47;
+  --accent-soft: rgba(122, 203, 170, 0.17);
   --status-warning-bg: rgba(240, 216, 168, 0.12);
   --status-warning-text: #f0d8a8;
   --accent-secondary-text: #d9c89a;
@@ -230,3 +230,12 @@ body {
 .trait-coupe-hd { top: -5mm; right: -5mm; border-left-width: 0.2mm; border-bottom-width: 0.2mm; }
 .trait-coupe-bg { bottom: -5mm; left: -5mm; border-right-width: 0.2mm; border-top-width: 0.2mm; }
 .trait-coupe-bd { bottom: -5mm; right: -5mm; border-left-width: 0.2mm; border-top-width: 0.2mm; }
+
+/* Grands bandeaux verts (accueil, biographie, événement) : en mode sombre, ils se fondaient dans le
+   fond vert foncé. Dégradé plus lumineux et fin liseré doré pour bien les détacher. */
+[data-theme="dark"] .bandeau-vert {
+  background-image: linear-gradient(to bottom right, #155f47, #1e7a5d 60%, #279070);
+  box-shadow:
+    inset 0 0 0 1px rgba(217, 200, 154, 0.28),
+    0 24px 60px -24px rgba(0, 0, 0, 0.7);
+}
