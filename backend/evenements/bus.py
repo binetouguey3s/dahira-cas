@@ -3,7 +3,6 @@
 from collections import Counter
 from decimal import Decimal
 
-from django.db.models import Sum
 from rest_framework.exceptions import ValidationError
 
 from comptes.permissions import ROLES_EVENEMENTS, a_un_role
@@ -17,9 +16,10 @@ def est_responsable(user, evenement) -> bool:
     """Admin contenus / Admin général, ou membre désigné responsable des bus de cet événement."""
     if a_un_role(user, ROLES_EVENEMENTS):
         return True
-    return bool(
-        user and user.is_authenticated and evenement.responsables_bus.filter(membre=user).exists()
-    )
+    if not (user and user.is_authenticated):
+        return False
+    # .all() profite des responsables déjà chargés avec la liste des événements.
+    return any(r.membre_id == user.pk for r in evenement.responsables_bus.all())
 
 
 def places_occupees(evenement, sauf=()) -> Counter:
@@ -61,11 +61,12 @@ def montant_du(reservation) -> Decimal:
     prix = reservation.evenement.prix_place or Decimal("0")
     if reservation.annulee:
         return Decimal("0")
-    return prix * reservation.passagers.count()
+    return prix * len(reservation.passagers.all())
 
 
 def total_paiements(reservation, statut) -> Decimal:
-    return reservation.paiements.filter(statut=statut).aggregate(t=Sum("montant"))["t"] or Decimal("0")
+    # Calcul en Python sur les paiements (déjà chargés avec la réservation dans les listes).
+    return sum((p.montant for p in reservation.paiements.all() if p.statut == statut), Decimal("0"))
 
 
 def statut_reservation(reservation, du=None, paye=None) -> str:
@@ -85,4 +86,4 @@ def statut_reservation(reservation, du=None, paye=None) -> str:
 
 def modifiable_par_membre(reservation) -> bool:
     """Le membre peut modifier ou annuler lui-même tant qu'aucun paiement n'a été validé."""
-    return not reservation.annulee and not reservation.paiements.filter(statut=PaiementBus.Statut.VALIDE).exists()
+    return not reservation.annulee and not any(p.statut == PaiementBus.Statut.VALIDE for p in reservation.paiements.all())

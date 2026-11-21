@@ -1,4 +1,7 @@
+from collections import Counter
+
 from django.db import transaction
+from django.db.models import Count
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -64,11 +67,47 @@ class EvenementSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["archive_le", "id", "cree_par", "cree_le"]
 
+    # --- Lecture groupée -----------------------------------------------------------------------
+    # Pour une liste d'événements, les places occupées et les réservations du membre sont lues en
+    # une seule fois pour toute la page (au lieu de plusieurs requêtes par événement).
+
+    def _lot(self, obj):
+        lots = self.context.setdefault("_lot_bus", {})
+        if obj.pk not in lots:
+            parent = getattr(self, "parent", None)
+            page = list(parent.instance) if parent is not None and parent.instance is not None else [obj]
+            evenements = {e.pk: e for e in page if e.pk not in lots}
+            evenements[obj.pk] = obj
+            occupation = {pk: Counter() for pk in evenements}
+            lignes = (
+                PassagerBus.objects.filter(reservation__evenement_id__in=evenements)
+                .values("reservation__evenement_id", "bus_numero")
+                .annotate(n=Count("id"))
+            )
+            for ligne in lignes:
+                occupation[ligne["reservation__evenement_id"]][ligne["bus_numero"]] = ligne["n"]
+            miennes = {}
+            user = _utilisateur(self)
+            if user:
+                resas = (
+                    ReservationBus.objects.filter(evenement_id__in=evenements, membre=user, annulee=False)
+                    .select_related("membre")
+                    .prefetch_related(
+                        "passagers", "paiements__responsable__membre", "paiements__declare_par", "paiements__traite_par"
+                    )
+                )
+                for resa in resas:
+                    resa.evenement = evenements[resa.evenement_id]  # avec ses responsables déjà chargés
+                    miennes[resa.evenement_id] = resa
+            for pk in evenements:
+                lots[pk] = {"occupation": occupation[pk], "ma_reservation": miennes.get(pk)}
+        return lots[obj.pk]
+
     def get_bus(self, obj):
         """Places de chaque bus : [{numero, places_total, places_restantes}]."""
         if not obj.reservation_bus_active or not obj.nb_bus:
             return []
-        occupees = regles.places_occupees(obj)
+        occupees = self._lot(obj)["occupation"]
         total = obj.places_par_bus or 0
         return [
             {"numero": n, "places_total": total, "places_restantes": max(total - occupees.get(n, 0), 0)}
@@ -76,23 +115,24 @@ class EvenementSerializer(serializers.ModelSerializer):
         ]
 
     def get_places_restantes(self, obj):
-        return regles.places_restantes(obj) if obj.reservation_bus_active else 0
+        if not obj.reservation_bus_active:
+            return 0
+        return max(regles.capacite(obj) - sum(self._lot(obj)["occupation"].values()), 0)
 
     def get_ma_reservation(self, obj):
-        user = _utilisateur(self)
-        if not user:
+        if not _utilisateur(self):
             return None
-        resa = obj.reservations_bus.filter(membre=user, annulee=False).first()
+        resa = self._lot(obj)["ma_reservation"]
         return ReservationBusSerializer(resa, context=self.context).data if resa else None
 
     def get_nb_reservations(self, obj):
-        return PassagerBus.objects.filter(reservation__evenement=obj).count()
+        return sum(self._lot(obj)["occupation"].values())
 
     def get_responsables(self, obj):
         # Noms et numéros des responsables : visibles seulement par les membres connectés.
         if not _utilisateur(self):
             return []
-        return ResponsableBusSerializer(obj.responsables_bus.select_related("membre"), many=True).data
+        return ResponsableBusSerializer(obj.responsables_bus.all(), many=True).data
 
     def get_est_responsable(self, obj):
         user = _utilisateur(self)
@@ -244,7 +284,7 @@ class ReservationBusSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "membre", "acceptee", "annulee", "date_reservation"]
 
     def get_nb_places(self, obj):
-        return obj.passagers.count()
+        return len(obj.passagers.all())
 
     def get_montant_du(self, obj):
         return regles.montant_du(obj)

@@ -1,5 +1,6 @@
 import hashlib
 
+from django.core.cache import cache
 from django.db import models
 
 from dahira_backend.stockage import stockage_audio_video
@@ -48,13 +49,20 @@ class Parametres(models.Model):
     def __str__(self):
         return "Paramètres du site"
 
+    CLE_CACHE = "parametres_site"
+
     def save(self, *args, **kwargs):
         self.pk = 1
         super().save(*args, **kwargs)
+        cache.delete(self.CLE_CACHE)  # la prochaine lecture reprend les nouvelles valeurs
 
     @classmethod
     def charger(cls):
-        objet, _ = cls.objects.get_or_create(pk=1)
+        """Paramètres du site, gardés en mémoire (ils sont lus à chaque visite et changent rarement)."""
+        objet = cache.get(cls.CLE_CACHE)
+        if objet is None:
+            objet, _ = cls.objects.get_or_create(pk=1)
+            cache.set(cls.CLE_CACHE, objet, 3600)
         return objet
 
 

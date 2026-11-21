@@ -140,6 +140,23 @@ class NomsPropresEtAnneesTests(APITestCase):
         self.assertEqual(deproteger("في <x>Keur Ndiaye Lo</x>", "ar"), "في Keur Ndiaye Lo")
 
 
+class CacheParametresTests(APITestCase):
+    def test_lus_une_fois_puis_rafraichis_apres_modification(self):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+
+        from comptes.tests_utils import creer_membre
+
+        self.client.get("/api/site/parametres/")
+        with CaptureQueriesContext(connection) as requetes:
+            self.client.get("/api/site/parametres/")
+        self.assertEqual(len(requetes), 0)
+        self.client.force_authenticate(creer_membre("+221770000091", role="admin_contenus"))
+        self.client.patch("/api/site/parametres/", {"sigle": "DCAS"}, format="json")
+        self.client.force_authenticate(None)
+        self.assertEqual(self.client.get("/api/site/parametres/").data["sigle"], "DCAS")
+
+
 class SanteTests(APITestCase):
     def test_sante_sans_base_de_donnees(self):
         with self.assertNumQueries(0):

@@ -41,7 +41,8 @@ class EvenementViewSet(ArchivesMixin, viewsets.ModelViewSet):
     roles_archives = ROLES_EVENEMENTS
 
     def get_queryset(self):
-        qs = self.filtrer_archives(super().get_queryset())
+        # Responsables chargés avec les événements (affichage et droits sans requête par événement).
+        qs = self.filtrer_archives(super().get_queryset()).prefetch_related("responsables_bus__membre")
         periode = self.request.query_params.get("periode")
         if periode == "a_venir":
             qs = qs.filter(date__gte=timezone.now())
