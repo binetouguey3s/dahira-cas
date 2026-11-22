@@ -198,3 +198,53 @@ class ExportExcelView(APIView):
         )
         reponse["Content-Disposition"] = f'attachment; filename="cotisations-{annee}.xlsx"'
         return reponse
+
+
+class AnneeView(APIView):
+    """GET /api/finances/annee/?annee=2026 — tableau de l'année en une fois : chaque membre et ses 12 mois."""
+
+    permission_classes = [role_requis(*ROLES_FINANCE)]
+
+    def get(self, request):
+        from decimal import Decimal
+
+        from django.db.models import Q
+
+        from site_web.models import Parametres
+
+        try:
+            annee = int(request.query_params.get("annee") or timezone.localdate().year)
+        except ValueError:
+            annee = timezone.localdate().year
+        cotisations = Cotisation.objects.filter(annee=annee, archive_le__isnull=True)
+        par_membre = {}
+        for c in cotisations:
+            par_membre.setdefault(c.membre_id, {})[str(c.mois)] = {
+                "id": c.id,
+                "statut": c.statut,
+                "montant": c.montant,
+                "moyen_paiement": c.moyen_paiement,
+                "reference_transaction": c.reference_transaction,
+                "date_paiement": c.date_paiement,
+            }
+        membres = Membre.objects.filter(Q(is_active=True) | Q(pk__in=par_membre.keys())).order_by("nom_complet").distinct()
+        lignes = []
+        for m in membres:
+            mois = par_membre.get(m.pk, {})
+            paye = sum((c["montant"] for c in mois.values() if c["statut"] == "paye"), Decimal("0"))
+            reste = sum((c["montant"] for c in mois.values() if c["statut"] != "paye"), Decimal("0"))
+            lignes.append(
+                {
+                    "id": m.pk,
+                    "nom_complet": m.nom_complet or m.username,
+                    "telephone": m.telephone,
+                    "carte_numero": m.carte_numero,
+                    "sans_compte": m.sans_compte,
+                    "cotisations": mois,
+                    "total_paye": paye,
+                    "reste": reste,
+                }
+            )
+        return Response(
+            {"annee": annee, "montant_defaut": Parametres.charger().montant_cotisation, "membres": lignes}
+        )

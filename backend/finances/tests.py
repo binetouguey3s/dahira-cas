@@ -239,3 +239,24 @@ class MembresSansCompteEtExcelTests(APITestCase):
         self.assertEqual((ligne[4], ligne[5]), ("Payé", "Retard"))
         self.assertEqual((ligne[16], ligne[17]), (1000, 1000))
         self.assertEqual(classeur["Paiements 2026"]["E4"].value, 1000)
+
+
+class VueAnneeTests(APITestCase):
+    def test_annee_en_une_requete(self):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+
+        finance = creer_membre("+221770000041", role="responsable_finance")
+        m = creer_membre("+221770000042")
+        Cotisation.objects.create(membre=m, mois=3, annee=2026, statut="paye", montant=1000)
+        Cotisation.objects.create(membre=m, mois=4, annee=2026, statut="en_retard", montant=1000)
+        self.client.force_authenticate(m)
+        self.assertEqual(self.client.get("/api/finances/annee/?annee=2026").status_code, 403)
+        self.client.force_authenticate(finance)
+        self.client.get("/api/finances/annee/?annee=2026")
+        with CaptureQueriesContext(connection) as q:
+            data = self.client.get("/api/finances/annee/?annee=2026").data
+        self.assertLessEqual(len(q), 4)
+        ligne = next(l for l in data["membres"] if l["id"] == m.id)
+        self.assertEqual(ligne["cotisations"]["3"]["statut"], "paye")
+        self.assertEqual((ligne["total_paye"], ligne["reste"]), (1000, 1000))

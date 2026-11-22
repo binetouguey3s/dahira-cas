@@ -5,6 +5,7 @@ from django.urls import path
 from .views import (
     CotisationViewSet,
     EnvoyerRappelsView,
+    AnneeView,
     ExportExcelView,
     MembreSansCompteViewSet,
     RappelsView,
@@ -20,5 +21,6 @@ urlpatterns = [
     path("rappels/envoyer/", EnvoyerRappelsView.as_view(), name="rappels-envoyer"),
     path("taches/", TachesQuotidiennesView.as_view(), name="taches-quotidiennes"),
     path("export/", ExportExcelView.as_view(), name="export-excel"),
+    path("annee/", AnneeView.as_view(), name="annee"),
     *router.urls,
 ]

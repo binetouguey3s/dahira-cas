@@ -95,6 +95,16 @@ gestion, et **Inscrire un membre** pour quelqu'un qui n'a pas de smartphone.
   mais ne peut pas se connecter. S'il s'inscrit un jour avec le même numéro de téléphone, il
   retrouve automatiquement son numéro de carte et tout son historique de cotisations.
 
+### Vue de l'année
+En haut de la page Finance, l'onglet **Année** affiche une carte par membre avec ses 12 mois en
+couleur (vert = payé, rouge = en retard, jaune = à payer, pointillé = pas de cotisation) et ce qui
+reste à payer.
+- **Touchez un mois** pour l'encaisser (Wave, Orange Money ou espèces / autre, référence
+  facultative). S'il n'y a pas encore de cotisation ce mois-là, elle est créée et marquée payée.
+- Touchez un mois **payé** pour voir la date, le moyen et la référence, ou annuler le paiement.
+- **Retardataires seulement** : n'affiche que les membres qui doivent encore quelque chose.
+- Recherche par nom, téléphone ou n° de carte ; 10 membres par page.
+
 ### Ce que fait le robot automatique chaque matin
 1. **Le 1er du mois** : crée les cotisations du mois pour chaque membre actif.
 2. **Chaque jour** : passe « en retard » les mois précédents non payés.

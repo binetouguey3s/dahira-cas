@@ -453,7 +453,22 @@
     "telephoneSansCompteAide": "اختياري. أضفه إن أمكن: يسمح بالتذكير عبر واتساب وبالاحتفاظ بسجلّه إذا سجّل لاحقًا.",
     "ajouterMembre": "إضافة العضو",
     "sansCompteAjoute": "تمت إضافة {{nom}} مع اشتراك هذا الشهر.",
-    "sansCompte": "بدون حساب"
+    "sansCompte": "بدون حساب",
+    "vueMois": "حسب الشهر",
+    "vueAnnee": "السنة",
+    "retardatairesSeulement": "المتأخرون فقط",
+    "legende": {
+      "paye": "مدفوع",
+      "en_retard": "متأخر",
+      "non_paye": "للدفع",
+      "vide": "لا اشتراك"
+    },
+    "resteDu": "المتبقي {{montant}}",
+    "aJour": "محدَّث ✓",
+    "paiementAnnule": "تم إلغاء الدفع.",
+    "aEncaisser": "المبلغ المطلوب تحصيله: {{montant}}. اختر وسيلة الدفع:",
+    "pasDeCotisation": "لا يوجد اشتراك بعد لهذا الشهر: سيُنشأ ({{montant}}) ويُسجَّل مدفوعًا.",
+    "aucuneCotisation": "لا اشتراكات"
   },
   "adminMedia": {
     "sousTitre": "انشر الدروس وأدِرها.",

@@ -429,7 +429,22 @@
     "telephoneSansCompteAide": "Opcional. Indícalo si es posible: permite recordatorios por WhatsApp y conservar su historial si se registra más tarde.",
     "ajouterMembre": "Añadir el miembro",
     "sansCompteAjoute": "{{nom}} ha sido añadido, con la cuota de este mes.",
-    "sansCompte": "Sin cuenta"
+    "sansCompte": "Sin cuenta",
+    "vueMois": "Por mes",
+    "vueAnnee": "Año",
+    "retardatairesSeulement": "Solo morosos",
+    "legende": {
+      "paye": "Pagado",
+      "en_retard": "Atrasado",
+      "non_paye": "Por pagar",
+      "vide": "Sin cuota"
+    },
+    "resteDu": "Faltan {{montant}}",
+    "aJour": "Al día ✓",
+    "paiementAnnule": "Pago anulado.",
+    "aEncaisser": "Importe a cobrar: {{montant}}. Elige el medio de pago:",
+    "pasDeCotisation": "Aún no hay cuota este mes: se creará ({{montant}}) y se marcará como pagada.",
+    "aucuneCotisation": "Sin cuotas"
   },
   "adminMedia": {
     "sousTitre": "Publica y gestiona las enseñanzas.",

@@ -429,7 +429,22 @@
     "telephoneSansCompteAide": "Facultatif. Indiquez-le si possible : il permet de le relancer par WhatsApp et de retrouver son historique s'il s'inscrit plus tard.",
     "ajouterMembre": "Ajouter le membre",
     "sansCompteAjoute": "{{nom}} est ajouté, avec sa cotisation du mois.",
-    "sansCompte": "Sans compte"
+    "sansCompte": "Sans compte",
+    "vueMois": "Par mois",
+    "vueAnnee": "Année",
+    "retardatairesSeulement": "Retardataires seulement",
+    "legende": {
+      "paye": "Payé",
+      "en_retard": "En retard",
+      "non_paye": "À payer",
+      "vide": "Pas de cotisation"
+    },
+    "resteDu": "Reste {{montant}}",
+    "aJour": "À jour ✓",
+    "paiementAnnule": "Paiement annulé.",
+    "aEncaisser": "Montant à encaisser : {{montant}}. Choisissez le moyen de paiement :",
+    "pasDeCotisation": "Pas encore de cotisation ce mois-ci : elle sera créée ({{montant}}) et marquée payée.",
+    "aucuneCotisation": "Aucune cotisation"
   },
   "adminMedia": {
     "sousTitre": "Publiez et gérez les enseignements.",

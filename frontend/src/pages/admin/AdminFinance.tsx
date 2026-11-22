@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/layout/AppShell";
 import { Archives, BoutonArchives } from "@/components/metier/Archives";
 import { RappelsCotisation } from "@/components/metier/RappelsCotisation";
+import { VueAnnee } from "@/components/metier/finance/VueAnnee";
 import { TelephoneInput } from "@/components/ui/TelephoneInput";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
@@ -25,6 +26,7 @@ export default function AdminFinance() {
   const { parametres } = useParametres();
   const { notifier } = useToast();
   const maintenant = new Date();
+  const [vue, setVue] = useState<"mois" | "annee">("mois");
   const [mois, setMois] = useState(maintenant.getMonth() + 1);
   const [annee, setAnnee] = useState(maintenant.getFullYear());
   const [statut, setStatut] = useState<"tous" | "paye" | "impaye">("tous");
@@ -243,6 +245,27 @@ export default function AdminFinance() {
         }
       />
 
+      <Onglets
+        className="mb-5 max-w-sm"
+        valeur={vue}
+        onChange={setVue}
+        options={[
+          { id: "mois", label: t("finance.vueMois") },
+          { id: "annee", label: t("finance.vueAnnee") },
+        ]}
+      />
+
+      {vue === "annee" ? (
+        <>
+          <Select value={annee} onChange={(e) => setAnnee(Number(e.target.value))} className="mb-4 w-auto min-w-28" aria-label={t("finance.annee")}>
+            {Array.from({ length: 6 }, (_, i) => maintenant.getFullYear() + 1 - i).map((a) => (
+              <option key={a}>{a}</option>
+            ))}
+          </Select>
+          <VueAnnee annee={annee} onChange={charger} />
+        </>
+      ) : (
+        <>
       <div className="mb-5 flex flex-wrap gap-3">
         <Select value={mois} onChange={(e) => setMois(Number(e.target.value))} className="w-auto min-w-40 capitalize" aria-label={t("finance.mois")}>
           {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
@@ -355,6 +378,9 @@ export default function AdminFinance() {
       )}
 
       {/* Encaisser */}
+        </>
+      )}
+
       <Modal
         ouvert={!!aEncaisser}
         onFermer={() => setAEncaisser(null)}

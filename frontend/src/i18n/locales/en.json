@@ -429,7 +429,22 @@
     "telephoneSansCompteAide": "Optional. Add it if possible: it allows WhatsApp reminders and keeps their history if they register later.",
     "ajouterMembre": "Add member",
     "sansCompteAjoute": "{{nom}} has been added, with this month's contribution.",
-    "sansCompte": "No account"
+    "sansCompte": "No account",
+    "vueMois": "By month",
+    "vueAnnee": "Year",
+    "retardatairesSeulement": "Late payers only",
+    "legende": {
+      "paye": "Paid",
+      "en_retard": "Late",
+      "non_paye": "To pay",
+      "vide": "No contribution"
+    },
+    "resteDu": "{{montant}} left",
+    "aJour": "Up to date ✓",
+    "paiementAnnule": "Payment cancelled.",
+    "aEncaisser": "Amount to collect: {{montant}}. Choose the payment method:",
+    "pasDeCotisation": "No contribution yet this month: it will be created ({{montant}}) and marked as paid.",
+    "aucuneCotisation": "No contribution"
   },
   "adminMedia": {
     "sousTitre": "Publish and manage teachings.",
