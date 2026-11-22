@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
 
 
 class Membre(AbstractUser):
@@ -21,7 +22,8 @@ class Membre(AbstractUser):
         AR = "ar", "العربية"
 
     nom_complet = models.CharField(max_length=150)
-    telephone = models.CharField(max_length=20, unique=True)
+    # Unique quand il est renseigné ; vide possible pour un membre sans compte (sans téléphone).
+    telephone = models.CharField(max_length=20, blank=True)
     profession = models.CharField(max_length=120, blank=True)
     adresse = models.CharField(max_length=255, blank=True)
     pays = models.CharField(max_length=80, blank=True, default="SN")  # code ISO 3166 (SN, FR…)
@@ -32,8 +34,18 @@ class Membre(AbstractUser):
     date_inscription = models.DateTimeField(auto_now_add=True)
     # Annonces des événements par e-mail (le membre peut les couper dans son profil).
     recevoir_annonces = models.BooleanField(default=True)
+    # Membre ajouté par la Finance (ou l'administration) sans compte sur la plateforme : il a ses
+    # cotisations mais ne se connecte pas. S'il s'inscrit plus tard avec ce numéro, son historique est gardé.
+    sans_compte = models.BooleanField(default=False)
 
     REQUIRED_FIELDS = ["email"]
+
+    class Meta(AbstractUser.Meta):
+        constraints = [
+            models.UniqueConstraint(
+                fields=["telephone"], condition=~Q(telephone=""), name="telephone_unique_si_renseigne"
+            )
+        ]
 
     def save(self, *args, **kwargs):
         if not self.carte_numero:

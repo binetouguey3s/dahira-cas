@@ -7,6 +7,7 @@ class CotisationSerializer(serializers.ModelSerializer):
     archive_par_nom = serializers.CharField(source="archive_par.nom_complet", read_only=True, default="")
     membre_nom = serializers.CharField(source="membre.nom_complet", read_only=True)
     membre_telephone = serializers.CharField(source="membre.telephone", read_only=True)
+    membre_sans_compte = serializers.BooleanField(source="membre.sans_compte", read_only=True)
 
     class Meta:
         model = Cotisation
@@ -17,6 +18,7 @@ class CotisationSerializer(serializers.ModelSerializer):
             "membre",
             "membre_nom",
             "membre_telephone",
+            "membre_sans_compte",
             "mois",
             "annee",
             "montant",

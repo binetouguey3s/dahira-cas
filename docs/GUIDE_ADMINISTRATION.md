@@ -84,6 +84,16 @@ gestion, et **Inscrire un membre** pour quelqu'un qui n'a pas de smartphone.
   pas encore pour ce mois (ce que fait aussi le robot automatique le 1er du mois).
 - **Archiver** (icône boîte) : retire une cotisation créée par erreur ; elle reste récupérable
   dans **Archives**.
+- **Exporter (Excel)** : télécharge un fichier .xlsx de l'année affichée, avec deux onglets :
+  - *Tableau* : une ligne par membre, une colonne par mois (vert = payé, rouge = en retard,
+    jaune = à payer), total payé et reste dû, et le total général ;
+  - *Paiements* : la liste détaillée des paiements reçus (date, membre, mois, montant, moyen,
+    référence).
+- **Membre non inscrit** : ajoute un membre du Dahira qui n'a pas de compte sur la plateforme
+  (sans smartphone, par exemple) : nom, et si possible téléphone et adresse. Il a ses cotisations
+  comme les autres (celle du mois est créée tout de suite), apparaît avec la mention « Sans compte »,
+  mais ne peut pas se connecter. S'il s'inscrit un jour avec le même numéro de téléphone, il
+  retrouve automatiquement son numéro de carte et tout son historique de cotisations.
 
 ### Ce que fait le robot automatique chaque matin
 1. **Le 1er du mois** : crée les cotisations du mois pour chaque membre actif.

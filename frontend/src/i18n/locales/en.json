@@ -421,7 +421,15 @@
     "aucuneCeMoisAide": "Generate this month's contributions for all members in one click.",
     "supprimerTitre": "Archive this contribution?",
     "supprimerMessage": "{{nom}}'s contribution will be archived. You can restore it from “Archives”.",
-    "generees": "{{count}} contributions created"
+    "generees": "{{count}} contributions created",
+    "exporterExcel": "Export (Excel)",
+    "exportFait": "{{annee}} Excel file downloaded.",
+    "membreSansCompte": "Unregistered member",
+    "membreSansCompteAide": "For a Dahira member who has no account on the platform (no smartphone, for example). They have contributions like everyone else but do not sign in. If they register one day with the same number, they keep their history.",
+    "telephoneSansCompteAide": "Optional. Add it if possible: it allows WhatsApp reminders and keeps their history if they register later.",
+    "ajouterMembre": "Add member",
+    "sansCompteAjoute": "{{nom}} has been added, with this month's contribution.",
+    "sansCompte": "No account"
   },
   "adminMedia": {
     "sousTitre": "Publish and manage teachings.",

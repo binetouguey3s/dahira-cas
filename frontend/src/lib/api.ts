@@ -120,6 +120,7 @@ export interface MembreAdmin extends Omit<Membre, "username"> {
   is_active: boolean;
   last_login: string | null;
   nb_cotisations_payees: number;
+  sans_compte?: boolean;
 }
 
 export interface MembreResume {
@@ -128,6 +129,8 @@ export interface MembreResume {
   telephone: string;
   carte_numero: string;
   photo: string | null;
+  /** Ajouté par la Finance, sans compte sur la plateforme. */
+  sans_compte?: boolean;
 }
 
 export interface CarteVerification {
@@ -145,6 +148,7 @@ export interface Cotisation {
   membre: number;
   membre_nom: string;
   membre_telephone: string;
+  membre_sans_compte?: boolean;
   mois: number;
   annee: number;
   montant: string;

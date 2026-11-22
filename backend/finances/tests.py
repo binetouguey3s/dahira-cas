@@ -166,3 +166,76 @@ class RappelsTests(APITestCase):
         taches_quotidiennes(date(2026, 11, 1))
         taches_quotidiennes(date(2026, 11, 10))
         self.assertIn("نوفمبر 2026", mail.outbox[0].body)
+
+
+class MembresSansCompteEtExcelTests(APITestCase):
+    def setUp(self):
+        from django.core.cache import cache
+
+        cache.clear()
+        self.finance = creer_membre("+221770000051", role="responsable_finance")
+        self.membre = creer_membre("+221770000052")
+
+    def test_ajout_sans_telephone_puis_cotisation_du_mois(self):
+        self.client.force_authenticate(self.membre)
+        self.assertEqual(self.client.post("/api/finances/membres-sans-compte/", {"nom_complet": "X Y"}).status_code, 403)
+        self.client.force_authenticate(self.finance)
+        res = self.client.post("/api/finances/membres-sans-compte/", {"nom_complet": "  Mame   Diarra Bousso "}, format="json")
+        self.assertEqual(res.status_code, 201, res.data)
+        self.assertEqual(res.data["nom_complet"], "Mame Diarra Bousso")
+        self.assertTrue(res.data["carte_numero"].startswith("FDCAS-"))
+        # Deux membres sans téléphone : pas de conflit d'unicité.
+        self.assertEqual(self.client.post("/api/finances/membres-sans-compte/", {"nom_complet": "Ali Ba"}, format="json").status_code, 201)
+        from comptes.models import Membre
+
+        sans = Membre.objects.get(pk=res.data["id"])
+        self.assertFalse(sans.has_usable_password())
+        self.assertEqual(Cotisation.objects.filter(membre=sans).count(), 1)
+        annuaire = self.client.get("/api/comptes/annuaire/").data
+        self.assertTrue(any(m["sans_compte"] for m in annuaire))
+
+    def test_inscription_rattache_l_historique(self):
+        self.client.force_authenticate(self.finance)
+        res = self.client.post("/api/finances/membres-sans-compte/", {"nom_complet": "Awa Sarr", "telephone": "77 555 44 33"}, format="json")
+        sans_id, carte = res.data["id"], res.data["carte_numero"]
+        self.client.force_authenticate(None)
+        rep = self.client.post(
+            "/api/comptes/inscription/",
+            {"nom_complet": "Awa Sarr", "telephone": "775554433", "telephone_confirmation": "775554433", "password": "MotDePasse-Solide-42"},
+            format="json",
+        )
+        self.assertEqual(rep.status_code, 201, rep.data)
+        self.assertEqual(rep.data["membre"]["id"], sans_id)
+        self.assertEqual(rep.data["membre"]["carte_numero"], carte)
+        self.assertEqual(Cotisation.objects.filter(membre_id=sans_id).count(), 1)
+        # Le numéro d'un vrai compte reste protégé.
+        rep = self.client.post(
+            "/api/comptes/inscription/",
+            {"nom_complet": "Z", "telephone": "770000052", "password": "MotDePasse-Solide-42"},
+            format="json",
+        )
+        self.assertEqual(rep.status_code, 400)
+
+    def test_export_excel(self):
+        from io import BytesIO
+
+        from django.utils import timezone
+
+        from openpyxl import load_workbook
+
+        Cotisation.objects.create(membre=self.membre, mois=1, annee=2026, statut="paye", montant=1000, moyen_paiement="wave", date_paiement=timezone.now())
+        Cotisation.objects.create(membre=self.membre, mois=2, annee=2026, statut="en_retard", montant=1000)
+        self.client.force_authenticate(self.membre)
+        self.assertEqual(self.client.get("/api/finances/export/?annee=2026").status_code, 403)
+        self.client.force_authenticate(self.finance)
+        rep = self.client.get("/api/finances/export/?annee=2026")
+        self.assertEqual(rep.status_code, 200)
+        self.assertIn("cotisations-2026.xlsx", rep["Content-Disposition"])
+        classeur = load_workbook(BytesIO(rep.content))
+        self.assertEqual(classeur.sheetnames, ["Tableau 2026", "Paiements 2026"])
+        tableau = classeur["Tableau 2026"]
+        lignes = {r[0]: r for r in tableau.iter_rows(min_row=5, values_only=True)}
+        ligne = lignes[self.membre.nom_complet]
+        self.assertEqual((ligne[4], ligne[5]), ("Payé", "Retard"))
+        self.assertEqual((ligne[16], ligne[17]), (1000, 1000))
+        self.assertEqual(classeur["Paiements 2026"]["E4"].value, 1000)

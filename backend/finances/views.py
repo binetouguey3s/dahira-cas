@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.utils import timezone
-from rest_framework import permissions, viewsets
+from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
@@ -12,8 +12,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from dahira_backend.archives import ArchivesMixin
 
-from comptes.permissions import ROLES_FINANCE, a_un_role
+from comptes.models import Membre
+from comptes.permissions import ROLES_FINANCE, a_un_role, role_requis
+from comptes.serializers import MembreSansCompteSerializer
 
+from .export_excel import classeur_annee
 from .models import Cotisation, ReglagesRappels
 from .rappels import apercu, envoyer_rappels, generer_mois, prochain_envoi, taches_quotidiennes
 from .serializers import CotisationSerializer, GenererCotisationsSerializer, ReglagesRappelsSerializer
@@ -145,3 +148,53 @@ class TachesQuotidiennesView(APIView):
         if not cle or not secrets.compare_digest(recue.encode(), cle.encode()):
             return Response({"detail": "Clé invalide."}, status=403)
         return Response(taches_quotidiennes())
+
+
+class MembreSansCompteViewSet(
+    mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    """/api/finances/membres-sans-compte/ — la Finance ajoute ou corrige un membre non inscrit sur la plateforme."""
+
+    serializer_class = MembreSansCompteSerializer
+    permission_classes = [role_requis(*ROLES_FINANCE)]
+    http_method_names = ["get", "post", "patch", "options"]
+
+    def get_queryset(self):
+        return Membre.objects.filter(sans_compte=True).order_by("nom_complet")
+
+    def perform_create(self, serializer):
+        from site_web.models import Parametres
+
+        membre = serializer.save()
+        # Cotisation du mois en cours, comme pour les autres membres.
+        aujourdhui = timezone.localdate()
+        Cotisation.objects.get_or_create(
+            membre=membre,
+            mois=aujourdhui.month,
+            annee=aujourdhui.year,
+            defaults={"montant": Parametres.charger().montant_cotisation},
+        )
+
+
+class ExportExcelView(APIView):
+    """GET /api/finances/export/?annee=2026 — fichier Excel : tableau de l'année et détail des paiements."""
+
+    permission_classes = [role_requis(*ROLES_FINANCE)]
+
+    def get(self, request):
+        from django.http import HttpResponse
+
+        from site_web.models import Parametres
+
+        try:
+            annee = int(request.query_params.get("annee") or timezone.localdate().year)
+        except ValueError:
+            annee = timezone.localdate().year
+        if not 2000 <= annee <= 2100:
+            annee = timezone.localdate().year
+        contenu = classeur_annee(annee, Parametres.charger().nom_dahira)
+        reponse = HttpResponse(
+            contenu, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        reponse["Content-Disposition"] = f'attachment; filename="cotisations-{annee}.xlsx"'
+        return reponse

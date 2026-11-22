@@ -9,6 +9,7 @@ python-decouple==3.8
 Pillow==12.3.0
 phonenumbers==9.0.43
 whitenoise==6.12.0
+openpyxl==3.1.5
 gunicorn==27.0.1
 # Stockage médias sur Cloudinary (actif seulement si CLOUDINARY_* est défini) :
 django-cloudinary-storage==0.3.0

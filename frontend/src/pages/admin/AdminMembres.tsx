@@ -203,6 +203,7 @@ export default function AdminMembres() {
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     <Badge tone={m.role === "membre" ? "neutral" : "or"}>{t(`roles.${m.role}`)}</Badge>
                     {!m.is_active && <Badge tone="error">{t("admin.desactive")}</Badge>}
+                    {m.sans_compte && <Badge>{t("finance.sansCompte")}</Badge>}
                   </div>
                 </CardInteractive>
               </ElementAnime>
@@ -230,7 +231,7 @@ export default function AdminMembres() {
         description={edition === "nouveau" ? t("admin.inviterDescription") : undefined}
         pied={
           <>
-            {edition && edition !== "nouveau" && (
+            {edition && edition !== "nouveau" && !edition.sans_compte && (
               <Button variant="ghost" className="sm:me-auto" onClick={() => setAReinitialiser(edition)}>
                 <KeyRound className="h-4 w-4" /> {t("admin.reinitialiserMdp")}
               </Button>

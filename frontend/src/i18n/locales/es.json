@@ -421,7 +421,15 @@
     "aucuneCeMoisAide": "Genera las cuotas del mes para todos los miembros con un clic.",
     "supprimerTitre": "¿Archivar esta cuota?",
     "supprimerMessage": "La cuota de {{nom}} se archivará. Podrás restaurarla desde «Archivo».",
-    "generees": "{{count}} cuotas creadas"
+    "generees": "{{count}} cuotas creadas",
+    "exporterExcel": "Exportar (Excel)",
+    "exportFait": "Archivo Excel {{annee}} descargado.",
+    "membreSansCompte": "Miembro no registrado",
+    "membreSansCompteAide": "Para un miembro de la Dahira que no tiene cuenta en la plataforma (sin smartphone, por ejemplo). Tiene sus cuotas como los demás, pero no inicia sesión. Si se registra un día con el mismo número, conserva su historial.",
+    "telephoneSansCompteAide": "Opcional. Indícalo si es posible: permite recordatorios por WhatsApp y conservar su historial si se registra más tarde.",
+    "ajouterMembre": "Añadir el miembro",
+    "sansCompteAjoute": "{{nom}} ha sido añadido, con la cuota de este mes.",
+    "sansCompte": "Sin cuenta"
   },
   "adminMedia": {
     "sousTitre": "Publica y gestiona las enseñanzas.",

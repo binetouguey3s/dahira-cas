@@ -1,10 +1,11 @@
-import { Archive, Banknote, CalendarPlus, CheckCircle2, MessageCircle, Plus, Search, Wallet } from "lucide-react";
+import { Archive, Banknote, CalendarPlus, CheckCircle2, Download, MessageCircle, Plus, Search, UserPlus, Wallet } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { Archives, BoutonArchives } from "@/components/metier/Archives";
 import { RappelsCotisation } from "@/components/metier/RappelsCotisation";
+import { TelephoneInput } from "@/components/ui/TelephoneInput";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { Avatar, ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Stat, Vide } from "@/components/ui/Divers";
@@ -43,6 +44,9 @@ export default function AdminFinance() {
   const [montantAjout, setMontantAjout] = useState(parametres.montant_cotisation);
   const [aSupprimer, setASupprimer] = useState<Cotisation | null>(null);
   const [archives, setArchives] = useState(false);
+  const [nouveauSansCompte, setNouveauSansCompte] = useState(false);
+  const [sansCompte, setSansCompte] = useState({ nom: "", telephone: "", adresse: "" });
+  const [export_, setExport] = useState(false);
 
   const charger = () => {
     setCotisations(null);
@@ -143,6 +147,46 @@ export default function AdminFinance() {
     }
   };
 
+  /** Fichier Excel de l'année affichée : tableau des membres × mois et détail des paiements. */
+  const exporterExcel = async () => {
+    setExport(true);
+    try {
+      const { data } = await api.get<Blob>(`/finances/export/?annee=${annee}`, { responseType: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(data);
+      a.download = `cotisations-${annee}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+      notifier(t("finance.exportFait", { annee }));
+    } catch (err) {
+      notifier(messageErreur(err, t("commun.erreur")), "erreur");
+    } finally {
+      setExport(false);
+    }
+  };
+
+  const ajouterSansCompte = async () => {
+    setEnvoi(true);
+    try {
+      await api.post("/finances/membres-sans-compte/", {
+        nom_complet: sansCompte.nom.trim(),
+        telephone: sansCompte.telephone,
+        adresse: sansCompte.adresse.trim(),
+      });
+      notifier(t("finance.sansCompteAjoute", { nom: sansCompte.nom.trim() }));
+      setNouveauSansCompte(false);
+      setSansCompte({ nom: "", telephone: "", adresse: "" });
+      setAnnuaire([]);
+      charger();
+    } catch (err) {
+      notifier(messageErreur(err, t("commun.erreur")), "erreur");
+    } finally {
+      setEnvoi(false);
+    }
+  };
+
   const supprimer = async () => {
     if (!aSupprimer) return;
     setEnvoi(true);
@@ -183,6 +227,12 @@ export default function AdminFinance() {
         action={
           <>
             <BoutonArchives onClick={() => setArchives(true)} />
+            <Button variant="outline" onClick={exporterExcel} chargement={export_}>
+              <Download className="h-4 w-4" /> {t("finance.exporterExcel")}
+            </Button>
+            <Button variant="outline" onClick={() => setNouveauSansCompte(true)}>
+              <UserPlus className="h-4 w-4" /> {t("finance.membreSansCompte")}
+            </Button>
             <Button variant="outline" onClick={() => setAjout(true)}>
               <Plus className="h-4 w-4" /> {t("finance.ajouter")}
             </Button>
@@ -249,7 +299,10 @@ export default function AdminFinance() {
               <Card className="flex flex-wrap items-center gap-3">
                 <Avatar nom={c.membre_nom} taille={40} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-text-primary">{c.membre_nom}</p>
+                  <p className="flex min-w-0 items-center gap-2 font-semibold text-text-primary">
+                    <span className="truncate">{c.membre_nom}</span>
+                    {c.membre_sans_compte && <Badge className="shrink-0 text-[10px]">{t("finance.sansCompte")}</Badge>}
+                  </p>
                   <p className="truncate text-sm text-text-secondary">
                     {formatMontant(c.montant)}
                     {c.moyen_paiement && ` · ${t(`cotisations.moyens.${c.moyen_paiement}`)}`}
@@ -267,11 +320,13 @@ export default function AdminFinance() {
                       <Button size="sm" onClick={() => setAEncaisser(c)} className="flex-1 sm:flex-none">
                         {t("finance.encaisser")}
                       </Button>
-                      <Button asChild variant="secondary" size="sm" title={t("finance.rappeler")}>
-                        <a href={rappel(c)} target="_blank" rel="noreferrer">
-                          <MessageCircle className="h-4 w-4" />
-                        </a>
-                      </Button>
+                      {c.membre_telephone && (
+                        <Button asChild variant="secondary" size="sm" title={t("finance.rappeler")}>
+                          <a href={rappel(c)} target="_blank" rel="noreferrer">
+                            <MessageCircle className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      )}
                     </>
                   )}
                   <Button variant="ghost" size="sm" className="text-status-error" onClick={() => setASupprimer(c)} aria-label={t("archives.archiver")}>
@@ -388,7 +443,9 @@ export default function AdminFinance() {
                 <Avatar nom={m.nom_complet} photo={m.photo} taille={32} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold text-text-primary">{m.nom_complet}</span>
-                  <span className="block truncate text-xs text-text-secondary">{m.telephone}</span>
+                  <span className="block truncate text-xs text-text-secondary">
+                    {[m.telephone, m.sans_compte && t("finance.sansCompte")].filter(Boolean).join(" · ") || m.carte_numero}
+                  </span>
                 </span>
                 {choixMembre === m.id && <CheckCircle2 className="h-5 w-5 text-accent-primary" />}
               </button>
@@ -409,6 +466,35 @@ export default function AdminFinance() {
         libelleConfirmer={t("archives.archiver")}
         chargement={envoi}
       />
+
+      <Modal
+        ouvert={nouveauSansCompte}
+        onFermer={() => setNouveauSansCompte(false)}
+        titre={t("finance.membreSansCompte")}
+        description={t("finance.membreSansCompteAide")}
+        pied={
+          <>
+            <Button variant="outline" onClick={() => setNouveauSansCompte(false)}>
+              {t("commun.annuler")}
+            </Button>
+            <Button onClick={ajouterSansCompte} chargement={envoi} disabled={sansCompte.nom.trim().length < 2}>
+              {t("finance.ajouterMembre")}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <Champ label={t("champs.nomComplet")}>
+            {(id) => <Input id={id} value={sansCompte.nom} onChange={(e) => setSansCompte((s) => ({ ...s, nom: e.target.value }))} />}
+          </Champ>
+          <Champ label={t("champs.telephone")} optionnel={t("commun.optionnel")} aide={t("finance.telephoneSansCompteAide")}>
+            {(id) => <TelephoneInput id={id} valeur={sansCompte.telephone} onChange={(telephone) => setSansCompte((s) => ({ ...s, telephone }))} />}
+          </Champ>
+          <Champ label={t("champs.adresse")} optionnel={t("commun.optionnel")}>
+            {(id) => <Input id={id} value={sansCompte.adresse} onChange={(e) => setSansCompte((s) => ({ ...s, adresse: e.target.value }))} />}
+          </Champ>
+        </div>
+      </Modal>
 
       <Archives<Cotisation>
         ouvert={archives}

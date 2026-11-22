@@ -1,4 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
+from django.db.models import Q
 from rest_framework import serializers
 
 from dahira_backend.stockage import supprimer_fichier
@@ -102,16 +103,23 @@ class MembreAdminSerializer(serializers.ModelSerializer):
             "date_inscription",
             "last_login",
             "nb_cotisations_payees",
+            "sans_compte",
         ]
-        read_only_fields = ["id", "is_staff", "carte_numero", "date_inscription", "last_login", "photo"]
+        read_only_fields = ["id", "is_staff", "carte_numero", "date_inscription", "last_login", "photo", "sans_compte"]
+        extra_kwargs = {"telephone": {"required": False, "allow_blank": True}}
 
     def validate_telephone(self, valeur):
+        # Un membre sans compte peut ne pas avoir de téléphone ; un compte normal en a toujours un.
+        if not (valeur or "").strip() and self.instance and self.instance.sans_compte:
+            return ""
         return valider_telephone_unique(valeur, self.instance)
 
     def validate_pays(self, valeur):
         return valider_pays(valeur)
 
     def validate(self, attrs):
+        if not self.instance and not attrs.get("telephone"):
+            raise serializers.ValidationError({"telephone": "Indiquez le numéro de téléphone."})
         demandeur = self.context["request"].user
         if self.instance and self.instance.pk == demandeur.pk:
             if "role" in attrs and attrs["role"] != self.instance.role:
@@ -131,7 +139,42 @@ class MembreResumeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Membre
-        fields = ["id", "nom_complet", "telephone", "carte_numero", "photo"]
+        fields = ["id", "nom_complet", "telephone", "carte_numero", "photo", "sans_compte"]
+
+
+class MembreSansCompteSerializer(serializers.ModelSerializer):
+    """Membre ajouté par la Finance sans compte sur la plateforme (téléphone facultatif)."""
+
+    class Meta:
+        model = Membre
+        fields = ["id", "nom_complet", "telephone", "adresse", "carte_numero", "sans_compte"]
+        read_only_fields = ["id", "carte_numero", "sans_compte"]
+        extra_kwargs = {"telephone": {"required": False, "allow_blank": True}}
+
+    def validate_nom_complet(self, valeur):
+        valeur = " ".join(valeur.split())
+        if len(valeur) < 2:
+            raise serializers.ValidationError("Écrivez le prénom et le nom.")
+        return valeur
+
+    def validate_telephone(self, valeur):
+        if not (valeur or "").strip():
+            return ""
+        return valider_telephone_unique(valeur, self.instance)
+
+    def create(self, validated_data):
+        import uuid
+
+        membre = Membre(
+            username=f"sans-compte-{uuid.uuid4().hex[:12]}",
+            nom_complet=validated_data["nom_complet"],
+            telephone=validated_data.get("telephone", ""),
+            adresse=validated_data.get("adresse", ""),
+            sans_compte=True,
+        )
+        membre.set_unusable_password()  # ne peut pas se connecter
+        membre.save()
+        return membre
 
 
 class CarteVerificationSerializer(serializers.ModelSerializer):
@@ -153,7 +196,14 @@ class InscriptionSerializer(serializers.ModelSerializer):
         extra_kwargs = {"langue_preferee": {"required": False}}
 
     def validate_telephone(self, valeur):
-        return valider_telephone_unique(valeur)
+        valeur = valider_telephone(valeur)
+        existants = Membre.objects.filter(Q(telephone=valeur) | Q(username=valeur))
+        # Un membre ajouté par la Finance sans compte, avec ce numéro : son inscription le rattache
+        # (il retrouve son numéro de carte et ses cotisations).
+        if existants.exclude(sans_compte=True).exists():
+            raise serializers.ValidationError("Ce numéro de téléphone est déjà utilisé.")
+        self._a_rattacher = existants.filter(sans_compte=True).first()
+        return valeur
 
     def validate(self, attrs):
         confirmation = attrs.pop("telephone_confirmation", "")
@@ -164,13 +214,14 @@ class InscriptionSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        membre = Membre(
-            username=validated_data["telephone"],
-            nom_complet=validated_data["nom_complet"],
-            telephone=validated_data["telephone"],
-            email=validated_data.get("email", ""),
-            langue_preferee=validated_data.get("langue_preferee", Membre.Langue.FR),
-        )
+        membre = getattr(self, "_a_rattacher", None) or Membre()
+        membre.username = validated_data["telephone"]
+        membre.nom_complet = validated_data["nom_complet"]
+        membre.telephone = validated_data["telephone"]
+        membre.email = validated_data.get("email", "")
+        membre.langue_preferee = validated_data.get("langue_preferee", Membre.Langue.FR)
+        membre.sans_compte = False
+        membre.is_active = True
         membre.set_password(validated_data["password"])
         membre.save()
         return membre

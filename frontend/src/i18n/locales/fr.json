@@ -421,7 +421,15 @@
     "aucuneCeMoisAide": "Générez les cotisations du mois pour tous les membres en un clic.",
     "supprimerTitre": "Archiver cette cotisation ?",
     "supprimerMessage": "La cotisation de {{nom}} sera mise aux archives. Vous pourrez la restaurer depuis « Archives ».",
-    "generees": "{{count}} cotisations créées"
+    "generees": "{{count}} cotisations créées",
+    "exporterExcel": "Exporter (Excel)",
+    "exportFait": "Fichier Excel {{annee}} téléchargé.",
+    "membreSansCompte": "Membre non inscrit",
+    "membreSansCompteAide": "Pour un membre du Dahira qui n'a pas de compte sur la plateforme (sans smartphone, par exemple). Il a ses cotisations comme les autres, mais ne se connecte pas. S'il s'inscrit un jour avec le même numéro, il retrouve son historique.",
+    "telephoneSansCompteAide": "Facultatif. Indiquez-le si possible : il permet de le relancer par WhatsApp et de retrouver son historique s'il s'inscrit plus tard.",
+    "ajouterMembre": "Ajouter le membre",
+    "sansCompteAjoute": "{{nom}} est ajouté, avec sa cotisation du mois.",
+    "sansCompte": "Sans compte"
   },
   "adminMedia": {
     "sousTitre": "Publiez et gérez les enseignements.",
