@@ -1,8 +1,11 @@
 import { motion } from "motion/react";
-
-import { VideoGuide } from "@/components/metier/VideoGuide";
-import { Compass, Lightbulb, Route } from "lucide-react";
+import { BookOpen, Compass, Headphones, Lightbulb, Route } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+
+import { CarteContenu } from "@/components/metier/Elements";
+import { aUneVideoGuide, VideoGuide } from "@/components/metier/VideoGuide";
+import { api, type ContenuMedia, type Paginated } from "@/lib/api";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { ElementAnime, ListeAnimee } from "@/components/ui/Divers";
@@ -13,15 +16,23 @@ export default function Biographie() {
   const { t } = useTranslation();
   const { parametres } = useParametres();
 
+  const [medias, setMedias] = useState<ContenuMedia[]>([]);
+
+  // Audios et vidéos publiés dans la médiathèque avec « Afficher sur la page Biographie ».
+  useEffect(() => {
+    api
+      .get<Paginated<ContenuMedia>>("/mediatheque/contenus/?sur_biographie=true&ordering=date_publication&page_size=50")
+      .then((res) => setMedias(res.data.results))
+      .catch(() => setMedias([]));
+  }, []);
+
+  // Seules les parties remplies dans les Paramètres du site s'affichent (aucun texte d'exemple).
   const sections = [
-    { icone: Route, titre: t("biographie.parcours"), texte: parametres.biographie_parcours || t("biographie.texteParcours") },
-    { icone: Compass, titre: t("biographie.vision"), texte: parametres.biographie_vision || t("biographie.texteVision") },
-    {
-      icone: Lightbulb,
-      titre: t("biographie.enseignements"),
-      texte: parametres.biographie_enseignements || t("biographie.texteEnseignements"),
-    },
-  ];
+    { icone: Route, titre: t("biographie.parcours"), texte: parametres.biographie_parcours },
+    { icone: Compass, titre: t("biographie.vision"), texte: parametres.biographie_vision },
+    { icone: Lightbulb, titre: t("biographie.enseignements"), texte: parametres.biographie_enseignements },
+  ].filter((s) => s.texte?.trim());
+  const pageVide = !sections.length && !medias.length && !aUneVideoGuide(parametres);
 
   return (
     <AppShell>
@@ -53,6 +64,14 @@ export default function Biographie() {
 
       <VideoGuide parametres={parametres} className="mx-auto mb-10 max-w-3xl" />
 
+      {pageVide && (
+        <div className="mx-auto flex max-w-xl flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-border-subtle px-6 py-10 text-center">
+          <BookOpen className="h-8 w-8 text-accent-primary" />
+          <p className="font-semibold text-text-primary">{t("biographie.bientot")}</p>
+          <p className="text-sm text-text-secondary">{t("biographie.bientotAide")}</p>
+        </div>
+      )}
+
       <ListeAnimee className="relative mx-auto flex max-w-3xl flex-col gap-6">
         {sections.map(({ icone: Icone, titre, texte }) => (
           <ElementAnime key={titre} className="relative flex gap-5">
@@ -70,6 +89,24 @@ export default function Biographie() {
           </ElementAnime>
         ))}
       </ListeAnimee>
+
+      {medias.length > 0 && (
+        <section className="mx-auto mt-10 max-w-3xl">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-text-primary">
+            <Headphones className="h-5 w-5 text-accent-primary" /> {t("biographie.ecouterRegarder")}
+          </h2>
+          <ListeAnimee className="flex flex-col gap-3">
+            {medias.map((c) => (
+              <ElementAnime key={c.id} className="flex flex-col gap-2">
+                <CarteContenu contenu={c} />
+                {c.type === "audio" && c.fichier && (
+                  <audio controls preload="none" src={c.fichier} className="h-10 w-full" />
+                )}
+              </ElementAnime>
+            ))}
+          </ListeAnimee>
+        </section>
+      )}
     </AppShell>
   );
 }

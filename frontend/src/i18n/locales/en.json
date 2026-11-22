@@ -109,11 +109,11 @@
   "biographie": {
     "titreGuide": "Religious guide of the Dahira",
     "parcours": "Journey",
-    "texteParcours": "Trained in the Mouride tradition through the teachings of Cheikh Ahmadou Bamba Mbacké, the Guide has devoted his life to passing on religious knowledge and to the spiritual support of the community.",
     "vision": "Vision",
-    "texteVision": "To bring the faithful together around the values of piety, work and solidarity carried by the Khidma, in continuity with the Cheikh's teaching.",
     "enseignements": "Teachings",
-    "texteEnseignements": "The Guide emphasises the daily practice of faith, the education of young people and mutual support within the Dahira, through talks, advice and answers to members' questions."
+    "bientot": "The Guide's biography will be available soon.",
+    "bientotAide": "It is being written with verified information.",
+    "ecouterRegarder": "Listen and watch"
   },
   "mediatheque": {
     "surTitre": "Teachings",
@@ -469,7 +469,9 @@
     "supprimerMessage": "“{{titre}}” will no longer be visible on the site. You can restore it from “Archives”.",
     "categorie": "Category (occasion)",
     "categoriePrecision": "Specify",
-    "categoriePrecisionExemple": "E.g. Kazu Rajab, Tamkharit…"
+    "categoriePrecisionExemple": "E.g. Kazu Rajab, Tamkharit…",
+    "surBiographie": "Also show on the Biography page",
+    "surBiographieAide": "The teaching appears in the “Listen and watch” part of the Guide's biography (an audio player is shown directly)."
   },
   "adminEv": {
     "sousTitre": "Create events and follow bus bookings.",
@@ -537,7 +539,9 @@
     "envoiEnCours": "Uploading: {{pourcent}}%",
     "motsNonTraduits": "Automatic translation",
     "motsNonTraduitsLabel": "Words never to translate",
-    "motsNonTraduitsAide": "One name, place or expression per line: they stay exactly as written in every language. Event locations, common names (Ndiaye, Fall, Moussa…), “Keur …”, “Darou …”, “Kourel” and years are already protected automatically."
+    "motsNonTraduitsAide": "One name, place or expression per line: they stay exactly as written in every language. Event locations, common names (Ndiaye, Fall, Moussa…), “Keur …”, “Darou …”, “Kourel” and years are already protected automatically.",
+    "biographieAide": "Write the Guide's verified biography here. To add audios or videos to the Biography page, publish them in the Media library and tick “Also show on the Biography page”.",
+    "partieVideMasquee": "Leave empty to hide this part."
   },
   "vocal": {
     "ouVocal": "Or send a voice message",

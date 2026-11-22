@@ -306,6 +306,8 @@ export interface ContenuMedia {
   nb_telechargements: number;
   aime: boolean;
   date_publication: string;
+  /** Affiché aussi sur la page Biographie. */
+  sur_biographie?: boolean;
 }
 
 export type ThemeQuestion = "jeune_ramadan" | "zakat" | "vie_dahira" | "autre";

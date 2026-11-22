@@ -109,11 +109,11 @@
   "biographie": {
     "titreGuide": "Guide religieux du Dahira",
     "parcours": "Parcours",
-    "texteParcours": "Formé dans la tradition mouride auprès des enseignements de Cheikh Ahmadou Bamba Mbacké, le Guide a consacré sa vie à la transmission du savoir religieux et à l'accompagnement spirituel de la communauté.",
     "vision": "Vision",
-    "texteVision": "Rassembler les fidèles autour des valeurs de piété, de travail et de solidarité portées par le Khidma, dans la continuité de l'enseignement du Cheikh.",
     "enseignements": "Enseignements",
-    "texteEnseignements": "Le Guide met l'accent sur la pratique quotidienne de la foi, l'éducation des jeunes et le soutien mutuel au sein du Dahira, à travers des causeries, des conseils et des réponses aux questions des membres."
+    "bientot": "La biographie du Guide sera bientôt disponible.",
+    "bientotAide": "Elle est en cours de rédaction avec des informations vérifiées.",
+    "ecouterRegarder": "Écouter et regarder"
   },
   "mediatheque": {
     "surTitre": "Enseignements",
@@ -469,7 +469,9 @@
     "supprimerMessage": "« {{titre}} » ne sera plus visible sur le site. Vous pourrez le restaurer depuis « Archives ».",
     "categorie": "Catégorie (occasion)",
     "categoriePrecision": "Précisez",
-    "categoriePrecisionExemple": "Ex. Kazu Rajab, Tamkharit…"
+    "categoriePrecisionExemple": "Ex. Kazu Rajab, Tamkharit…",
+    "surBiographie": "Afficher aussi sur la page Biographie",
+    "surBiographieAide": "L'enseignement apparaît dans la partie « Écouter et regarder » de la biographie du Guide (un lecteur audio s'affiche directement)."
   },
   "adminEv": {
     "sousTitre": "Créez les événements et suivez les réservations de bus.",
@@ -537,7 +539,9 @@
     "envoiEnCours": "Envoi : {{pourcent}} %",
     "motsNonTraduits": "Traduction automatique",
     "motsNonTraduitsLabel": "Mots à ne jamais traduire",
-    "motsNonTraduitsAide": "Un nom, un lieu ou une expression par ligne : ils restent écrits tels quels dans toutes les langues. Les lieux des événements, les noms courants (Ndiaye, Fall, Moussa…), « Keur … », « Darou … », « Kourel » et les années sont déjà protégés automatiquement."
+    "motsNonTraduitsAide": "Un nom, un lieu ou une expression par ligne : ils restent écrits tels quels dans toutes les langues. Les lieux des événements, les noms courants (Ndiaye, Fall, Moussa…), « Keur … », « Darou … », « Kourel » et les années sont déjà protégés automatiquement.",
+    "biographieAide": "Écrivez ici la biographie vérifiée du Guide. Pour ajouter des audios ou des vidéos sur la page Biographie, publiez-les dans la Médiathèque en cochant « Afficher aussi sur la page Biographie ».",
+    "partieVideMasquee": "Laissez vide pour ne pas afficher cette partie."
   },
   "vocal": {
     "ouVocal": "Ou envoyez un message vocal",

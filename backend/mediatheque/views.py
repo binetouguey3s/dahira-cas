@@ -20,7 +20,7 @@ class ContenuMediaViewSet(ArchivesMixin, viewsets.ModelViewSet):
     serializer_class = ContenuMediaSerializer
     permission_classes = [role_ou_lecture_seule(*ROLES_CONTENUS)]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
-    filterset_fields = ["type", "evenement", "auteur", "categorie"]
+    filterset_fields = ["type", "evenement", "auteur", "categorie", "sur_biographie"]
     search_fields = ["titre", "description", "auteur", "categorie_autre"]
     ordering_fields = ["date_publication", "nb_likes", "nb_telechargements", "titre"]
     roles_archives = ROLES_CONTENUS

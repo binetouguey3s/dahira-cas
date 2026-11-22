@@ -10,7 +10,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/Button";
 import { Badge, Card } from "@/components/ui/Card";
 import { ElementAnime, EnTete, ListeAnimee, Onglets, SqueletteListe, Vide } from "@/components/ui/Divers";
-import { Champ, Input, Select, Textarea } from "@/components/ui/Input";
+import { Champ, Input, Interrupteur, Select, Textarea } from "@/components/ui/Input";
 import { Confirmation, Modal } from "@/components/ui/Modal";
 import { Pagination, usePageLocale } from "@/components/ui/Pagination";
 import { useParametres } from "@/context/ParametresContext";
@@ -29,6 +29,7 @@ interface Formulaire {
   categorie: CategorieEvenement | "";
   categorie_autre: string;
   source: "fichier" | "lien";
+  sur_biographie: boolean;
 }
 
 const ACCEPT: Record<TypeContenu, string> = { audio: "audio/*", video: "video/*", texte: "" };
@@ -42,7 +43,7 @@ export default function AdminMediatheque() {
   const [filtre, setFiltre] = useState<"tous" | TypeContenu>("tous");
   const [recherche, setRecherche] = useState("");
   const [edition, setEdition] = useState<ContenuMedia | "nouveau" | null>(null);
-  const [form, setForm] = useState<Formulaire>({ titre: "", type: "audio", auteur: "", description: "", url_externe: "", evenement: "", categorie: "", categorie_autre: "", source: "fichier" });
+  const [form, setForm] = useState<Formulaire>({ titre: "", type: "audio", auteur: "", description: "", url_externe: "", evenement: "", categorie: "", categorie_autre: "", source: "fichier", sur_biographie: false });
   const [fichier, setFichier] = useState<File | null>(null);
   const [progression, setProgression] = useState<number | null>(null);
   const [aSupprimer, setASupprimer] = useState<ContenuMedia | null>(null);
@@ -64,7 +65,7 @@ export default function AdminMediatheque() {
     setFichier(null);
     setProgression(null);
     if (edition === "nouveau")
-      setForm({ titre: "", type: "audio", auteur: parametres.nom_guide, description: "", url_externe: "", evenement: "", categorie: "", categorie_autre: "", source: "fichier" });
+      setForm({ titre: "", type: "audio", auteur: parametres.nom_guide, description: "", url_externe: "", evenement: "", categorie: "", categorie_autre: "", source: "fichier", sur_biographie: false });
     else if (edition)
       setForm({
         titre: edition.titre,
@@ -76,6 +77,7 @@ export default function AdminMediatheque() {
         categorie: edition.categorie ?? "",
         categorie_autre: edition.categorie_autre ?? "",
         source: edition.url_externe && !edition.fichier ? "lien" : "fichier",
+        sur_biographie: !!edition.sur_biographie,
       });
   }, [edition, parametres.nom_guide]);
 
@@ -92,6 +94,7 @@ export default function AdminMediatheque() {
     donnees.append("evenement", form.evenement);
     donnees.append("categorie", form.categorie);
     donnees.append("categorie_autre", form.categorie === "autre" ? form.categorie_autre.trim() : "");
+    donnees.append("sur_biographie", form.sur_biographie ? "true" : "false");
     donnees.append("url_externe", form.type !== "texte" && form.source === "lien" ? form.url_externe.trim() : "");
     if (form.type !== "texte" && form.source === "fichier" && fichier) donnees.append("fichier", fichier);
     try {
@@ -374,6 +377,12 @@ export default function AdminMediatheque() {
           >
             {(id) => <Textarea id={id} rows={form.type === "texte" ? 10 : 4} value={form.description} onChange={maj("description")} />}
           </Champ>
+          <Interrupteur
+            coche={form.sur_biographie}
+            onChange={(v) => setForm((f) => ({ ...f, sur_biographie: v }))}
+            label={t("adminMedia.surBiographie")}
+            description={t("adminMedia.surBiographieAide")}
+          />
         </div>
       </Modal>
 

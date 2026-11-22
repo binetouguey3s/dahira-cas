@@ -25,6 +25,8 @@ class ContenuMedia(Archivable):
     evenement = models.ForeignKey(
         Evenement, on_delete=models.SET_NULL, null=True, blank=True, related_name="contenus"
     )
+    # Affiché aussi sur la page Biographie (audios / vidéos sur le Guide).
+    sur_biographie = models.BooleanField(default=False)
     nb_likes = models.PositiveIntegerField(default=0)
     nb_telechargements = models.PositiveIntegerField(default=0)
     date_publication = models.DateTimeField(auto_now_add=True)

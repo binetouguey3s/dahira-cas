@@ -142,16 +142,15 @@ export default function AdminSite() {
           </div>
           <Champ label={t("adminSite.nomGuide")}>{(id) => <Input id={id} value={form.nom_guide} onChange={maj("nom_guide")} />}</Champ>
           <Champ label={t("adminSite.titreGuide")}>{(id) => <Input id={id} value={form.titre_guide} onChange={maj("titre_guide")} />}</Champ>
-          <Champ label={t("biographie.parcours")} className="sm:col-span-2" aide={t("adminSite.videParDefaut")}>
-            {(id) => <Textarea id={id} rows={4} value={form.biographie_parcours} onChange={maj("biographie_parcours")} placeholder={t("biographie.texteParcours")} />}
+          <p className="-mb-1 text-sm text-text-secondary sm:col-span-2">{t("adminSite.biographieAide")}</p>
+          <Champ label={t("biographie.parcours")} className="sm:col-span-2" aide={t("adminSite.partieVideMasquee")}>
+            {(id) => <Textarea id={id} rows={6} value={form.biographie_parcours} onChange={maj("biographie_parcours")} />}
           </Champ>
-          <Champ label={t("biographie.vision")} className="sm:col-span-2">
-            {(id) => <Textarea id={id} rows={3} value={form.biographie_vision} onChange={maj("biographie_vision")} placeholder={t("biographie.texteVision")} />}
+          <Champ label={t("biographie.vision")} className="sm:col-span-2" aide={t("adminSite.partieVideMasquee")}>
+            {(id) => <Textarea id={id} rows={4} value={form.biographie_vision} onChange={maj("biographie_vision")} />}
           </Champ>
-          <Champ label={t("biographie.enseignements")} className="sm:col-span-2">
-            {(id) => (
-              <Textarea id={id} rows={3} value={form.biographie_enseignements} onChange={maj("biographie_enseignements")} placeholder={t("biographie.texteEnseignements")} />
-            )}
+          <Champ label={t("biographie.enseignements")} className="sm:col-span-2" aide={t("adminSite.partieVideMasquee")}>
+            {(id) => <Textarea id={id} rows={4} value={form.biographie_enseignements} onChange={maj("biographie_enseignements")} />}
           </Champ>
         </Section>
 

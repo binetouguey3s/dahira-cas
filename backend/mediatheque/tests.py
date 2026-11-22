@@ -71,3 +71,18 @@ class CategorieMediaTests(APITestCase):
 
     def test_categorie_inconnue_refusee(self):
         self.assertEqual(self.publier(categorie="nimporte").status_code, 400)
+
+
+class SurBiographieTests(APITestCase):
+    def test_filtre_et_ecriture(self):
+        from comptes.tests_utils import creer_membre
+        from mediatheque.models import ContenuMedia
+
+        ContenuMedia.objects.create(titre="Récit de vie", type="audio", auteur="Oustaz", url_externe="https://exemple.sn/a.mp3", sur_biographie=True)
+        ContenuMedia.objects.create(titre="Autre", type="texte", auteur="Oustaz", description="x")
+        data = self.client.get("/api/mediatheque/contenus/?sur_biographie=true").data
+        self.assertEqual([c["titre"] for c in data["results"]], ["Récit de vie"])
+        self.client.force_authenticate(creer_membre("+221770000031", role="admin_contenus"))
+        autre = ContenuMedia.objects.get(titre="Autre")
+        res = self.client.patch(f"/api/mediatheque/contenus/{autre.id}/", {"sur_biographie": True}, format="json")
+        self.assertTrue(res.data["sur_biographie"])

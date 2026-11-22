@@ -133,6 +133,8 @@ dans **Paramètres du site**.
 3. **Catégorie (occasion)** : Magal, Gamou, Nisfou Shabaan, Leylatul Khadr, Dahira, Causerie,
    ou **Autre** avec une précision libre (Kazu Rajab, Tamkharit…).
 4. **Événement lié** (facultatif) : la catégorie de l'événement est reprise automatiquement.
+   **Afficher aussi sur la page Biographie** : l'audio ou la vidéo apparaît dans la partie
+   « Écouter et regarder » de la biographie du Guide (autant que vous voulez).
 5. Description (traduite automatiquement dans les autres langues).
 
 La liste montre les « j'aime » et les téléchargements. **Modifier** (crayon) ou **Archiver**
@@ -221,7 +223,7 @@ visibles dans l'historique.
 | Section | Contenu |
 |---|---|
 | Identité du Dahira | Logo, nom, sigle (affiché sur les cartes de membre) |
-| Le Guide | Photo, nom, titre, textes de la biographie (parcours, vision, enseignements) |
+| Le Guide | Photo, nom, titre, textes de la biographie (parcours, vision, enseignements). Une partie laissée vide n'est pas affichée ; si tout est vide, la page indique que la biographie sera bientôt disponible |
 | Vidéo de présentation | Fichier ou lien YouTube / Vimeo, titre, affichage aussi sur l'accueil |
 | Citation du jour | Texte et auteur affichés sur l'accueil |
 | Traduction automatique | Liste des mots à ne jamais traduire |

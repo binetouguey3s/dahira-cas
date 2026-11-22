@@ -30,6 +30,7 @@ class ContenuMediaSerializer(serializers.ModelSerializer):
             "nb_telechargements",
             "aime",
             "date_publication",
+            "sur_biographie",
         ]
         read_only_fields = ["archive_le", "id", "nb_likes", "nb_telechargements", "date_publication"]
 
